@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Prompt:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --gov-navy: #1a365d;
+  --gov-navy-light: #2a4365;
+  --gov-gold: #d69e2e;
+  --gov-teal: #0d9488;
+}
+
+body {
+  font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-sarabun {
+  font-family: 'Sarabun', sans-serif;
+}
+
+.font-prompt {
+  font-family: 'Prompt', sans-serif;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* High Contrast Mode */
+.high-contrast {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+.high-contrast .bg-white {
+  background-color: #121212 !important;
+  color: #ffffff !important;
+  border-color: #444444 !important;
+}
+.high-contrast .text-govNavy,
+.high-contrast .text-slate-700,
+.high-contrast .text-slate-800 {
+  color: #fbbf24 !important;
+}
+
+/* A4 Screen Preview Paper */
+.a4-paper {
+  background: white;
+  width: 210mm;
+  min-height: 297mm;
+  padding: 15mm 15mm 15mm 15mm;
+  margin: 0 auto 2rem auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+  position: relative;
+}
+
+@media (max-width: 900px) {
+  .a4-paper {
+    width: 100%;
+    min-height: auto;
+    padding: 1rem;
+  }
+}
