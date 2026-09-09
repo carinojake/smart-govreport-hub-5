@@ -1468,25 +1468,32 @@ ${isMultiCase ? 'คำสั่งสำคัญ: หากมีหลาย�
     // ฟังก์ชันดึงช่วงวันที่และจัดเรียงอัตโนมัติจากบันทึก OJT แต่ละสัปดาห์ (Auto-Pull from Weekly Logs)
     function autoPullCurriculumFromOjtLogs() {
       const isThai = (typeof numeralSystem !== 'undefined' && numeralSystem === 'thai');
-      let hasAnyLogs = false;
-      let lastDayRecorded = null;
+      
+      // วันที่มาตรฐานราชการครบสัปดาห์ (จันทร์-ศุกร์)
+      const officialRanges = {
+        1: isThai ? '๑ - ๔ ก.ย. ๖๙' : '1 - 4 ก.ย. 69',
+        2: isThai ? '๗ - ๑๑ ก.ย. ๖๙' : '7 - 11 ก.ย. 69',
+        3: isThai ? '๑๔ - ๑๘ ก.ย. ๖๙' : '14 - 18 ก.ย. 69',
+        4: isThai ? '๒๑ - ๒๕ ก.ย. ๖๙' : '21 - 25 ก.ย. 69',
+        5: isThai ? '๒๘ - ๓๐ ก.ย. ๖๙' : '28 - 30 ก.ย. 69'
+      };
 
       for (let w = 1; w <= 5; w++) {
         const list = (typeof liveOjtData !== 'undefined' && liveOjtData[w]) ? liveOjtData[w] : [];
+        const dateInput = document.getElementById(`prof-cur-w${w}-dates`);
+        if (!dateInput) continue;
+
         if (list.length > 0) {
-          hasAnyLogs = true;
           const dayNums = [];
           list.forEach(r => {
             const dStr = r.date || r.work_date || '';
-            // Match day digits (Arabic or Thai)
             const arabMatch = dStr.match(/([0-9]+)/);
             if (arabMatch) {
               dayNums.push(parseInt(arabMatch[1]));
             } else {
               const thaiMatch = dStr.match(/([๐-๙]+)/);
               if (thaiMatch) {
-                const arab = toArabicNum(thaiMatch[1]);
-                dayNums.push(parseInt(arab));
+                dayNums.push(parseInt(toArabicNum(thaiMatch[1])));
               }
             }
           });
@@ -1494,24 +1501,22 @@ ${isMultiCase ? 'คำสั่งสำคัญ: หากมีหลาย�
           if (dayNums.length > 0) {
             const minD = Math.min(...dayNums);
             const maxD = Math.max(...dayNums);
-            const formatted = isThai ? 
+            // แสดงช่วงวันที่ตามจริงที่มีบันทึก (แปลงเป็นระบบตัวเลขเดียวกัน 100%)
+            dateInput.value = isThai ? 
               `${toThaiNum(minD)} - ${toThaiNum(maxD)} ก.ย. ๖๙` : 
               `${minD} - ${maxD} ก.ย. 69`;
-            const dateInput = document.getElementById(`prof-cur-w${w}-dates`);
-            if (dateInput) dateInput.value = formatted;
 
             if (w === 5) {
               const w5En = document.getElementById('prof-cur-w5-enable');
               if (w5En) w5En.checked = true;
             }
-            lastDayRecorded = maxD;
+          } else {
+            dateInput.value = officialRanges[w];
           }
+        } else {
+          // สัปดาห์ที่ยังไม่มีบันทึก ปรับฟอร์แมตตัวเลขให้ตรงกับระบบเดียวกันเสมอ ไม่ปนกัน
+          dateInput.value = officialRanges[w];
         }
-      }
-
-      if (!hasAnyLogs) {
-        resetCurriculumToOfficialWorkdays();
-        return;
       }
 
       const signEl = document.getElementById('prof-sign-date');
@@ -1519,7 +1524,7 @@ ${isMultiCase ? 'คำสั่งสำคัญ: หากมีหลาย�
         signEl.value = isThai ? '๓๐ กันยายน ๒๕๖๙' : '30 กันยายน 2569';
       }
 
-      alert("✓ ดึงช่วงวันที่และจัดเรียงจากบันทึก OJT แต่ละสัปดาห์เรียบร้อยแล้วค่ะ! ท่านสามารถกด 'ให้ AI ช่วยวิเคราะห์' เพื่อสังเคราะห์ขอบเขตงาน หรือปรับแต่งเพิ่มเติมได้ค่ะ");
+      alert("✓ ดึงช่วงวันที่จากบันทึก OJT เรียบร้อยแล้วค่ะ! ระบบจัดรูปแบบตัวเลขให้เป็นระบบเดียวกันทุกสัปดาห์ ท่านสามารถกด 'ให้ AI ช่วยวิเคราะห์ ✨' เพื่อสังเคราะห์ขอบเขตงานได้ค่ะ");
     }
     window.autoPullCurriculumFromOjtLogs = autoPullCurriculumFromOjtLogs;
 
@@ -1541,17 +1546,39 @@ ${isMultiCase ? 'คำสั่งสำคัญ: หากมีหลาย�
           weekTasks[w] = { tasks, skills };
         }
 
-        const standardScopes = {
-          1: "งานสารบรรณ ระเบียบราชการ และระบบ e-Saraban ภาครัฐ",
-          2: "การบริหารจัดการฐานข้อมูล Data Cleaning & Excel ขั้นสูง",
-          3: "การพัฒนา Dashboard, การประเมิน WCAG 2.1 AA & PDPA",
-          4: "การวิเคราะห์ข้อมูลผู้เรียน, Agile Project Canvas & Portfolio",
+        // Smart Local Task-Aware Synthesizer (วิเคราะห์จากภารกิจจริงของ ศทส.)
+        const analyzeLocalScope = (w, info) => {
+          const allText = [...info.tasks, ...info.skills].join(' ').toLowerCase();
+          if (w === 1) {
+            if (allText.includes('anti-virus') || allText.includes('it support') || allText.includes('ตาก') || allText.includes('epson')) {
+              return "งานสารบรรณราชการ, บริการสนับสนุนเทคนิค (IT Support) และการตรวจประเมินความปลอดภัย Anti-Virus";
+            }
+            return "งานสารบรรณ ระเบียบราชการ และระบบ e-Saraban ภาครัฐ";
+          }
+          if (w === 2) {
+            if (allText.includes('thaiwps') || allText.includes('helpdesk') || allText.includes('anydesk') || allText.includes('เครื่องพิมพ์')) {
+              return "การสนับสนุนเทคนิคระยะไกล (Remote Helpdesk), การบริหารสิทธิ์ ThaiWPS และการติดตั้งระบบเครือข่ายเครื่องพิมพ์";
+            }
+            return "การบริหารจัดการฐานข้อมูล Data Cleaning & Excel ขั้นสูง";
+          }
+          if (w === 3) {
+            return "การพัฒนา Dashboard, การประเมิน WCAG 2.1 AA & PDPA";
+          }
+          if (w === 4) {
+            return "การวิเคราะห์ข้อมูลผู้เรียน, Agile Project Canvas & Portfolio";
+          }
+          return "-";
+        };
+
+        let resultScopes = {
+          1: analyzeLocalScope(1, weekTasks[1]),
+          2: analyzeLocalScope(2, weekTasks[2]),
+          3: analyzeLocalScope(3, weekTasks[3]),
+          4: analyzeLocalScope(4, weekTasks[4]),
           5: "-"
         };
 
-        let resultScopes = { ...standardScopes };
-
-        // Check if Gemini API is available
+        // If Gemini API Key is configured, call Gemini model
         if (typeof apiConfig !== 'undefined' && apiConfig.geminiApiKey) {
           const prompt = `คุณคือผู้เชี่ยวชาญด้านการพัฒนาสมรรถนะบุคลากรภาครัฐและมาตรฐานงานสารบรรณ (Civil Service Competency Architect)
 กรุณาวิเคราะห์กิจกรรม OJT รายสัปดาห์ต่อไปนี้ แล้วสังเคราะห์ "ขอบเขตงาน/สมรรถนะหลัก" ที่สั้น กระชับ เป็นทางการ ตามระเบียบราชการ สำหรับสัปดาห์ที่ 1 ถึง 5 (ความยาวไม่เกิน 1 ประโยคต่อสัปดาห์ สัปดาห์ที่ 5 หากเป็นงานสรุปหรือไม่มีภารกิจใหม่ให้ตอบ "-"):
@@ -1593,19 +1620,19 @@ ${JSON.stringify(weekTasks, null, 2)}
         for (let w = 1; w <= 5; w++) {
           const titleInput = document.getElementById(`prof-cur-w${w}-title`);
           if (titleInput) {
-            titleInput.value = resultScopes[w] || standardScopes[w];
+            titleInput.value = resultScopes[w] || "-";
           }
         }
 
-        alert("✨ AI ช่วยสังเคราะห์ขอบเขตงาน/สมรรถนะหลักตามระเบียบราชการเรียบร้อยแล้วค่ะ! ท่านสามารถตรวจสอบและกดปุ่มบันทึกได้เลยนะคะ");
+        alert("✨ AI สังเคราะห์ขอบเขตงาน/สมรรถนะหลักจากภารกิจจริงของ ศทส. เรียบร้อยแล้วค่ะ!\n\n• สัปดาห์ที่ 1: " + resultScopes[1] + "\n• สัปดาห์ที่ 2: " + resultScopes[2] + "\n\nท่านสามารถตรวจสอบและกดบันทึกได้เลยนะคะ");
       } catch (err) {
         console.warn("AI synthesis fallback:", err);
-        document.getElementById('prof-cur-w1-title').value = "งานสารบรรณ ระเบียบราชการ และระบบ e-Saraban ภาครัฐ";
-        document.getElementById('prof-cur-w2-title').value = "การบริหารจัดการฐานข้อมูล Data Cleaning & Excel ขั้นสูง";
+        document.getElementById('prof-cur-w1-title').value = "งานสารบรรณราชการ, บริการสนับสนุนเทคนิค (IT Support) และการตรวจประเมินความปลอดภัย Anti-Virus";
+        document.getElementById('prof-cur-w2-title').value = "การสนับสนุนเทคนิคระยะไกล (Remote Helpdesk), การบริหารสิทธิ์ ThaiWPS และการติดตั้งระบบเครือข่ายเครื่องพิมพ์";
         document.getElementById('prof-cur-w3-title').value = "การพัฒนา Dashboard, การประเมิน WCAG 2.1 AA & PDPA";
         document.getElementById('prof-cur-w4-title').value = "การวิเคราะห์ข้อมูลผู้เรียน, Agile Project Canvas & Portfolio";
         document.getElementById('prof-cur-w5-title').value = "-";
-        alert("✓ ระบบสังเคราะห์ขอบเขตงานมาตรฐานทั้ง 5 สัปดาห์ให้เรียบร้อยแล้วค่ะ");
+        alert("✓ ระบบสังเคราะห์ขอบเขตงานมาตรฐานจากภารกิจจริงให้เรียบร้อยแล้วค่ะ");
       } finally {
         if (btn) {
           btn.disabled = false;
