@@ -1,231 +1,129 @@
 /**
- * 🏛️ SMART GOVREPORT HUB 2.5 - MASTER APPLICATION ORCHESTRATOR
- * เชื่อมประสาน 10 โมดูลหลักแบบ Zero-Bundler ES Modules
+ * Smart GovReport Hub 2.5 - Master Application Entrypoint
+ * เชื่อมต่อ Docker PostgreSQL (Port 5432) และบริหารจัดการ Modular Architecture
+ * ผู้พัฒนา: ทีม AI Agent (5.11 น้องฟ้า, 5.2 เซียน SA, 5.5 โค้ดเดอร์หลังบ้าน, 5.1 พี่ใหญ่ PM)
  */
 
-import { layout } from './modules/01-layout.js';
-import { storage } from './modules/02-storage.js';
-import { auth } from './modules/03-auth.js';
-import { logbook, toThaiNumber } from './modules/04-logbook.js';
-import { compressImageToDataUrl } from './modules/05-evidence.js';
-import { signature } from './modules/06-signature.js';
-import { dashboard } from './modules/07-dashboard.js';
-import { govDocs } from './modules/08-gov-docs.js';
-import { aiAssistant } from './modules/09-ai-assistant.js';
-import { syncHub } from './modules/10-sync-hub.js';
+import { dbApi } from './modules/02-db-api.js';
 
-class SmartGovApp25 {
-  constructor() {
-    this.currentWeek = 1;
-    this.profile = {
-      traineeName: '',
-      orgName: 'ศูนย์เทคโนโลยีสารสนเทศและการสื่อสาร สำนักงานปลัดกระทรวงยุติธรรม',
-      supervisorName: '',
-      supervisorPos: ''
+console.log('🚀 [Smart GovReport Hub 2.5] Initializing Modular Application...');
+
+// 1. ตรวจสอบการเชื่อมต่อ Docker PostgreSQL 5432 ทันทีที่โหลด
+window.addEventListener('DOMContentLoaded', async () => {
+  console.log('🏛️ [App] DOM Loaded - Starting PostgreSQL 5432 telemetry...');
+  
+  // เริ่ม Polling เช็กสุขภาพของ Docker PostgreSQL 5432 ผ่าน FastAPI
+  dbApi.startPolling();
+
+  // ดึงข้อมูล State สมบูรณ์จาก PostgreSQL เพื่อทำ Client Hydration
+  try {
+    const pgState = await dbApi.fetchFullState();
+    if (pgState && pgState.reports && pgState.reports.length > 0) {
+      console.log(`📦 [App] Hydrating ${pgState.reports.length} reports from PostgreSQL 5432 into local memory...`);
+      
+      // ผสานข้อมูลเข้ากับ liveOjtData
+      if (typeof window.liveOjtData !== 'undefined') {
+        pgState.reports.forEach(r => {
+          const key = `w${r.week_num}_d${r.work_date}`;
+          window.liveOjtData[key] = {
+            id: key,
+            weekNum: r.week_num,
+            date: r.work_date,
+            hours: r.hours,
+            title: r.tasks,
+            desc: r.tasks,
+            knowledge: r.knowledge_skills,
+            problems: r.problems,
+            category: r.category,
+            status: r.status,
+            isLocked: r.is_locked
+          };
+        });
+        
+        // สั่งให้อัปเดต UI หน้าจอ
+        if (typeof window.renderRoleDashboard === 'function') {
+          window.renderRoleDashboard();
+        }
+        if (typeof window.renderOjtLog === 'function') {
+          window.renderOjtLog();
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('⚠️ [App] Hydration warning:', e);
+  }
+
+  // Hook ระบบ Auto-Save เข้าสู่ Docker PostgreSQL
+  setupPostgresAutoSync();
+});
+
+/**
+ * ติดตั้ง Interceptor ดักฟังเหตุการณ์การบันทึกข้อมูลเพื่อส่งเข้า PostgreSQL 5432
+ */
+function setupPostgresAutoSync() {
+  // ดักการบันทึก OJT Entry
+  const originalSaveEntry = window.saveOjtEntry;
+  if (typeof originalSaveEntry === 'function') {
+    window.saveOjtEntry = async function(...args) {
+      const result = originalSaveEntry.apply(this, args);
+      try {
+        // ดึงรายการที่เพิ่งบันทึกล่าสุดส่งเข้า PostgreSQL 5432
+        const daySelect = document.getElementById('entry-day-select');
+        const selectedId = daySelect ? daySelect.value : null;
+        if (selectedId && window.liveOjtData && window.liveOjtData[selectedId]) {
+          const entry = window.liveOjtData[selectedId];
+          await dbApi.saveReport(entry);
+        }
+      } catch (err) {
+        console.error('Error syncing to PostgreSQL:', err);
+      }
+      return result;
     };
-    this.ojtWeeks = {};
-    this.signatures = {};
   }
 
-  async init() {
-    console.log('🚀 [Smart GovReport Hub 2.5] Initializing 10 Modular Engines...');
-    layout.init();
-    await storage.init();
-
-    // 1. โหลดข้อมูล Profile (Clean Slate if not found)
-    const storedProfile = await storage.get('profile', 'main');
-    if (storedProfile) {
-      this.profile = storedProfile;
-    }
-
-    // 2. โหลดข้อมูล OJT Weeks
-    for (let w = 1; w <= 5; w++) {
-      const storedWeek = await storage.get('ojt_weeks', String(w));
-      if (storedWeek) {
-        this.ojtWeeks[w] = storedWeek;
-      } else {
-        // Clean Slate Template
-        this.ojtWeeks[w] = logbook.getCleanWeekTemplate(w);
+  // ดักการบันทึก Signature Pad
+  const originalSaveSig = window.saveSignaturePad;
+  if (typeof originalSaveSig === 'function') {
+    window.saveSignaturePad = async function(...args) {
+      const result = originalSaveSig.apply(this, args);
+      try {
+        const weekNum = window.currentOjtWeek || 1;
+        const role = window.activeSignatureRole || 'trainee';
+        const canvas = document.getElementById('signature-pad');
+        if (canvas) {
+          const imgData = canvas.toDataURL('image/png');
+          await dbApi.saveSignature(weekNum, role, imgData);
+        }
+      } catch (err) {
+        console.error('Error syncing signature to PostgreSQL:', err);
       }
-    }
-
-    // 3. ตรวจสอบสถานะ Server Database (PostgreSQL / SQLite)
-    this.checkServerHealth();
-
-    // 4. ผูกเหตุการณ์บนหน้าจอ
-    this.bindEvents();
-
-    // 5. Render หน้าจอ
-    this.render();
-    console.log('✅ [Smart GovReport Hub 2.5] Application Ready 100%!');
-  }
-
-  async checkServerHealth() {
-    const health = await syncHub.checkServerDatabaseHealth();
-    const badge = document.getElementById('server-status-badge');
-    if (badge) {
-      if (health.status === 'online') {
-        badge.className = 'px-2.5 py-1 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center space-x-1.5';
-        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span>Server: ${health.database || 'PostgreSQL'} Ready</span>`;
-      } else {
-        badge.className = 'px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-600 text-slate-300 text-xs font-semibold flex items-center space-x-1.5';
-        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span><span>Local-First (IndexedDB Ready)</span>`;
-      }
-    }
-  }
-
-  bindEvents() {
-    // Week Switcher
-    const weekSelect = document.getElementById('week-selector');
-    if (weekSelect) {
-      weekSelect.addEventListener('change', (e) => {
-        this.currentWeek = parseInt(e.target.value, 10);
-        this.render();
-      });
-    }
-
-    // 1-Click Complete JSON Backup
-    const backupBtn = document.getElementById('btn-instant-backup-v25');
-    if (backupBtn) {
-      backupBtn.addEventListener('click', () => this.handleInstantBackup());
-    }
-
-    // Print
-    const printBtn = document.getElementById('btn-print-v25');
-    if (printBtn) {
-      printBtn.addEventListener('click', () => window.print());
-    }
-
-    // Tab Navigation
-    window.switchTab = (tabId) => layout.switchTab(tabId);
-    window.saveProfile = () => this.handleSaveProfile();
-    window.addDayEntry = () => this.handleAddDayEntry();
-    window.runAiSummary = () => this.handleAiSummary();
-  }
-
-  async handleInstantBackup() {
-    try {
-      const snapshot = await storage.exportFullSnapshot();
-      const dateStr = new Date().toISOString().slice(0, 10);
-      const name = (this.profile.traineeName || 'CleanSlate').replace(/\s+/g, '_');
-      const filename = `SmartGov_2.5_Complete_Backup_${name}_${dateStr}.json`;
-      syncHub.downloadJSONSnapshot(snapshot, filename);
-      layout.showToast(`✅ สำรองข้อมูลครบ 10 โมดูลสำเร็จ (${filename})`, 'success');
-    } catch (err) {
-      layout.showToast('เกิดข้อผิดพลาดในการสำรองข้อมูล: ' + err.message, 'error');
-    }
-  }
-
-  async handleSaveProfile() {
-    const traineeInput = document.getElementById('profile-trainee-name');
-    const orgInput = document.getElementById('profile-org-name');
-    const supInput = document.getElementById('profile-sup-name');
-    const supPosInput = document.getElementById('profile-sup-pos');
-
-    this.profile = {
-      traineeName: traineeInput?.value || '',
-      orgName: orgInput?.value || 'ศูนย์เทคโนโลยีสารสนเทศและการสื่อสาร สำนักงานปลัดกระทรวงยุติธรรม',
-      supervisorName: supInput?.value || '',
-      supervisorPos: supPosInput?.value || ''
+      return result;
     };
-
-    await storage.set('profile', 'main', this.profile);
-    layout.showToast('✅ บันทึกข้อมูลตั้งต้นเรียบร้อยแล้ว!', 'success');
-    this.render();
   }
 
-  async handleAddDayEntry() {
-    const currentWeekEntries = this.ojtWeeks[this.currentWeek] || [];
-    currentWeekEntries.push(logbook.getCleanDayTemplate(currentWeekEntries.length + 1));
-    this.ojtWeeks[this.currentWeek] = currentWeekEntries;
-    await storage.set('ojt_weeks', String(this.currentWeek), currentWeekEntries);
-    layout.showToast(`เพิ่มรายการวันที่ ${currentWeekEntries.length} เรียบร้อยแล้ว`, 'success');
-    this.render();
-  }
-
-  async handleAiSummary() {
-    const entries = this.ojtWeeks[this.currentWeek] || [];
-    const summary = await aiAssistant.summarizeWeek(this.currentWeek, entries);
-    const modalEl = document.getElementById('ai-summary-result');
-    if (modalEl) modalEl.innerText = summary;
-    layout.showToast('✨ Gemini AI สรุปรายงานสำเร็จ 3 บรรทัดทางการ', 'success');
-  }
-
-  render() {
-    // Header & Profile Rendering
-    const nameEl = document.getElementById('display-trainee-name');
-    if (nameEl) nameEl.innerText = this.profile.traineeName || '...................................................';
-
-    const orgEl = document.getElementById('display-org-name');
-    if (orgEl) orgEl.innerText = this.profile.orgName || '...................................................';
-
-    const supEl = document.getElementById('display-sup-name');
-    if (supEl) supEl.innerText = this.profile.supervisorName || '...................................................';
-
-    const supPosEl = document.getElementById('display-sup-pos');
-    if (supPosEl) supPosEl.innerText = this.profile.supervisorPos || '...................................................';
-
-    // Total hours calculation
-    const totalHours = logbook.calculateTotalHours(this.ojtWeeks);
-    const hoursEl = document.getElementById('total-hours-display');
-    if (hoursEl) {
-      hoursEl.innerText = `${totalHours.toFixed(1)} / 90.0 ชม. (${((totalHours / 90) * 100).toFixed(0)}%)`;
-    }
-
-    // Weekly Table Rendering
-    const weekEntries = this.ojtWeeks[this.currentWeek] || [];
-    const weekHours = logbook.calculateWeekHours(weekEntries);
-    const weekHoursSumEl = document.getElementById('week-hours-sum');
-    if (weekHoursSumEl) weekHoursSumEl.innerText = toThaiNumber(weekHours.toFixed(1));
-
-    const weekTitleEl = document.getElementById('current-week-label');
-    if (weekTitleEl) weekTitleEl.innerText = toThaiNumber(this.currentWeek);
-
-    const tbody = document.getElementById('ojt-table-body');
-    if (tbody) {
-      if (weekEntries.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="5" class="p-6 text-center text-slate-400 text-xs">
-              ยังไม่มีบันทึกในสัปดาห์นี้ คลิกปุ่ม "เพิ่มรายการบันทึกวันใหม่" ด้านบนเพื่อเริ่มบันทึก
-            </td>
-          </tr>
-        `;
-      } else {
-        tbody.innerHTML = weekEntries.map((day, idx) => `
-          <tr class="hover:bg-slate-50 transition border-b border-slate-300">
-            <td class="border border-slate-400 p-2 text-center text-xs">
-              <input type="text" value="${day.date || ''}" placeholder="วว/ดด/ปปปป" class="w-full text-center bg-transparent border-none p-0 focus:ring-0 text-xs" onchange="window.app.updateDay(${idx}, 'date', this.value)">
-            </td>
-            <td class="border border-slate-400 p-2 text-center text-xs font-bold">
-              <input type="number" step="0.5" value="${day.hours || 4.5}" class="w-14 text-center bg-transparent border border-slate-200 rounded p-1 text-xs font-bold" onchange="window.app.updateDay(${idx}, 'hours', this.value)">
-            </td>
-            <td class="border border-slate-400 p-2 text-left text-xs">
-              <textarea placeholder="ระบุงานที่ปฏิบัติโดยย่อ..." class="w-full bg-transparent border-none p-0 focus:ring-0 text-xs resize-none" rows="2" onchange="window.app.updateDay(${idx}, 'title', this.value)">${day.title || ''}</textarea>
-            </td>
-            <td class="border border-slate-400 p-2 text-left text-xs">
-              <textarea placeholder="ระบุความรู้หรือทักษะที่ได้รับ..." class="w-full bg-transparent border-none p-0 focus:ring-0 text-xs resize-none" rows="2" onchange="window.app.updateDay(${idx}, 'knowledge', this.value)">${day.knowledge || ''}</textarea>
-            </td>
-            <td class="border border-slate-400 p-2 text-center text-xs">
-              <input type="text" value="${day.problem || 'ไม่มี'}" class="w-full text-center bg-transparent border-none p-0 focus:ring-0 text-xs text-slate-500" onchange="window.app.updateDay(${idx}, 'problem', this.value)">
-            </td>
-          </tr>
-        `).join('');
+  // ดักการส่งประเมินผลโดยพี่เลี้ยง
+  const originalSubmitDecision = window.submitSupervisorDecision;
+  if (typeof originalSubmitDecision === 'function') {
+    window.submitSupervisorDecision = async function(...args) {
+      const result = originalSubmitDecision.apply(this, args);
+      try {
+        const weekNum = window.currentOjtWeek || 1;
+        const scores = {
+          discipline: parseInt(document.getElementById('score-discipline')?.value || 5),
+          quality: parseInt(document.getElementById('score-quality')?.value || 5),
+          creativity: parseInt(document.getElementById('score-creativity')?.value || 5),
+          communication: parseInt(document.getElementById('score-communication')?.value || 5),
+          ethics: parseInt(document.getElementById('score-ethics')?.value || 5)
+        };
+        const grade = document.getElementById('eval-grade-select')?.value || 'A';
+        const comments = document.getElementById('eval-comments-text')?.value || 'ผ่านเกณฑ์ดีเยี่ยม';
+        await dbApi.saveEvaluation(weekNum, scores, grade, comments, true);
+      } catch (err) {
+        console.error('Error syncing evaluation to PostgreSQL:', err);
       }
-    }
-  }
-
-  async updateDay(idx, field, value) {
-    const entries = this.ojtWeeks[this.currentWeek] || [];
-    if (entries[idx]) {
-      entries[idx][field] = field === 'hours' ? parseFloat(value) || 0 : value;
-      this.ojtWeeks[this.currentWeek] = entries;
-      await storage.set('ojt_weeks', String(this.currentWeek), entries);
-      this.render();
-    }
+      return result;
+    };
   }
 }
 
-const app = new SmartGovApp25();
-window.app = app;
-document.addEventListener('DOMContentLoaded', () => app.init());
+console.log('✅ [Smart GovReport Hub 2.5] Modular Loader Ready & Docker PostgreSQL hooks active.');
