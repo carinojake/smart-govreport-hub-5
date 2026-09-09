@@ -310,8 +310,8 @@
         const timeStr = now.toTimeString().slice(0, 8).replace(/:/g, '');
 
         const payload = {
-          app: "Smart GovReport Hub 2.0",
-          version: "2.0.0",
+          app: "Smart GovReport Hub 2.5",
+          version: "2.5.0",
           backupType: "COMPLETE_EMERGENCY_BACKUP",
           exportedAt: now.toISOString(),
           exportedBy: session ? (session.full_name || session.username) : traineeName,
@@ -352,8 +352,8 @@
         return;
       }
       const payload = {
-        app: "Smart GovReport Hub 2.0",
-        version: "2.0.0",
+        app: "Smart GovReport Hub 2.5",
+        version: "2.5.0",
         exportedAt: new Date().toISOString(),
         profile: profileData,
         projectSummary: projectSummaryData,
@@ -1703,7 +1703,7 @@
 
     // Handle Logout
     function handleLogout() {
-      if (confirm('ยืนยันการออกจากระบบ Smart GovReport Hub 2.0?')) {
+      if (confirm('ยืนยันการออกจากระบบ Smart GovReport Hub 2.5?')) {
         const m1 = document.getElementById('member-management-modal');
         if (m1) m1.classList.add('hidden');
         const m2 = document.getElementById('security-modal');

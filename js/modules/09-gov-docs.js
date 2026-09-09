@@ -298,7 +298,7 @@
       if (dateEl) dateEl.innerText = officialMemoData.date || '3 กันยายน 2569';
 
       const subEl = document.getElementById('memo-subject');
-      if (subEl) subEl.innerText = officialMemoData.subject || 'รายงานผลการดำเนินงานโครงการพัฒนาระบบ Smart GovReport Hub 2.0 (เวอร์ชัน 1.0)';
+      if (subEl) subEl.innerText = officialMemoData.subject || 'รายงานผลการดำเนินงานโครงการพัฒนาระบบ Smart GovReport Hub 2.5 (เวอร์ชัน 1.0)';
 
       const recEl = document.getElementById('memo-recipient');
       if (recEl) recEl.innerText = officialMemoData.recipient || 'ผู้อำนวยการกลุ่มงานสารสนเทศและพัฒนาระบบ / ผู้ควบคุมการฝึกงาน';

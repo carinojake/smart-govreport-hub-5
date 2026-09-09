@@ -1093,7 +1093,7 @@
       fetch(`${API_BASE_URL}/api/health`)
         .then(res => res.json())
         .then(data => {
-          console.log('✅ Smart GovReport Hub 2.0 Core Connected:', data);
+          console.log('✅ Smart GovReport Hub 2.5 Core Connected:', data);
           fetchBackupHistory();
         })
         .catch(err => console.log('FastAPI offline or waiting to start.'));
