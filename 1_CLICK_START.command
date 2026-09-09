@@ -28,6 +28,18 @@ for PORT in ${FRONTEND_PORT} ${BACKEND_PORT}; do
     fi
 done
 
+# 1.5 ตรวจสอบและสตาร์ท Docker PostgreSQL 5432 หากยังไม่ได้รัน
+echo "🐘 ตรวจสอบ Docker PostgreSQL (Port 5432)..."
+if command -v docker >/dev/null 2>&1; then
+    if ! docker ps --filter "name=smartgov_postgres" --format '{{.Names}}' | grep -q "smartgov_postgres"; then
+        echo "⚡ กำลังสตาร์ท Docker PostgreSQL container..."
+        docker start smartgov_postgres 2>/dev/null || docker run -d --name smartgov_postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=smartgov_v25 -p 5432:5432 -v smartgov_pgdata:/var/lib/postgresql/data postgres:16-alpine
+        sleep 2
+    else
+        echo "✅ Docker PostgreSQL พร้อมทำงานอยู่แล้ว"
+    fi
+fi
+
 # 2. เริ่มต้น FastAPI Backend Server (Port 8086)
 echo "⚡ กำลังสตาร์ท FastAPI Backend (Port ${BACKEND_PORT})..."
 cd "${BACKEND_DIR}" || exit 1
