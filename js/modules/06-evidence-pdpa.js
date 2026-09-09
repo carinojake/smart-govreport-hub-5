@@ -1514,13 +1514,9 @@ ${isMultiCase ? 'คำสั่งสำคัญ: หากมีหลาย�
         return;
       }
 
-      if (lastDayRecorded) {
-        const signEl = document.getElementById('prof-sign-date');
-        if (signEl) {
-          signEl.value = isThai ? 
-            `${toThaiNum(lastDayRecorded)} กันยายน ๒๕๖๙` : 
-            `${lastDayRecorded} กันยายน 2569`;
-        }
+      const signEl = document.getElementById('prof-sign-date');
+      if (signEl) {
+        signEl.value = isThai ? '๓๐ กันยายน ๒๕๖๙' : '30 กันยายน 2569';
       }
 
       alert("✓ ดึงช่วงวันที่และจัดเรียงจากบันทึก OJT แต่ละสัปดาห์เรียบร้อยแล้วค่ะ! ท่านสามารถกด 'ให้ AI ช่วยวิเคราะห์' เพื่อสังเคราะห์ขอบเขตงาน หรือปรับแต่งเพิ่มเติมได้ค่ะ");
