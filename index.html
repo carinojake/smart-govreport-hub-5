@@ -171,17 +171,38 @@
             </button>
           </div>
 
-          <!-- Demo / Quick Access Note -->
-          <div class="mt-4 p-3 bg-slate-50 rounded-2xl border border-slate-200 text-center">
-            <p class="text-[10px] text-slate-500 leading-relaxed">
-              <i class="fa-solid fa-shield-cat text-govGold mr-1"></i> บัญชีทดสอบเริ่มต้น: 
-              Admin <code class="bg-white px-1 py-0.5 rounded border text-slate-700 font-mono">admin_ict / Admin@2026</code><br>
-              พี่เลี้ยง <code class="bg-white px-1 py-0.5 rounded border text-slate-700 font-mono">sup_sarinya / Sup@2026</code> | 
-              เด็กฝึกงาน <code class="bg-white px-1 py-0.5 rounded border text-slate-700 font-mono">trainee_jake / Trainee@2026</code>
-            </p>
-            <div class="mt-2.5 pt-2 border-t border-slate-200/80 flex flex-wrap items-center justify-center gap-2">
-              <span class="text-[11px] text-slate-600 font-medium">🎓 บัญชีผู้เข้าอบรม 37 ท่าน (card_001 - card_037):</span>
-              <button type="button" onclick="openCohortAccountsModal()" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-2xs">
+          <!-- Demo Sandbox / Quick Access Box (Auto-hidden on Production) -->
+          <div id="demo-credentials-box" class="mt-4 p-3.5 bg-gradient-to-br from-slate-50 to-blue-50/40 rounded-2xl border border-slate-200/90 text-center shadow-xs">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-200/70 mb-2.5">
+              <span class="inline-flex items-center space-x-1.5 text-[11px] font-bold text-govNavy">
+                <i class="fa-solid fa-flask-vial text-govGold"></i>
+                <span>โหมดทดสอบ (Demo Sandbox)</span>
+              </span>
+              <span class="text-[9px] font-mono text-emerald-700 bg-emerald-100/70 px-1.5 py-0.2 rounded-full border border-emerald-300/60">
+                1-Click Fast Login
+              </span>
+            </div>
+
+            <!-- 3 Quick Login Badges -->
+            <div class="grid grid-cols-3 gap-1.5 mb-2.5">
+              <button type="button" onclick="quickDemoLogin('admin')" class="px-2 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 text-slate-800 rounded-xl text-xs font-bold transition flex flex-col items-center justify-center gap-0.5 shadow-2xs hover:border-govNavy/40 group cursor-pointer" title="คลิกเพื่อเข้าสู่ระบบเป็น Admin ICT (admin_ict / Admin@2026)">
+                <span class="text-xs text-purple-600 group-hover:scale-110 transition"><i class="fa-solid fa-user-shield"></i></span>
+                <span class="text-[10px] tracking-tight">Admin ICT</span>
+              </button>
+              <button type="button" onclick="quickDemoLogin('supervisor')" class="px-2 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 text-slate-800 rounded-xl text-xs font-bold transition flex flex-col items-center justify-center gap-0.5 shadow-2xs hover:border-govNavy/40 group cursor-pointer" title="คลิกเพื่อเข้าสู่ระบบเป็น ผู้ควบคุมงาน (sup_sarinya / Sup@2026)">
+                <span class="text-xs text-blue-600 group-hover:scale-110 transition"><i class="fa-solid fa-user-tie"></i></span>
+                <span class="text-[10px] tracking-tight">พี่เลี้ยง</span>
+              </button>
+              <button type="button" onclick="quickDemoLogin('trainee')" class="px-2 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 text-slate-800 rounded-xl text-xs font-bold transition flex flex-col items-center justify-center gap-0.5 shadow-2xs hover:border-govNavy/40 group cursor-pointer" title="คลิกเพื่อเข้าสู่ระบบเป็น เด็กฝึกงาน (trainee_jake / Trainee@2026)">
+                <span class="text-xs text-emerald-600 group-hover:scale-110 transition"><i class="fa-solid fa-user-graduate"></i></span>
+                <span class="text-[10px] tracking-tight">เด็กฝึกงาน</span>
+              </button>
+            </div>
+
+            <!-- 37 Cohort Trainees Picker -->
+            <div class="pt-2 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-1.5">
+              <span class="text-[11px] text-slate-600 font-medium">🎓 ผู้เข้าอบรม 37 ท่าน:</span>
+              <button type="button" onclick="openCohortAccountsModal()" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-2xs cursor-pointer">
                 <i class="fa-solid fa-id-card-clip text-indigo-500"></i>
                 <span>เลือกเข้าสู่ระบบด่วน</span>
               </button>

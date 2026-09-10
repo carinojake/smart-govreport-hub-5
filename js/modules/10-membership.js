@@ -1150,8 +1150,59 @@
       if (userInput) userInput.value = username;
       if (passInput) passInput.value = 'Trainee@2026';
       closeCohortAccountsModal();
-      if (userInput) userInput.focus();
+      
+      const form = document.getElementById('login-form');
+      if (form) {
+        if (typeof form.requestSubmit === 'function') {
+          form.requestSubmit();
+        } else {
+          form.dispatchEvent(new Event('submit', { cancelable: true }));
+        }
+      }
     }
+    window.selectCohortAccount = selectCohortAccount;
+
+    function quickDemoLogin(role) {
+      const userInput = document.getElementById('login-username');
+      const passInput = document.getElementById('login-password');
+      if (!userInput || !passInput) return;
+
+      if (role === 'admin') {
+        userInput.value = 'admin_ict';
+        passInput.value = 'Admin@2026';
+      } else if (role === 'supervisor') {
+        userInput.value = 'sup_sarinya';
+        passInput.value = 'Sup@2026';
+      } else if (role === 'trainee') {
+        userInput.value = 'trainee_jake';
+        passInput.value = 'Trainee@2026';
+      }
+
+      const form = document.getElementById('login-form');
+      if (form) {
+        if (typeof form.requestSubmit === 'function') {
+          form.requestSubmit();
+        } else {
+          form.dispatchEvent(new Event('submit', { cancelable: true }));
+        }
+      }
+    }
+    window.quickDemoLogin = quickDemoLogin;
+
+    function initDemoSandboxMode() {
+      const box = document.getElementById('demo-credentials-box');
+      if (!box) return;
+      const host = window.location.hostname;
+      const isLocal = host === 'localhost' || host === '127.0.0.1' || host === '' || host === '0.0.0.0';
+      const hasDemoParam = new URLSearchParams(window.location.search).get('demo') === '1';
+
+      if (isLocal || hasDemoParam) {
+        box.classList.remove('hidden');
+      } else {
+        box.classList.add('hidden');
+      }
+    }
+    window.initDemoSandboxMode = initDemoSandboxMode;
 
 
     function saveLocalUsers(users) {
@@ -2521,5 +2572,6 @@
       changeOjtWeek();
       renderChart();
       checkAuthGuard();
+      initDemoSandboxMode();
     });
   
