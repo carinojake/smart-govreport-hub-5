@@ -960,7 +960,7 @@
         }
       }
 
-      const views = ['dashboard', 'ojt-log', 'project-summary', 'official-memo', 'portfolio-report', 'executive-overview'];
+      const views = ['dashboard', 'ojt-log', 'project-summary', 'official-memo', 'portfolio-report', 'executive-overview', 'audit-console', 'knowledge-base', 'photo-gallery'];
       views.forEach(v => {
         const el = document.getElementById('view-' + v);
         const btn = document.getElementById('btn-tab-' + v);
@@ -989,6 +989,12 @@
         renderPortfolio();
       } else if (tabId === 'executive-overview') {
         if (typeof renderExecutiveOverview === 'function') renderExecutiveOverview();
+      } else if (tabId === 'audit-console') {
+        if (typeof loadAuditLogs === 'function') loadAuditLogs();
+      } else if (tabId === 'knowledge-base') {
+        if (typeof renderKnowledgeBase === 'function') renderKnowledgeBase();
+      } else if (tabId === 'photo-gallery') {
+        if (typeof renderPhotoGallery === 'function') renderPhotoGallery();
       }
     }
 
@@ -1119,13 +1125,24 @@
       }, 150);
     }
 
-    function quickEditWeekDateRange() {
+    function quickEditWeekDateRange(customRange = null) {
       const weekSelect = document.getElementById('ojt-week-select');
       const w = parseInt(weekSelect ? weekSelect.value : 4) || 4;
       const curDates = (profileData.curriculum && profileData.curriculum[`w${w}`]?.dates) || '';
       
-      const newDates = prompt(`📅 กำหนด/แก้ไขช่วงวันที่สำหรับ สัปดาห์ที่ ${w}:`, curDates || 'เช่น 22 - 26 ก.ย. 69');
+      const newDates = customRange !== null ? customRange : prompt(`📅 กำหนด/แก้ไขช่วงวันที่สำหรับ สัปดาห์ที่ ${w}:`, curDates || 'เช่น 22 - 26 ก.ย. 69');
       if (newDates !== null && newDates.trim() !== '') {
+        // TC013: ตรวจสอบวันที่เริ่มต้นและสิ้นสุด
+        const dateParts = newDates.split(/[-–to]/);
+        if (dateParts.length >= 2) {
+          const d1 = extractDayNumber(dateParts[0]);
+          const d2 = extractDayNumber(dateParts[1]);
+          if (d1 !== 999 && d2 !== 999 && d2 < d1) {
+            alert("❌ วันที่สิ้นสุดต้องไม่เกิดขึ้นก่อนวันที่เริ่มต้น");
+            return;
+          }
+        }
+
         if (!profileData.curriculum) profileData.curriculum = {};
         if (!profileData.curriculum[`w${w}`]) profileData.curriculum[`w${w}`] = {};
         profileData.curriculum[`w${w}`].dates = newDates.trim();

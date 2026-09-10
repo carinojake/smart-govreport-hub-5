@@ -198,24 +198,49 @@
   <!-- Top Navigation Bar -->
   <header class="bg-govNavy text-white sticky top-0 z-40 shadow-md no-print">
     <div class="w-full max-w-[1680px] mx-auto px-3 sm:px-4 lg:px-6">
-      <div class="flex items-center justify-between h-16 gap-2">
+      <div class="flex items-center justify-between h-16 gap-3">
         
-        <!-- Logo & Brand -->
-        <div class="flex items-center space-x-2.5 flex-shrink-0 min-w-0">
-          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-govGold text-lg sm:text-xl shadow-inner flex-shrink-0">
+        <!-- Logo & Brand (Clean & Never Overlaps) -->
+        <div class="flex items-center space-x-3 flex-shrink-0 min-w-0 pr-2">
+          <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-govGold text-xl shadow-inner flex-shrink-0">
             <i class="fa-solid fa-file-signature"></i>
           </div>
-          <div class="min-w-0 flex flex-col justify-center">
-            <h1 class="font-bold text-sm sm:text-base lg:text-lg tracking-wide leading-tight whitespace-nowrap">Smart GovReport Hub 2.5</h1>
-            <p class="text-[11px] text-slate-300 truncate hidden xl:block">ระบบบริหารจัดการและจัดทำรายงานราชการอัจฉริยะ (รุ่นที่ 1)</p>
+          <div class="flex flex-col justify-center min-w-0">
+            <div class="flex items-center space-x-2">
+              <h1 class="font-extrabold text-base sm:text-lg tracking-wide leading-tight text-white whitespace-nowrap">
+                Smart GovReport Hub 2.5
+              </h1>
+              <span class="hidden sm:inline-block px-2 py-0.5 rounded-md bg-white/15 text-govGold text-[10px] font-bold border border-white/10 whitespace-nowrap">
+                บจอ 1
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-300 truncate hidden 2xl:block">
+              ศูนย์เทคโนโลยีสารสนเทศและการสื่อสาร (ศทส.) • สำนักงานปลัดกระทรวงยุติธรรม
+            </p>
           </div>
         </div>
 
-        <!-- Utility & Accessibility Tools -->
-        <div class="flex items-center justify-end space-x-1.5 sm:space-x-2 min-w-0 flex-1 overflow-x-auto no-scrollbar py-1">
+        <!-- Center: Dedicated Omnisearch Bar (Never collides with title) -->
+        <div class="hidden lg:flex items-center flex-1 max-w-xs mx-2">
+          <button onclick="openGlobalSearchModal()" class="w-full flex items-center justify-between bg-white/10 hover:bg-white/20 border border-white/20 text-slate-200 px-3.5 py-1.5 rounded-xl text-xs shadow-xs transition-all cursor-pointer group" title="สืบค้นทั่วทั้งระบบและคลังงานรุ่นพี่ (Ctrl + K)">
+            <span class="flex items-center space-x-2 truncate">
+              <i class="fa-solid fa-magnifying-glass text-govGold group-hover:scale-110 transition-transform"></i>
+              <span class="text-slate-300 truncate">ค้นหาผลงาน, งานรุ่นพี่...</span>
+            </span>
+            <span class="ml-2 bg-white/20 text-slate-200 text-[10px] font-mono px-1.5 py-0.5 rounded border border-white/20 flex-shrink-0">⌘K</span>
+          </button>
+        </div>
+
+        <!-- Utility & Accessibility Tools (Right Cluster) -->
+        <div class="flex items-center justify-end space-x-2 min-w-0 flex-shrink-0 py-1">
           
+          <!-- Compact Search Icon for Smaller Screens (< lg) -->
+          <button onclick="openGlobalSearchModal()" class="lg:hidden p-2 rounded-xl bg-white/10 hover:bg-white/20 text-govGold border border-white/20 text-xs flex items-center justify-center cursor-pointer flex-shrink-0" title="ค้นหาทั่วระบบ (Ctrl + K)">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+
           <!-- PostgreSQL 5432 Live Status Pill (Sleek Glassmorphic Badge) -->
-          <div id="pg-docker-pill" class="flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-[11px] text-emerald-300 font-medium shadow-sm backdrop-blur-md whitespace-nowrap flex-shrink-0 transition-all hover:bg-emerald-900/50 hover:border-emerald-400/40 cursor-pointer" title="Docker PostgreSQL 5432 เชื่อมต่อสมบูรณ์">
+          <div id="pg-docker-pill" class="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-emerald-950/70 border border-emerald-500/40 text-[11px] text-emerald-300 font-medium shadow-sm backdrop-blur-md whitespace-nowrap flex-shrink-0 transition-all hover:bg-emerald-900/60 cursor-pointer" title="Docker PostgreSQL 5432 เชื่อมต่อสมบูรณ์">
             <span class="relative flex h-2 w-2 flex-shrink-0">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
@@ -227,79 +252,140 @@
               <span class="bg-emerald-500/20 text-emerald-200 px-1.5 py-0.5 rounded text-[10px] font-mono border border-emerald-500/30">1 รายการ</span>
             </span>
           </div>
-          
+
+          <!-- DROPDOWN 1: ศูนย์ควบคุมระบบ (SYSTEM HUB) -->
+          <div class="relative">
+            <button id="btn-system-hub-toggle" onclick="toggleSystemHubDropdown(event)" class="bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-600 px-2.5 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition whitespace-nowrap flex-shrink-0 cursor-pointer" title="ศูนย์ควบคุมระบบและเครื่องมือสำรองข้อมูล">
+              <i class="fa-solid fa-sliders text-govGold"></i>
+              <span class="hidden md:inline">เครื่องมือระบบ</span>
+              <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-0.5"></i>
+            </button>
+
+            <!-- System Hub Dropdown Menu -->
+            <div id="system-hub-dropdown" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 space-y-1 z-50 text-slate-800">
+              <div class="px-3 py-1.5 border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                ศูนย์ควบคุมและสำรองข้อมูล
+              </div>
+              
+              <!-- SPRINT 1: Auto-Backup Shield Button -->
+              <button onclick="toggleSystemHubDropdown(); openBackupManagerModal();" id="header-backup-btn" class="w-full p-2 hover:bg-emerald-50 text-slate-700 rounded-xl text-xs font-semibold flex items-center justify-between transition text-left">
+                <span class="flex items-center space-x-2">
+                  <i class="fa-solid fa-shield-halved text-emerald-500 w-4 text-center"></i>
+                  <span>Auto-Backup 100%</span>
+                </span>
+                <span class="bg-emerald-100 text-emerald-700 text-[10px] px-1.5 py-0.5 rounded font-bold">ปลอดภัย</span>
+              </button>
+
+              <!-- JSON Complete Backup Button -->
+              <button onclick="toggleSystemHubDropdown(); downloadCompleteBackupJSON();" id="header-instant-backup-btn" class="w-full p-2 hover:bg-teal-50 text-slate-700 rounded-xl text-xs font-semibold flex items-center space-x-2 transition text-left">
+                <i class="fa-solid fa-file-arrow-down text-teal-600 w-4 text-center"></i>
+                <span>สำรองข้อมูลเป็น JSON ทันที</span>
+              </button>
+
+              <!-- API & LocalStorage Live Status Button -->
+              <button onclick="toggleSystemHubDropdown(); openApiSyncModal();" id="header-sync-btn" class="w-full p-2 hover:bg-blue-50 text-slate-700 rounded-xl text-xs font-semibold flex items-center justify-between transition text-left">
+                <span class="flex items-center space-x-2">
+                  <i class="fa-solid fa-cloud-arrow-up text-blue-600 w-4 text-center"></i>
+                  <span id="header-sync-label">LocalStorage: บันทึกแล้ว</span>
+                </span>
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              </button>
+
+              <div class="border-t border-slate-100 my-1"></div>
+
+              <!-- SPRINT 3: Executive Dashboard Quick Switch Button -->
+              <button onclick="toggleSystemHubDropdown(); switchTab('executive-overview');" id="header-executive-btn" class="w-full p-2 hover:bg-amber-50 text-slate-700 rounded-xl text-xs font-semibold flex items-center space-x-2 transition text-left">
+                <i class="fa-solid fa-chart-line text-amber-500 w-4 text-center"></i>
+                <span>เปิดหน้ารวมผู้บริหาร</span>
+              </button>
+
+              <!-- Audit Log Console Quick Switch Button -->
+              <button onclick="toggleSystemHubDropdown(); switchTab('audit-console');" id="header-audit-btn" class="w-full p-2 hover:bg-indigo-50 text-slate-700 rounded-xl text-xs font-semibold flex items-center space-x-2 transition text-left">
+                <i class="fa-solid fa-terminal text-indigo-500 w-4 text-center"></i>
+                <span>เปิดหน้า Audit Console</span>
+              </button>
+
+              <!-- Print / Export PDF -->
+              <button onclick="toggleSystemHubDropdown(); window.print();" class="w-full p-2 hover:bg-yellow-50 text-slate-700 rounded-xl text-xs font-semibold flex items-center space-x-2 transition text-left">
+                <i class="fa-solid fa-print text-yellow-600 w-4 text-center"></i>
+                <span>พิมพ์เอกสาร / ส่งออก PDF</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- DROPDOWN 2: การเข้าถึง (ACCESSIBILITY & PDPA) -->
+          <div class="relative">
+            <button id="btn-a11y-toggle" onclick="toggleA11yDropdown(event)" class="bg-blue-950/70 hover:bg-blue-900 text-blue-200 border border-blue-500/40 px-2.5 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition whitespace-nowrap flex-shrink-0 cursor-pointer" title="การเข้าถึงและโหมดพรางข้อมูล PDPA">
+              <i class="fa-solid fa-universal-access text-teal-300"></i>
+              <span class="hidden lg:inline">การเข้าถึง</span>
+              <i class="fa-solid fa-chevron-down text-[10px] text-blue-300/80 ml-0.5"></i>
+            </button>
+
+            <!-- A11y Dropdown Menu -->
+            <div id="a11y-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 space-y-2.5 z-50 text-slate-800">
+              <div class="border-b border-slate-100 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                ความสะดวกและการเข้าถึง (WCAG)
+              </div>
+
+              <!-- PDPA Privacy Mode Toggle Button -->
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-slate-700 flex items-center space-x-1.5">
+                  <i class="fa-solid fa-shield-halved text-blue-500"></i>
+                  <span>โหมด PDPA</span>
+                </span>
+                <button onclick="togglePdpaMode()" id="pdpa-toggle-btn" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center space-x-1">
+                  <span>สถานะ:</span>
+                  <span id="pdpa-status-label" class="font-extrabold text-blue-800">ปิด</span>
+                </button>
+              </div>
+
+              <!-- Text Resize Controls -->
+              <div class="flex items-center justify-between pt-1 border-t border-slate-100">
+                <span class="text-xs font-semibold text-slate-700">ขนาดตัวอักษร:</span>
+                <div class="bg-slate-100 rounded-lg p-0.5 flex items-center space-x-0.5 text-xs">
+                  <button onclick="changeFontSize('text-sm')" class="px-2 py-0.5 rounded hover:bg-white font-medium" title="ขนาดปกติ">A</button>
+                  <button onclick="changeFontSize('text-base')" class="px-2 py-0.5 rounded hover:bg-white font-semibold" title="ขนาดปานกลาง">A+</button>
+                  <button onclick="changeFontSize('text-lg')" class="px-2 py-0.5 rounded hover:bg-white font-bold" title="ขนาดใหญ่">A++</button>
+                </div>
+              </div>
+
+              <!-- High Contrast Toggle -->
+              <div class="flex items-center justify-between pt-1 border-t border-slate-100">
+                <span class="text-xs font-semibold text-slate-700">คอนทราสต์สูง:</span>
+                <button onclick="toggleContrast()" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs transition" title="สลับโหมดคอนทราสต์สูง">
+                  <i class="fa-solid fa-circle-half-stroke text-amber-500"></i>
+                  <span class="text-[11px] ml-1 font-semibold">สลับสี</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Member Management & Approval Button (Visible to Supervisor & Admin) -->
-          <button onclick="openMemberManagementModal()" id="btn-member-mgmt" class="hidden bg-purple-950/60 hover:bg-purple-900 text-purple-200 border border-purple-500/40 px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition whitespace-nowrap flex-shrink-0" title="จัดการรายชื่อและอนุมัติสมาชิกใหม่">
+          <button onclick="openMemberManagementModal()" id="btn-member-mgmt" class="hidden bg-purple-950/70 hover:bg-purple-900 text-purple-200 border border-purple-500/40 px-2.5 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition whitespace-nowrap flex-shrink-0 cursor-pointer" title="จัดการรายชื่อและอนุมัติสมาชิกใหม่">
             <i class="fa-solid fa-users-gear text-purple-400"></i>
             <span class="hidden md:inline">จัดการสมาชิก</span>
             <span id="pending-count-badge" class="hidden bg-amber-500 text-slate-900 text-[10px] px-1.5 py-0.2 rounded-full font-bold">0</span>
           </button>
 
-          <!-- User Display & Logout Button -->
-          <div id="user-display-container" class="hidden flex items-center space-x-1.5 bg-white/10 px-2 py-1.5 rounded-lg border border-white/10 text-xs whitespace-nowrap flex-shrink-0">
-            <i class="fa-solid fa-circle-user text-slate-300"></i>
-            <span id="user-display-name" class="font-semibold text-slate-200 truncate max-w-[90px] sm:max-w-[120px]">ผู้ใช้งาน</span>
-            <span id="user-display-role" class="bg-govGold/20 text-govGold text-[10px] px-1.5 py-0.5 rounded border border-govGold/30 hidden lg:inline">บทบาท</span>
-            <button onclick="handleLogout()" class="text-slate-400 hover:text-rose-300 ml-0.5 p-0.5 transition" title="ออกจากระบบ">
-              <i class="fa-solid fa-arrow-right-from-bracket"></i>
-            </button>
-          </div>
-
-          <!-- PDPA Privacy Mode Toggle Button -->
-          <button onclick="togglePdpaMode()" id="pdpa-toggle-btn" class="bg-blue-950/60 hover:bg-blue-900 text-blue-200 border border-blue-500/40 px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition whitespace-nowrap flex-shrink-0" title="คลิกเปิด/ปิดการเซ็นเซอร์ข้อมูลส่วนบุคคลตาม พ.ร.บ. PDPA">
-            <i class="fa-solid fa-shield-halved text-blue-400"></i>
-            <span id="pdpa-status-label" class="hidden lg:inline">PDPA: ปิด</span>
-          </button>
-
           <!-- Security Screen Lock & Role Switcher Button -->
-          <button onclick="openSecurityModal()" id="security-role-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition whitespace-nowrap flex-shrink-0" title="คลิกเพื่อล็อคหน้าจอ หรือสลับบทบาทด้วย PIN">
+          <button onclick="openSecurityModal()" id="security-role-btn" class="bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-600 px-2.5 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition whitespace-nowrap flex-shrink-0 cursor-pointer" title="คลิกเพื่อล็อคหน้าจอ หรือสลับบทบาทด้วย PIN">
             <i id="security-icon" class="fa-solid fa-lock-open text-emerald-400"></i>
             <span id="security-role-label" class="hidden md:inline">ผู้ฝึกงาน</span>
           </button>
 
-          <!-- SPRINT 1: Auto-Backup Shield Button -->
-          <button onclick="openBackupManagerModal()" id="header-backup-btn" class="bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/40 px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition whitespace-nowrap flex-shrink-0" title="ระบบสำรองฐานข้อมูลอัตโนมัติ 100% ป้องกันข้อมูลสูญหาย">
-            <i class="fa-solid fa-shield-halved text-emerald-400"></i>
-            <span class="hidden 2xl:inline">Auto-Backup:</span>
-            <span class="bg-emerald-500/20 text-emerald-300 text-[10px] px-1.5 py-0.5 rounded border border-emerald-500/30 font-medium">100% ปลอดภัย</span>
-          </button>
-
-          <!-- SPRINT 3: Executive Dashboard Quick Switch Button -->
-          <button onclick="switchTab('executive-overview')" id="header-executive-btn" class="bg-amber-950/60 hover:bg-amber-900 text-amber-300 border border-amber-500/40 px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition whitespace-nowrap flex-shrink-0" title="เปิดหน้า Executive Dashboard">
-            <i class="fa-solid fa-chart-line text-amber-400"></i>
-            <span class="hidden xl:inline">หน้ารวมผู้บริหาร</span>
-          </button>
-
-          <!-- API & LocalStorage Live Status Button -->
-          <button onclick="openApiSyncModal()" id="header-sync-btn" class="bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/30 px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition whitespace-nowrap flex-shrink-0" title="คลิกเพื่อจัดการการเชื่อมต่อ API / LocalStorage">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
-            <span id="header-sync-label" class="hidden xl:inline">LocalStorage: บันทึกแล้ว</span>
-            <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
-          </button>
-
-          <!-- Text Resize -->
-          <div class="bg-white/10 rounded-lg p-0.5 flex items-center space-x-0.5 text-xs flex-shrink-0 border border-white/10">
-            <button onclick="changeFontSize('text-sm')" class="px-1.5 py-1 rounded hover:bg-white/20 font-medium leading-none" title="ขนาดตัวอักษรปกติ">A</button>
-            <button onclick="changeFontSize('text-base')" class="px-1.5 py-1 rounded hover:bg-white/20 font-semibold leading-none" title="ขนาดตัวอักษรปานกลาง">A+</button>
-            <button onclick="changeFontSize('text-lg')" class="px-1.5 py-1 rounded hover:bg-white/20 font-bold leading-none" title="ขนาดตัวอักษรใหญ่">A++</button>
+          <!-- User Display & Logout Button -->
+          <div id="user-display-container" class="hidden flex items-center space-x-2 bg-white/10 px-2.5 py-1.5 rounded-xl border border-white/10 text-xs whitespace-nowrap flex-shrink-0">
+            <div class="flex items-center space-x-1.5">
+              <i class="fa-solid fa-circle-user text-slate-300"></i>
+              <span id="user-display-name" class="font-semibold text-slate-200 truncate max-w-[90px] sm:max-w-[120px]">ผู้ใช้งาน</span>
+              <span id="user-display-role" class="bg-govGold/20 text-govGold text-[10px] px-1.5 py-0.5 rounded border border-govGold/30 hidden lg:inline">บทบาท</span>
+            </div>
+            <button onclick="handleLogout()" class="bg-rose-500/20 hover:bg-rose-600 text-rose-200 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center space-x-1 border border-rose-500/30 cursor-pointer shadow-xs" title="คลิกเพื่อออกจากระบบ">
+              <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
+              <span>ออกจากระบบ</span>
+            </button>
           </div>
 
-          <!-- High Contrast Toggle -->
-          <button onclick="toggleContrast()" class="p-1.5 sm:p-2 rounded-lg bg-white/10 hover:bg-white/20 text-yellow-300 text-xs flex-shrink-0 border border-white/10 transition" title="สลับโหมดคอนทราสต์สูง">
-            <i class="fa-solid fa-circle-half-stroke"></i>
-          </button>
-
-          <!-- JSON Complete Backup Button (1-Click Emergency Instant Download) -->
-          <button onclick="downloadCompleteBackupJSON()" id="header-instant-backup-btn" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-xs flex items-center space-x-1.5 shadow transition-all whitespace-nowrap flex-shrink-0" title="ดาวน์โหลดสำรองข้อมูลทั้งหมดเป็นไฟล์ JSON ลงเครื่องทันที (1 วินาที)">
-            <i class="fa-solid fa-file-arrow-down"></i>
-            <span class="hidden sm:inline">สำรอง JSON</span>
-          </button>
-
-          <!-- Print / Export PDF -->
-          <button onclick="window.print()" class="bg-govGold hover:bg-yellow-600 text-slate-900 font-semibold px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-xs flex items-center space-x-1.5 shadow transition-all whitespace-nowrap flex-shrink-0">
-            <i class="fa-solid fa-print"></i>
-            <span class="hidden sm:inline">พิมพ์ / PDF</span>
-          </button>
         </div>
 
       </div>
@@ -314,16 +400,32 @@
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 sticky top-24 space-y-4">
         
         <!-- User Profile Card -->
-        <div class="p-3 bg-gradient-to-br from-slate-50 to-blue-50/50 rounded-xl border border-blue-100 flex items-center space-x-3">
-          <div id="sidebar-user-avatar" class="w-12 h-12 rounded-full bg-govNavy text-white flex items-center justify-center font-bold text-lg shadow flex-shrink-0">
-            <i id="sidebar-user-avatar-icon" class="fa-solid fa-user-tie"></i>
+        <div class="p-3 bg-gradient-to-br from-slate-50 to-blue-50/50 rounded-xl border border-blue-100 space-y-2.5">
+          <div class="flex items-center space-x-3">
+            <div id="sidebar-user-avatar" class="w-11 h-11 rounded-full bg-govNavy text-white flex items-center justify-center font-bold text-base shadow flex-shrink-0">
+              <i id="sidebar-user-avatar-icon" class="fa-solid fa-user-tie"></i>
+            </div>
+            <div class="min-w-0 flex-1 overflow-hidden">
+              <h2 id="sidebar-user-fullname" class="font-bold text-sm text-slate-800 truncate" title="ชื่อผู้ใช้งาน">คุณนิติพัฒน์ (พี่เจค)</h2>
+              <p id="sidebar-user-dept" class="text-xs text-govTeal font-medium truncate" title="สังกัด/หน่วยงาน">สายหลักสูตรขั้นสูง (BB 211)</p>
+              <p id="sidebar-user-role" class="text-[11px] text-slate-500 truncate" title="บทบาท">IT Specialist & Data Admin</p>
+            </div>
           </div>
-          <div class="min-w-0 flex-1 overflow-hidden">
-            <h2 id="sidebar-user-fullname" class="font-bold text-sm text-slate-800 truncate" title="ชื่อผู้ใช้งาน">คุณนิติพัฒน์ (พี่เจค)</h2>
-            <p id="sidebar-user-dept" class="text-xs text-govTeal font-medium truncate" title="สังกัด/หน่วยงาน">สายหลักสูตรขั้นสูง (BB 211)</p>
-            <p id="sidebar-user-role" class="text-[11px] text-slate-500 truncate" title="บทบาท">IT Specialist & Data Admin</p>
-          </div>
+          <!-- Quick Logout Button inside Profile Card -->
+          <button onclick="handleLogout()" class="w-full py-1.5 px-2.5 bg-white hover:bg-rose-50 text-rose-600 hover:text-rose-700 border border-rose-200 hover:border-rose-300 rounded-lg text-xs font-semibold flex items-center justify-center space-x-1.5 transition shadow-2xs cursor-pointer" title="ออกจากระบบ Smart GovReport Hub">
+            <i class="fa-solid fa-arrow-right-from-bracket text-rose-500 text-xs"></i>
+            <span>ออกจากระบบ (Sign Out)</span>
+          </button>
         </div>
+
+        <!-- Global Quick Search in Sidebar -->
+        <button onclick="openGlobalSearchModal()" class="w-full flex items-center justify-between bg-slate-50 hover:bg-blue-50/70 border border-slate-200 text-slate-600 px-3 py-2 rounded-xl text-xs transition cursor-pointer group shadow-2xs">
+          <span class="flex items-center space-x-2 min-w-0">
+            <i class="fa-solid fa-magnifying-glass text-govGold group-hover:scale-110 transition-transform"></i>
+            <span class="font-medium text-[11px] text-slate-700 truncate">ค้นหารายงาน, งานรุ่นพี่...</span>
+          </span>
+          <span class="bg-slate-200 text-slate-500 text-[10px] font-mono px-1.5 py-0.5 rounded ml-1">⌘K</span>
+        </button>
 
         <!-- Navigation Tabs -->
         <div>
@@ -372,6 +474,35 @@
               <div class="text-left">
                 <span class="block">รายงานสมรรถนะ Portfolio</span>
                 <span id="sidebar-portfolio-subtitle" class="text-[10px] text-slate-400 font-normal">แฟ้มสะสมผลงานและสมรรถนะ</span>
+              </div>
+            </button>
+
+            <button onclick="switchTab('audit-console')" id="btn-tab-audit-console" class="tab-btn w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-slate-100">
+              <i class="fa-solid fa-terminal w-5 text-center text-indigo-600"></i>
+              <div class="text-left">
+                <span class="block font-semibold">Audit Log Console</span>
+                <span class="text-[10px] text-slate-400 font-normal">ประวัติการทำงานระบบ & PDPA</span>
+              </div>
+            </button>
+
+            <!-- MODULE A: Senior Precedent Knowledge Base Navigation Button -->
+            <button onclick="switchTab('knowledge-base')" id="btn-tab-knowledge-base" class="tab-btn w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-slate-100">
+              <i class="fa-solid fa-book-open-reader w-5 text-center text-govGold"></i>
+              <div class="text-left flex-1 min-w-0">
+                <span class="block font-semibold">คลังสืบค้นงานรุ่นพี่</span>
+                <span class="text-[10px] text-slate-400 font-normal truncate block">Knowledge Base & แม่แบบ</span>
+              </div>
+            </button>
+
+            <!-- MODULE B: Photo Evidence & Activity Gallery Navigation Button -->
+            <button onclick="switchTab('photo-gallery')" id="btn-tab-photo-gallery" class="tab-btn w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-slate-100">
+              <i class="fa-solid fa-images w-5 text-center text-govTeal"></i>
+              <div class="text-left flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <span class="block font-semibold">คลังภาพหลักฐาน</span>
+                  <span id="sidebar-photo-count-badge" class="bg-govTealLight text-govTeal text-[10px] px-1.5 py-0.2 rounded-full font-bold">4</span>
+                </div>
+                <span class="text-[10px] text-slate-400 font-normal truncate block">ภาพถ่าย OJT & Before-After</span>
               </div>
             </button>
 
@@ -2050,6 +2181,360 @@
         </div>
 
       </section>
+
+      <!-- ========================================================================= -->
+      <!-- VIEW: AUDIT LOG CONSOLE (ศูนย์ตรวจสอบประวัติระบบหลังบ้าน) -->
+      <!-- ========================================================================= -->
+      <section id="view-audit-console" class="hidden space-y-4">
+        
+        <!-- Header Banner -->
+        <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-5 sm:p-6 rounded-2xl shadow-md border border-indigo-800/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 no-print">
+          <div class="flex items-center space-x-3.5">
+            <div class="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-300 text-2xl shadow-inner flex-shrink-0">
+              <i class="fa-solid fa-terminal"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="font-bold text-base sm:text-lg tracking-wide text-white">ศูนย์ตรวจสอบประวัติระบบหลังบ้าน (Audit Log Console)</h3>
+                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full font-semibold">Dual Engine v2.5</span>
+              </div>
+              <p class="text-xs text-slate-300 mt-0.5">ระบบบันทึกประวัติการทำงานแบบ Tamper-proof สอดคล้องตามระเบียบงานสารบรรณ พ.ร.บ.คอมพิวเตอร์ และ PDPA 2562</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="loadAuditLogs()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold shadow-sm transition flex items-center space-x-1.5 cursor-pointer" title="รีเฟรชข้อมูลล่าสุด">
+              <i class="fa-solid fa-rotate"></i>
+              <span>รีเฟรชสด</span>
+            </button>
+            <button onclick="exportAudit('csv')" class="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-indigo-200 border border-indigo-400/30 rounded-lg text-xs font-semibold transition flex items-center space-x-1.5 cursor-pointer" title="ส่งออกเป็นไฟล์ CSV">
+              <i class="fa-solid fa-file-csv text-emerald-400"></i>
+              <span>ส่งออก CSV</span>
+            </button>
+            <button onclick="exportAudit('json')" class="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-indigo-200 border border-indigo-400/30 rounded-lg text-xs font-semibold transition flex items-center space-x-1.5 cursor-pointer" title="ส่งออกเป็นไฟล์ JSON">
+              <i class="fa-solid fa-code text-amber-400"></i>
+              <span>ส่งออก JSON</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Role Guard Alert (shown only when Trainee tries to view) -->
+        <div id="audit-role-guard" class="hidden p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-shield-halved text-amber-600 text-base"></i>
+            <span><strong>การจำกัดสิทธิ์ (RBAC Notice):</strong> หน้านี้สงวนสิทธิ์สำหรับผู้ควบคุมงาน (Supervisor) และผู้ดูแลระบบ (Admin) เท่านั้น กรุณาสลับบัญชีหรือบทบาทเพื่อเข้าถึง</span>
+          </div>
+          <button onclick="switchTab('dashboard')" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-md font-semibold text-[11px] transition">
+            กลับหน้าหลัก
+          </button>
+        </div>
+
+        <!-- Audit Main Content Area -->
+        <div id="audit-main-content" class="space-y-4">
+          <!-- 4 KPI Summary Cards -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 no-print">
+            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
+              <div class="flex items-center justify-between text-slate-500 text-xs mb-1">
+                <span>บันทึกทั้งหมด (Total)</span>
+                <i class="fa-solid fa-database text-indigo-500"></i>
+              </div>
+              <div class="text-xl font-bold text-slate-800" id="stat-audit-total">0</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">กิจกรรมในระบบทั้งหมด</div>
+            </div>
+
+            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
+              <div class="flex items-center justify-between text-slate-500 text-xs mb-1">
+                <span>ความปลอดภัย / แจ้งเตือน</span>
+                <i class="fa-solid fa-triangle-exclamation text-rose-500"></i>
+              </div>
+              <div class="text-xl font-bold text-rose-600" id="stat-audit-alerts">0</div>
+              <div class="text-[10px] text-rose-500 mt-0.5">BOLA / PIN ผิดพลาด / Warning</div>
+            </div>
+
+            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
+              <div class="flex items-center justify-between text-slate-500 text-xs mb-1">
+                <span>การเปลี่ยนแปลงข้อมูล</span>
+                <i class="fa-solid fa-pen-to-square text-amber-500"></i>
+              </div>
+              <div class="text-xl font-bold text-amber-600" id="stat-audit-mutations">0</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">บันทึก OJT / ลบ / แก้ไข</div>
+            </div>
+
+            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
+              <div class="flex items-center justify-between text-slate-500 text-xs mb-1">
+                <span>การเข้าสู่ระบบ (Auth)</span>
+                <i class="fa-solid fa-key text-emerald-500"></i>
+              </div>
+              <div class="text-xl font-bold text-emerald-600" id="stat-audit-auth">0</div>
+              <div class="text-[10px] text-emerald-600 mt-0.5">Active Users: <span id="stat-audit-users" class="font-bold">0</span> คน</div>
+            </div>
+          </div>
+
+          <!-- Toolbar: Search & Filter -->
+          <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs flex flex-wrap items-center justify-between gap-2.5 no-print">
+            <div class="flex flex-wrap items-center gap-2 flex-1 min-w-[280px]">
+              <!-- Search Bar -->
+              <div class="relative flex-1 min-w-[180px]">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                <input type="text" id="audit-search-keyword" placeholder="ค้นหาตามเหตุการณ์, ผู้ใช้, IP หรือเนื้อหา..." class="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition" onkeyup="if(event.key==='Enter') loadAuditLogs()">
+              </div>
+
+              <!-- Category Filter -->
+              <select id="audit-filter-category" onchange="loadAuditLogs()" class="py-1.5 px-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:ring-1 focus:ring-indigo-500 focus:bg-white cursor-pointer">
+                <option value="ALL">หมวดหมู่ทั้งหมด</option>
+                <option value="AUTH">🔑 การยืนยันตัวตน (AUTH)</option>
+                <option value="DATA_MUTATION">📝 แก้ไขข้อมูล (DATA)</option>
+                <option value="SIGNATURE">✍️ การลงนาม (SIGNATURE)</option>
+                <option value="SECURITY">🛡️ ความมั่นคงปลอดภัย (SECURITY)</option>
+                <option value="EXPORT">📦 การส่งออก (EXPORT)</option>
+                <option value="COMPLIANCE">⚖️ การยินยอม (PDPA)</option>
+              </select>
+
+              <!-- Severity Filter -->
+              <select id="audit-filter-severity" onchange="loadAuditLogs()" class="py-1.5 px-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:ring-1 focus:ring-indigo-500 focus:bg-white cursor-pointer">
+                <option value="ALL">ทุกระดับความปลอดภัย</option>
+                <option value="SUCCESS">🟢 สำเร็จ (SUCCESS)</option>
+                <option value="INFO">🔵 ข้อมูลทั่วไป (INFO)</option>
+                <option value="WARN">🟡 ข้อควรระวัง (WARN)</option>
+                <option value="ALERT">🔴 แจ้งเตือนสกัดกั้น (ALERT)</option>
+                <option value="ERROR">⛔ ข้อผิดพลาด (ERROR)</option>
+              </select>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+              <button onclick="loadAuditLogs()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition cursor-pointer">
+                <i class="fa-solid fa-filter mr-1 text-slate-500"></i> กรองข้อมูล
+              </button>
+              <button onclick="resetAuditFilters()" class="px-2.5 py-1.5 bg-white hover:bg-slate-50 text-slate-500 border border-slate-200 rounded-lg text-xs font-semibold transition cursor-pointer" title="ล้างตัวกรอง">
+                <i class="fa-solid fa-arrows-rotate"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Audit Log Table Container -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse" id="audit-table">
+                <thead>
+                  <tr class="bg-slate-100/80 border-b border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
+                    <th class="py-2.5 px-3 w-12 text-center">#</th>
+                    <th class="py-2.5 px-3 w-40">วัน-เวลา (Timestamp)</th>
+                    <th class="py-2.5 px-3 w-36">ผู้ใช้งาน (User & Role)</th>
+                    <th class="py-2.5 px-3 w-32">หมวดหมู่ (Category)</th>
+                    <th class="py-2.5 px-3">เหตุการณ์ / ปฏิบัติการ (Event)</th>
+                    <th class="py-2.5 px-3 w-28">เป้าหมาย (Target)</th>
+                    <th class="py-2.5 px-3 w-24 text-center">ระดับ (Severity)</th>
+                    <th class="py-2.5 px-3 w-28 text-center">IP & Client</th>
+                    <th class="py-2.5 px-3 w-20 text-center">รายละเอียด</th>
+                  </tr>
+                </thead>
+                <tbody id="audit-table-body" class="divide-y divide-slate-100 text-slate-700">
+                  <tr>
+                    <td colspan="9" class="py-8 text-center text-slate-400">
+                      <i class="fa-solid fa-spinner fa-spin text-lg mb-2 text-indigo-500"></i>
+                      <div>กำลังโหลดประวัติการทำงานของระบบ...</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Table Footer / Pagination -->
+            <div class="p-3 bg-slate-50/70 border-t border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-500 gap-2">
+              <div class="flex items-center gap-1">
+                <span>แสดง <strong id="audit-showing-count" class="text-slate-800">0</strong> รายการ</span>
+                <span class="text-slate-400">•</span>
+                <span>มาตรฐานระบบ ISO/IEC 27001 & PDPA</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span id="audit-page-info" class="mr-2 text-[11px]">หน้า 1</span>
+                <button onclick="prevAuditPage()" id="btn-audit-prev" class="px-2.5 py-1 bg-white border border-slate-200 hover:bg-slate-100 rounded-md disabled:opacity-40 disabled:cursor-not-allowed">
+                  <i class="fa-solid fa-chevron-left text-[10px]"></i> ก่อนหน้า
+                </button>
+                <button onclick="nextAuditPage()" id="btn-audit-next" class="px-2.5 py-1 bg-white border border-slate-200 hover:bg-slate-100 rounded-md disabled:opacity-40 disabled:cursor-not-allowed">
+                  ถัดไป <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- TAB 7: SENIOR PRECEDENT KNOWLEDGE BASE (คลังสืบค้นงานรุ่นพี่) -->
+      <!-- ========================================================================= -->
+      <section id="view-knowledge-base" class="hidden space-y-6">
+        
+        <!-- Header Banner -->
+        <div class="bg-gradient-to-r from-govNavy via-slate-800 to-govNavyLight text-white rounded-2xl p-6 shadow-md border border-slate-700/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div class="space-y-1.5">
+            <div class="inline-flex items-center space-x-2 bg-white/10 px-3 py-1 rounded-full text-xs text-govGold font-semibold border border-white/10">
+              <i class="fa-solid fa-graduation-cap"></i>
+              <span>ศทส. กระทรวงยุติธรรม • ศูนย์คลังความรู้และแนวปฏิบัติรุ่นพี่</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight">
+              คลังสืบค้นข้อมูลและผลงานรุ่นพี่ (Senior Precedent Knowledge Base)
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-300">
+              ค้นหาแนวทางรายงาน, คำสั่งสคริปต์, เอกสารอ้างอิง และแม่แบบที่ผ่านการตรวจรับรองจากพี่เลี้ยง ศทส. เรียบร้อยแล้ว
+            </p>
+          </div>
+          <div class="flex items-center space-x-2 self-stretch md:self-auto">
+            <button onclick="downloadKbTemplate('AntiVirus_Audit_Report.xlsx', 'รายงานตรวจสอบช่องโหว่และ Antivirus')" class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold border border-white/20 transition flex items-center space-x-1.5 shadow-2xs">
+              <i class="fa-solid fa-file-excel text-emerald-400"></i>
+              <span>โหลด Template ล่าสุด</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Search & Category Filters Bar -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs space-y-3">
+          
+          <!-- Search Box -->
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+            <input type="text" id="kb-search-input" onkeyup="searchKnowledgeBase()" placeholder="ค้นหาผลงานและแนวทางจากรุ่นพี่... เช่น 'Antivirus', 'Docker 5432', 'สารบรรณ' หรือ 'คุณนิติพัฒน์'" class="w-full pl-10 pr-24 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-govNavy focus:border-transparent transition">
+            <span class="absolute right-3 top-2.5 text-[10px] font-mono bg-slate-200 text-slate-600 px-2 py-0.5 rounded border border-slate-300">
+              Live Filter
+            </span>
+          </div>
+
+          <!-- Category Chips -->
+          <div class="flex items-center justify-between flex-wrap gap-2 pt-1">
+            <div class="flex items-center flex-wrap gap-1.5" id="kb-filter-chips">
+              <button onclick="filterKnowledgeCategory('all')" data-cat="all" class="kb-filter-btn px-3 py-1.5 rounded-full text-xs font-bold bg-govNavy text-white shadow-xs transition">
+                ทั้งหมด (All)
+              </button>
+              <button onclick="filterKnowledgeCategory('security')" data-cat="security" class="kb-filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                🛡️ งาน Antivirus Audit & Security
+              </button>
+              <button onclick="filterKnowledgeCategory('docker')" data-cat="docker" class="kb-filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                🐳 งานติดตั้ง Docker & PostgreSQL 5432
+              </button>
+              <button onclick="filterKnowledgeCategory('saraban')" data-cat="saraban" class="kb-filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                📜 งานบันทึกสารบรรณภาครัฐ
+              </button>
+              <button onclick="filterKnowledgeCategory('hardware')" data-cat="hardware" class="kb-filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                🖥️ งานบำรุงรักษาคอมพิวเตอร์ ศทส.
+              </button>
+            </div>
+            <span id="kb-result-count" class="text-xs font-bold text-slate-500">
+              พบ 4 ผลงานที่ผ่านการรับรอง
+            </span>
+          </div>
+
+        </div>
+
+        <!-- Knowledge Cards Grid -->
+        <div id="kb-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          <!-- Dynamically populated by renderKnowledgeBase() -->
+        </div>
+
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- TAB 8: VISUAL EVIDENCE & PHOTO GALLERY (คลังภาพหลักฐาน) -->
+      <!-- ========================================================================= -->
+      <section id="view-photo-gallery" class="hidden space-y-6">
+        
+        <!-- Header Banner -->
+        <div class="bg-gradient-to-r from-teal-900 via-slate-800 to-govNavy text-white rounded-2xl p-6 shadow-md border border-slate-700/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div class="space-y-1.5">
+            <div class="inline-flex items-center space-x-2 bg-white/10 px-3 py-1 rounded-full text-xs text-teal-300 font-semibold border border-white/10">
+              <i class="fa-solid fa-camera"></i>
+              <span>ศทส. กระทรวงยุติธรรม • คลังภาพหลักฐานและการตรวจงานเชิงประจักษ์</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight">
+              คลังภาพถ่ายหลักฐานและกิจกรรมการปฏิบัติงาน (Visual Evidence Showcase)
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-300">
+              จัดแสดงภาพถ่ายการทำงานจริง, แท็กเปรียบเทียบ ก่อน-หลัง (Before & After), และกล่องข้อคิดเห็นชี้แนะจากพี่เลี้ยง
+            </p>
+          </div>
+          <div class="flex items-center space-x-2 self-stretch md:self-auto">
+            <label class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center space-x-2 shadow-xs cursor-pointer">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span>อัปโหลดภาพหลักฐานใหม่</span>
+              <input type="file" id="photo-gallery-file-input" accept="image/*" class="hidden" onchange="handlePhotoGalleryUpload(event)">
+            </label>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center flex-wrap gap-1.5">
+            <button onclick="filterPhotoCategory('all')" data-cat="all" class="photo-filter-btn px-3 py-1.5 rounded-full text-xs font-bold bg-govNavy text-white shadow-xs transition">
+              ทั้งหมด (All Photos)
+            </button>
+            <button onclick="filterPhotoCategory('before-after')" data-cat="before-after" class="photo-filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+              ⚡ ก่อนทำ vs หลังทำ (Before & After)
+            </button>
+            <button onclick="filterPhotoCategory('hardware')" data-cat="hardware" class="photo-filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+              🖥️ ฮาร์ดแวร์ & บำรุงรักษา
+            </button>
+            <button onclick="filterPhotoCategory('server')" data-cat="server" class="photo-filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+              🖧 เซิร์ฟเวอร์ & Data Center
+            </button>
+            <button onclick="filterPhotoCategory('document')" data-cat="document" class="photo-filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+              📁 งานสารบรรณ & สัญญา
+            </button>
+          </div>
+          <span id="photo-gallery-count" class="text-xs font-bold text-slate-500">
+            แสดงทั้งหมด 4 ภาพหลักฐาน
+          </span>
+        </div>
+
+        <!-- Photo Grid -->
+        <div id="photo-gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <!-- Dynamically populated by renderPhotoGallery() -->
+        </div>
+
+      </section>
+
+      <!-- Audit Detail JSON Modal -->
+      <div id="audit-detail-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4 no-print">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-5 shadow-2xl border border-slate-100 space-y-4 max-h-[85vh] flex flex-col">
+          <div class="flex items-center justify-between border-b pb-3">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+                <i class="fa-solid fa-file-lines"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-sm text-slate-800" id="audit-modal-title">รายละเอียดบันทึกการทำงาน (Audit Detail)</h4>
+                <p class="text-[11px] text-slate-400" id="audit-modal-subtitle">Log ID: -</p>
+              </div>
+            </div>
+            <button onclick="closeAuditModal()" class="w-7 h-7 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <div class="overflow-y-auto flex-1 space-y-3 text-xs">
+            <div class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
+              <div><span class="text-slate-400">วัน-เวลา:</span> <strong id="modal-audit-time" class="text-slate-800 block">-</strong></div>
+              <div><span class="text-slate-400">ผู้ดำเนินการ:</span> <strong id="modal-audit-user" class="text-slate-800 block">-</strong></div>
+              <div><span class="text-slate-400">หมวดหมู่ / เหตุการณ์:</span> <strong id="modal-audit-event" class="text-slate-800 block">-</strong></div>
+              <div><span class="text-slate-400">IP & User-Agent:</span> <strong id="modal-audit-ip" class="text-slate-800 block truncate">-</strong></div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-semibold text-slate-700">JSON Payload & Context (โครงสร้างข้อมูลดิบ):</span>
+                <button onclick="copyAuditJson()" class="text-[11px] text-indigo-600 hover:underline cursor-pointer">
+                  <i class="fa-solid fa-copy mr-0.5"></i> คัดลอก JSON
+                </button>
+              </div>
+              <pre id="modal-audit-json" class="p-3 bg-slate-900 text-indigo-200 rounded-xl font-mono text-[11px] overflow-x-auto max-h-60 leading-relaxed"></pre>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t flex justify-end">
+            <button onclick="closeAuditModal()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-semibold transition cursor-pointer">
+              ปิดหน้าต่าง
+            </button>
+          </div>
+        </div>
+      </div>
 
     </main>
 
@@ -4348,20 +4833,55 @@ function doGet(e) {
         </button>
       </div>
 
-      <!-- Current Mode Badge -->
-      <div class="flex items-center justify-between bg-slate-50 px-3 py-2 rounded-xl border border-slate-200 text-xs">
+      <!-- Search & Filter Toolbar -->
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-slate-50 p-2.5 rounded-2xl border border-slate-200 text-xs">
+        <div class="relative flex-1">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input type="text" id="mgmt-search-input" oninput="filterMembersTable()" placeholder="ค้นหาชื่อ, นามสกุล, username, หรืออีเมล..." class="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-600 transition">
+        </div>
+        <div class="flex items-center space-x-2">
+          <label for="mgmt-role-filter" class="text-slate-500 whitespace-nowrap text-[11px] font-medium"><i class="fa-solid fa-filter mr-1 text-slate-400"></i>บทบาท:</label>
+          <select id="mgmt-role-filter" onchange="filterMembersTable()" class="bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-600">
+            <option value="all">ทั้งหมดทุกบทบาท</option>
+            <option value="trainee">ผู้ฝึกงาน (Trainee)</option>
+            <option value="supervisor">ผู้ควบคุมงาน (Supervisor)</option>
+            <option value="advisor">อาจารย์นิเทศก์ (Advisor)</option>
+            <option value="staff">Admin / เจ้าหน้าที่ (Staff)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Current Mode Badge & Batch Action Bar -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-slate-50 px-3 py-2 rounded-xl border border-slate-200 text-xs gap-2">
         <div class="flex items-center space-x-2">
           <span class="text-slate-500">สถานะผู้ใช้งาน:</span>
           <span id="mgmt-view-badge" class="px-2 py-0.5 bg-govNavy text-white rounded-lg font-semibold text-[11px]">ผู้ควบคุมงาน</span>
+          <span class="text-slate-300">|</span>
+          <p class="text-slate-500 text-[11px]" id="mgmt-tab-desc">รายการคำขอสมัครสมาชิกใหม่ที่รอการอนุมัติ</p>
         </div>
-        <p class="text-slate-400 text-[11px]" id="mgmt-tab-desc">รายการคำขอสมัครสมาชิกใหม่ที่รอการอนุมัติ</p>
+        
+        <!-- Batch Actions (Visible in Pending Tab when items selected) -->
+        <div id="batch-actions-container" class="hidden items-center space-x-2 w-full sm:w-auto justify-end">
+          <span id="batch-selected-count" class="text-[11px] text-purple-700 font-bold bg-purple-50 px-2 py-0.5 rounded-lg border border-purple-200">เลือก 0 รายการ</span>
+          <button type="button" onclick="batchApproveMembers('approve')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-[11px] shadow-xs transition flex items-center space-x-1">
+            <i class="fa-solid fa-check-double text-xs"></i>
+            <span>อนุมัติที่เลือก</span>
+          </button>
+          <button type="button" onclick="batchApproveMembers('reject')" class="px-2.5 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-semibold text-[11px] transition flex items-center space-x-1">
+            <i class="fa-solid fa-trash-can text-xs"></i>
+            <span>ปฏิเสธที่เลือก</span>
+          </button>
+        </div>
       </div>
 
       <!-- Tab 1: Pending Table -->
       <div id="mgmt-panel-pending" class="flex-1 overflow-y-auto border border-slate-200 rounded-2xl">
         <table class="w-full text-left text-xs border-collapse">
-          <thead class="bg-slate-100 sticky top-0 text-slate-700 font-bold border-b">
+          <thead class="bg-slate-100 sticky top-0 text-slate-700 font-bold border-b z-10">
             <tr>
+              <th class="p-3 w-10 text-center">
+                <input type="checkbox" id="master-select-pending" onchange="toggleSelectAllPending(this)" class="rounded border-slate-300 text-purple-600 focus:ring-purple-500 cursor-pointer" title="เลือกทั้งหมด">
+              </th>
               <th class="p-3">ชื่อ - นามสกุล / Username</th>
               <th class="p-3">บทบาท</th>
               <th class="p-3">สังกัด / ความพิการ</th>
@@ -4378,12 +4898,13 @@ function doGet(e) {
       <!-- Tab 2: All Active Members & Supervisor Assignment (Admin Only) -->
       <div id="mgmt-panel-all" class="hidden flex-1 overflow-y-auto border border-slate-200 rounded-2xl">
         <table class="w-full text-left text-xs border-collapse">
-          <thead class="bg-slate-100 sticky top-0 text-slate-700 font-bold border-b">
+          <thead class="bg-slate-100 sticky top-0 text-slate-700 font-bold border-b z-10">
             <tr>
               <th class="p-3">ชื่อ - นามสกุล / บัญชี</th>
               <th class="p-3">บทบาท</th>
               <th class="p-3">สังกัด / หน่วยงาน</th>
               <th class="p-3">ผู้ควบคุมงาน / พี่เลี้ยงผู้ดูแล</th>
+              <th class="p-3 text-center">สถานะ</th>
               <th class="p-3 text-center">จัดการ</th>
             </tr>
           </thead>
@@ -4402,6 +4923,100 @@ function doGet(e) {
           ปิดหน้าต่าง
         </button>
       </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: EDIT MEMBER PROFILE (ADMIN / STAFF ONLY) -->
+  <!-- ========================================================================= -->
+  <div id="edit-member-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 overflow-y-auto no-print">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 my-8 space-y-4 max-h-[90vh] overflow-y-auto">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b pb-3">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-user-pen"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-800">แก้ไขข้อมูลสมาชิก</h3>
+            <p class="text-xs text-slate-500" id="edit-member-subtitle">แก้ไขข้อมูลโปรไฟล์และสังกัดของสมาชิก</p>
+          </div>
+        </div>
+        <button onclick="closeEditMemberModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Edit Form -->
+      <form id="edit-member-form" onsubmit="saveEditMemberProfile(event)" class="space-y-3.5 text-xs">
+        <input type="hidden" id="edit-member-username-hidden">
+
+        <div>
+          <label class="block text-slate-600 font-semibold mb-1">ชื่อบัญชีผู้ใช้ (Username)</label>
+          <input type="text" id="edit-member-username" disabled class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-slate-500 font-mono text-xs cursor-not-allowed">
+        </div>
+
+        <div>
+          <label for="edit-member-fullname" class="block text-slate-600 font-semibold mb-1">ชื่อ - นามสกุล <span class="text-red-500">*</span></label>
+          <input type="text" id="edit-member-fullname" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-800 text-xs focus:ring-2 focus:ring-purple-500/20 focus:border-purple-600">
+        </div>
+
+        <div>
+          <label for="edit-member-email" class="block text-slate-600 font-semibold mb-1">อีเมลติดต่อ <span class="text-red-500">*</span></label>
+          <input type="email" id="edit-member-email" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-800 text-xs focus:ring-2 focus:ring-purple-500/20 focus:border-purple-600">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="edit-member-role" class="block text-slate-600 font-semibold mb-1">บทบาทในระบบ <span class="text-red-500">*</span></label>
+            <select id="edit-member-role" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-800 text-xs bg-white focus:ring-2 focus:ring-purple-500/20 focus:border-purple-600">
+              <option value="trainee">ผู้ฝึกงาน (Trainee)</option>
+              <option value="supervisor">ผู้ควบคุมงาน (Supervisor)</option>
+              <option value="advisor">อาจารย์นิเทศก์ (Advisor)</option>
+              <option value="staff">Admin / เจ้าหน้าที่ (Staff)</option>
+            </select>
+          </div>
+          <div>
+            <label for="edit-member-status" class="block text-slate-600 font-semibold mb-1">สถานะบัญชี</label>
+            <select id="edit-member-status" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-800 text-xs bg-white focus:ring-2 focus:ring-purple-500/20 focus:border-purple-600">
+              <option value="active">ใช้งานปกติ (Active)</option>
+              <option value="suspended">ระงับสิทธิ์ชั่วคราว (Suspended)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="edit-member-department" class="block text-slate-600 font-semibold mb-1">สังกัด / กลุ่มงาน</label>
+          <input type="text" id="edit-member-department" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-800 text-xs focus:ring-2 focus:ring-purple-500/20 focus:border-purple-600">
+        </div>
+
+        <div>
+          <label for="edit-member-disability" class="block text-slate-600 font-semibold mb-1">ประเภทความพิการ (ถ้ามี)</label>
+          <select id="edit-member-disability" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-800 text-xs bg-white focus:ring-2 focus:ring-purple-500/20 focus:border-purple-600">
+            <option value="-">- ไม่มี / ทั่วไป -</option>
+            <option value="ทางการเคลื่อนไหวหรือทางร่างกาย">ทางการเคลื่อนไหวหรือทางร่างกาย</option>
+            <option value="ทางการมองเห็น">ทางการมองเห็น</option>
+            <option value="ทางการได้ยินหรือการสื่อความหมาย">ทางการได้ยินหรือการสื่อความหมาย</option>
+            <option value="ทางจิตใจหรือพฤติกรรม">ทางจิตใจหรือพฤติกรรม</option>
+            <option value="ทางสติปัญญา">ทางสติปัญญา</option>
+            <option value="ทางการเรียนรู้">ทางการเรียนรู้</option>
+            <option value="ออทิสติก">ออทิสติก</option>
+          </select>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex items-center justify-end space-x-2 pt-3 border-t">
+          <button type="button" onclick="closeEditMemberModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium transition">
+            ยกเลิก
+          </button>
+          <button type="submit" class="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white rounded-xl font-bold transition shadow-sm flex items-center space-x-1.5">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>บันทึกการแก้ไข</span>
+          </button>
+        </div>
+      </form>
 
     </div>
   </div>
@@ -4645,8 +5260,155 @@ function doGet(e) {
     </div>
   </div>
 
-  <!-- SPRINT 1, 2, 3 CONTROLLER SCRIPTS -->
+  <!-- ========================================================================= -->
+  <!-- LIGHTBOX PHOTO VIEWER & SUPERVISOR COMMENTS MODAL -->
+  <!-- ========================================================================= -->
+  <div id="photo-lightbox-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center hidden p-2 sm:p-4 no-print">
+    <div class="bg-white rounded-3xl max-w-5xl w-full overflow-hidden shadow-2xl border border-slate-700/50 flex flex-col lg:flex-row max-h-[92vh]">
+      
+      <!-- Left: Image Viewer with Zoom & Before-After Toggle -->
+      <div class="lg:w-7/12 bg-slate-900 flex flex-col justify-between p-4 relative select-none">
+        
+        <!-- Viewer Top Controls -->
+        <div class="flex items-center justify-between text-white text-xs z-10">
+          <!-- Before & After Switcher -->
+          <div id="lightbox-before-after-controls" class="hidden flex items-center bg-white/10 p-1 rounded-xl border border-white/10 space-x-1">
+            <button onclick="toggleLightboxBeforeAfter('before')" id="lightbox-btn-before" class="px-3 py-1 rounded-lg text-xs font-semibold bg-white/20 text-white hover:bg-white/30 transition">
+              ก่อนทำ (Before)
+            </button>
+            <button onclick="toggleLightboxBeforeAfter('after')" id="lightbox-btn-after" class="px-3 py-1 rounded-lg text-xs font-bold bg-emerald-500 text-white shadow transition">
+              หลังทำ (After)
+            </button>
+          </div>
+          <div></div>
 
+          <!-- Zoom Controls -->
+          <div class="flex items-center space-x-1 bg-white/10 px-2 py-1 rounded-xl border border-white/10">
+            <button onclick="zoomLightbox(-0.2)" class="w-7 h-7 rounded hover:bg-white/20 flex items-center justify-center text-sm" title="ย่อภาพ">
+              <i class="fa-solid fa-minus"></i>
+            </button>
+            <span id="lightbox-zoom-label" class="font-mono text-[11px] px-1">100%</span>
+            <button onclick="zoomLightbox(0.2)" class="w-7 h-7 rounded hover:bg-white/20 flex items-center justify-center text-sm" title="ขยายภาพ">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Center Image Viewport -->
+        <div class="flex-1 flex items-center justify-center overflow-hidden my-auto min-h-[280px]">
+          <img id="lightbox-img" src="" alt="ภาพหลักฐาน" class="max-h-[55vh] max-w-full object-contain rounded-xl shadow-lg transition-transform duration-200">
+        </div>
+
+        <!-- Viewer Bottom Note -->
+        <div class="text-[11px] text-slate-400 text-center z-10 flex items-center justify-center space-x-3">
+          <span><i class="fa-solid fa-arrows-up-down-left-right mr-1"></i>โหมดภาพขยายความคมชัดสูง</span>
+          <span>•</span>
+          <span>บีบอัดแบบ WebP อัตโนมัติ</span>
+        </div>
+
+      </div>
+
+      <!-- Right: Metadata & Supervisor Feedback Thread -->
+      <div class="lg:w-5/12 bg-white p-5 flex flex-col justify-between overflow-y-auto space-y-4">
+        
+        <!-- Modal Top Header -->
+        <div class="flex items-start justify-between border-b pb-3">
+          <div class="space-y-1 pr-2">
+            <div class="flex items-center space-x-1.5">
+              <span class="bg-govTealLight text-govTeal text-[10px] font-bold px-2 py-0.5 rounded-md">หลักฐานเชิงประจักษ์</span>
+              <span class="text-[11px] text-slate-400" id="lightbox-date">-</span>
+            </div>
+            <h3 class="text-base font-bold text-slate-900 leading-snug" id="lightbox-title">-</h3>
+          </div>
+          <button onclick="closePhotoLightbox()" class="w-8 h-8 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center transition flex-shrink-0">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+
+        <!-- Description & Author Details -->
+        <div class="space-y-2">
+          <p class="text-xs text-slate-600 leading-relaxed font-sarabun bg-slate-50 p-3 rounded-xl border border-slate-200" id="lightbox-caption">
+            -
+          </p>
+          <div class="grid grid-cols-2 gap-2 text-[11px]">
+            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+              <span class="text-slate-400 block text-[10px]">ผู้ปฏิบัติงาน</span>
+              <span class="font-bold text-slate-800 truncate block" id="lightbox-author">-</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-blue-50/60 border border-blue-100">
+              <span class="text-blue-500 block text-[10px]">พี่เลี้ยงผู้ควบคุมงาน</span>
+              <span class="font-bold text-govNavy truncate block" id="lightbox-supervisor">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Supervisor Comments Section -->
+        <div class="flex-1 flex flex-col space-y-2 min-h-[160px]">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
+              <i class="fa-regular fa-comment-dots text-govNavy"></i>
+              <span>ข้อคิดเห็นและการชี้แนะจากพี่เลี้ยง (Coordination)</span>
+            </h4>
+          </div>
+
+          <!-- Comments List Container -->
+          <div id="lightbox-comments-list" class="flex-1 space-y-2 overflow-y-auto max-h-[180px] pr-1">
+            <!-- Dynamically populated -->
+          </div>
+
+          <!-- Comment Input Form -->
+          <div class="pt-2 border-t flex items-center space-x-2">
+            <input type="text" id="lightbox-new-comment-input" onkeyup="if(event.key==='Enter') addLightboxComment()" placeholder="พิมพ์ข้อเสนอแนะ หรือตอบกลับพี่เลี้ยง..." class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-govNavy focus:border-transparent transition">
+            <button onclick="addLightboxComment()" class="px-3 py-2 bg-govNavy hover:bg-govNavyLight text-white rounded-xl text-xs font-bold transition flex items-center space-x-1 shadow-xs flex-shrink-0">
+              <i class="fa-solid fa-paper-plane text-amber-300"></i>
+              <span>ส่ง</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- GLOBAL OMNISEARCH MODAL (Ctrl + K / Cmd + K) -->
+  <!-- ========================================================================= -->
+  <div id="global-search-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-start justify-center pt-16 sm:pt-24 hidden p-4 no-print" onclick="if(event.target===this) closeGlobalSearchModal()">
+    <div class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[75vh]">
+      
+      <!-- Search Input Header -->
+      <div class="p-4 border-b border-slate-100 flex items-center space-x-3 bg-slate-50/50">
+        <i class="fa-solid fa-magnifying-glass text-govNavy text-base pl-2"></i>
+        <input type="text" id="global-search-input" oninput="handleGlobalSearchInput(this.value)" placeholder="ค้นหารายงาน, งานรุ่นพี่, สคริปต์, หรือภาพหลักฐาน..." class="flex-1 bg-transparent border-none text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-0">
+        <span class="text-[10px] font-mono bg-slate-200 text-slate-600 px-2 py-0.5 rounded border border-slate-300">ESC ปิด</span>
+        <button onclick="closeGlobalSearchModal()" class="w-7 h-7 rounded-lg text-slate-400 hover:text-slate-600 flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Quick Category Hints -->
+      <div class="px-4 py-2 bg-slate-100/60 border-b border-slate-100 flex items-center space-x-2 text-[11px] text-slate-500 overflow-x-auto">
+        <span class="font-bold text-slate-600">คำค้นยอดนิยม:</span>
+        <button onclick="document.getElementById('global-search-input').value='Antivirus'; handleGlobalSearchInput('Antivirus');" class="px-2 py-0.5 rounded bg-white border border-slate-200 hover:bg-slate-50">Antivirus Audit</button>
+        <button onclick="document.getElementById('global-search-input').value='Docker'; handleGlobalSearchInput('Docker');" class="px-2 py-0.5 rounded bg-white border border-slate-200 hover:bg-slate-50">Docker 5432</button>
+        <button onclick="document.getElementById('global-search-input').value='สารบรรณ'; handleGlobalSearchInput('สารบรรณ');" class="px-2 py-0.5 rounded bg-white border border-slate-200 hover:bg-slate-50">งานสารบรรณ</button>
+        <button onclick="document.getElementById('global-search-input').value='ฮาร์ดแวร์'; handleGlobalSearchInput('ฮาร์ดแวร์');" class="px-2 py-0.5 rounded bg-white border border-slate-200 hover:bg-slate-50">บำรุงรักษา PC</button>
+      </div>
+
+      <!-- Results List Container -->
+      <div id="global-search-results" class="p-4 space-y-3 overflow-y-auto flex-1">
+        <!-- Dynamically populated by handleGlobalSearchInput() -->
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+        <span><i class="fa-solid fa-keyboard mr-1"></i>กดปุ่มลูกศรหรือคลิกเพื่อเลือกรายการ</span>
+        <span class="text-govNavy font-semibold">Smart GovReport Hub 2.5</span>
+      </div>
+
+    </div>
+  </div>
 
   <!-- Modular JavaScript Architecture (Smart GovReport Hub 2.5) -->
   <script src="js/modules/01-core-state.js"></script>
@@ -4658,6 +5420,8 @@ function doGet(e) {
   <script src="js/modules/09-gov-docs.js"></script>
   <script src="js/modules/10-membership.js"></script>
   <script src="js/modules/11-sync-hub.js"></script>
+  <script src="js/modules/12-audit-console.js"></script>
+  <script src="js/modules/13-knowledge-photo-hub.js"></script>
   <script type="module" src="js/app.js"></script>
 </body>
 </html>

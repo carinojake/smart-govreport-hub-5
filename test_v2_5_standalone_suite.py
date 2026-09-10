@@ -43,6 +43,11 @@ def run_suite():
                   "view-executive-overview" in content)
             check("v2.5 Index contains core modals (Signature, Sync, PDPA)", 
                   "signature-modal" in content and "api-sync-modal" in content and "ojt-photo-modal" in content)
+            # Approval Gate Enhanced Verification
+            check("v2.5 Index contains Member Management & Approval Gate Modal", "member-management-modal" in content)
+            check("v2.5 Index contains Search & Filter Toolbar in Approval Gate", "mgmt-search-input" in content and "mgmt-role-filter" in content)
+            check("v2.5 Index contains Batch Actions Bar in Approval Gate", "batch-actions-container" in content and "master-select-pending" in content)
+            check("v2.5 Index contains Edit Member Profile Modal", "edit-member-modal" in content and "edit-member-form" in content)
     except Exception as e:
         check(f"v2.5 Frontend reachable: {e}", False)
 

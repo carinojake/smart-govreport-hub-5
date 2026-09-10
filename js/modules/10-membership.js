@@ -953,7 +953,7 @@
       }
 ];
 
-    // Transform into SmartGov Trainee Accounts (Default password: Trainee@2026)
+    // Transform into SmartGov Trainee Accounts (Pre-computed SHA-256 Hashes)
     const COHORT_SEED_USERS = COHORT_PARTICIPANTS.map((p) => {
       const padIndex = String(p.id).padStart(3, "0");
       const pad2 = String(p.id).padStart(2, "0");
@@ -966,7 +966,6 @@
       return {
         id: "usr-card-" + pad2,
         username: "card_" + padIndex,
-        // "Trainee@2026" SHA-256 client hash
         client_hash: "bd1230d06d9da6fa26d96ab22f71887f504cc876cecee2d9b97ec60f12e8acb2",
         full_name: displayName,
         nickname: (p.nickname && p.nickname !== "ไม่ระบุ") ? p.nickname : displayName,
@@ -991,7 +990,6 @@
       {
         id: 'usr-admin-01',
         username: 'admin_ict',
-        // 'Admin@2026' SHA-256 client hash
         client_hash: 'a36aef5a11c4073fbe60314fc9df530a9d5f986533594d1f5190742ff9e0e408',
         full_name: 'เจ้าหน้าที่ผู้ดูแลระบบ (Admin ICT)',
         email: 'ict_admin@moj.go.th',
@@ -1005,7 +1003,6 @@
       {
         id: 'usr-sup-01',
         username: 'sup_sarinya',
-        // 'Sup@2026' SHA-256 client hash
         client_hash: 'e890e1a545c52ab0a0e292935266cbde22483c00d2b425bade134134145ef3cd',
         full_name: 'นางสาวสรินยา สุวรรณวณิช',
         email: 'sarinya.s@moj.go.th',
@@ -1019,7 +1016,6 @@
       {
         id: 'usr-trainee-01',
         username: 'trainee_jake',
-        // 'Trainee@2026' SHA-256 client hash
         client_hash: 'bd1230d06d9da6fa26d96ab22f71887f504cc876cecee2d9b97ec60f12e8acb2',
         full_name: 'นายเจค (นิติพัฒน์ คุ้มวงษ์)',
         email: 'carinojake@gmail.com',
@@ -1571,6 +1567,13 @@
             return;
           }
 
+          if (matched.is_suspended === true || matched.status === 'suspended') {
+            alert('🚫 บัญชีผู้ใช้งานนี้ถูกระงับสิทธิ์การใช้งานชั่วคราว กรุณาติดต่อผู้ดูแลระบบ (Admin)');
+            if (btn) btn.disabled = false;
+            if (btnText) btnText.innerText = 'เข้าสู่ระบบ';
+            return;
+          }
+
           sessionStorage.setItem(MEMBER_STORAGE_KEYS.SESSION, JSON.stringify(matched));
         }
 
@@ -1728,6 +1731,7 @@
     // 🏛️ ADMIN TABS & SUPERVISOR ASSIGNMENT CONTROLLER
     // =========================================================================
     let currentMgmtTab = 'pending';
+    let selectedPendingUsernames = new Set();
 
     function switchMgmtTab(tab) {
       currentMgmtTab = tab;
@@ -1736,6 +1740,7 @@
       const panelPending = document.getElementById('mgmt-panel-pending');
       const panelAll = document.getElementById('mgmt-panel-all');
       const desc = document.getElementById('mgmt-tab-desc');
+      const batchContainer = document.getElementById('batch-actions-container');
       const session = getActiveSession();
 
       if (tab === 'pending') {
@@ -1750,6 +1755,7 @@
         if (btnAll) { btnAll.className = 'px-3.5 py-1.5 rounded-xl font-bold bg-govNavy text-white shadow-xs transition flex items-center space-x-1.5'; }
         if (panelPending) panelPending.classList.add('hidden');
         if (panelAll) panelAll.classList.remove('hidden');
+        if (batchContainer) batchContainer.classList.add('hidden');
         if (desc) {
           desc.innerText = (session && session.role === 'supervisor')
             ? 'รายชื่อสมาชิกและเด็กฝึกงานที่อยู่ภายใต้การดูแลของคุณ'
@@ -1767,6 +1773,36 @@
       }
     }
 
+    // =========================================================================
+    // 🔍 SEARCH & FILTER CONTROLLER
+    // =========================================================================
+    function filterMembersTable() {
+      const searchVal = (document.getElementById('mgmt-search-input')?.value || '').trim().toLowerCase();
+      const roleVal = document.getElementById('mgmt-role-filter')?.value || 'all';
+
+      const tbodyId = (currentMgmtTab === 'pending') ? 'pending-members-tbody' : 'all-members-tbody';
+      const tbody = document.getElementById(tbodyId);
+      if (!tbody) return;
+
+      const rows = tbody.querySelectorAll('tr[data-user]');
+      rows.forEach(tr => {
+        const text = (tr.getAttribute('data-search') || '').toLowerCase();
+        const role = tr.getAttribute('data-role') || '';
+        
+        const matchSearch = !searchVal || text.includes(searchVal);
+        const matchRole = (roleVal === 'all') || (role === roleVal);
+
+        if (matchSearch && matchRole) {
+          tr.style.display = '';
+        } else {
+          tr.style.display = 'none';
+        }
+      });
+    }
+
+    // =========================================================================
+    // 👥 TAB 2: ALL ACTIVE MEMBERS (ADMIN & SUPERVISOR VIEW)
+    // =========================================================================
     function renderAllMembersList() {
       const session = getActiveSession();
       const tbody = document.getElementById('all-members-tbody');
@@ -1787,7 +1823,7 @@
 
       tbody.innerHTML = '';
       if (activeUsers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">ไม่พบสมาชิกในสังกัดของคุณ</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400">ไม่พบสมาชิกในสังกัดของคุณ</td></tr>';
         return;
       }
 
@@ -1800,7 +1836,10 @@
 
       activeUsers.forEach(u => {
         const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-50 transition';
+        tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
+        tr.setAttribute('data-user', u.username);
+        tr.setAttribute('data-role', u.role);
+        tr.setAttribute('data-search', `${u.full_name} ${u.username} ${u.email} ${u.department || ''}`.toLowerCase());
 
         let supervisorCell = '';
         if (u.role === 'trainee') {
@@ -1813,7 +1852,7 @@
             });
             supervisorCell = `
               <div class="flex items-center space-x-1.5">
-                <select id="assign-sup-${u.username}" class="p-1.5 border border-slate-300 rounded-lg text-xs bg-white text-slate-700 max-w-[200px]">
+                <select id="assign-sup-${u.username}" class="p-1.5 border border-slate-300 rounded-lg text-xs bg-white text-slate-700 max-w-[190px]">
                   ${optionsHtml}
                 </select>
                 <button onclick="saveSupervisorAssignment('${u.username}')" class="px-2.5 py-1.5 bg-govNavy hover:bg-govNavyLight text-white rounded-lg font-semibold text-[11px] shadow-xs transition" title="บันทึกการมอบหมายพี่เลี้ยง">
@@ -1827,6 +1866,43 @@
           }
         } else {
           supervisorCell = `<span class="text-slate-400">-</span>`;
+        }
+
+        const isSuspended = (u.is_suspended === true || u.status === 'suspended');
+        const statusBadge = isSuspended 
+          ? '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700 border border-rose-200"><i class="fa-solid fa-ban mr-1"></i>ระงับสิทธิ์</span>'
+          : '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-circle-check mr-1"></i>ใช้งานปกติ</span>';
+
+        let actionButtons = '';
+        if (session.role === 'staff') {
+          const isSelf = (u.username.toLowerCase() === session.username.toLowerCase());
+          const toggleIcon = isSuspended ? 'fa-lock-open text-emerald-600' : 'fa-ban text-amber-600';
+          const toggleTitle = isSuspended ? 'ปลดล็อกสิทธิ์ใช้งาน' : 'ระงับสิทธิ์ชั่วคราว';
+
+          actionButtons = `
+            <div class="flex items-center justify-center space-x-1">
+              <button onclick="openEditMemberModal('${sanitizeHTML(u.username)}')" class="p-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg transition" title="แก้ไขข้อมูลโปรไฟล์">
+                <i class="fa-solid fa-user-pen text-xs"></i>
+              </button>
+              ${!isSelf ? `
+                <button onclick="toggleUserStatus('${sanitizeHTML(u.username)}')" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition" title="${toggleTitle}">
+                  <i class="fa-solid ${toggleIcon} text-xs"></i>
+                </button>
+                <button onclick="resetUserPassword('${sanitizeHTML(u.username)}')" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition" title="รีเซ็ตรหัสผ่าน">
+                  <i class="fa-solid fa-key text-xs text-amber-600"></i>
+                </button>
+                <button onclick="deleteUserAccount('${sanitizeHTML(u.username)}')" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition" title="ลบบัญชีถาวร">
+                  <i class="fa-solid fa-trash-can text-xs"></i>
+                </button>
+              ` : `
+                <button onclick="resetUserPassword('${sanitizeHTML(u.username)}')" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition" title="รีเซ็ตรหัสผ่าน">
+                  <i class="fa-solid fa-key text-xs text-amber-600"></i>
+                </button>
+              `}
+            </div>
+          `;
+        } else {
+          actionButtons = '<span class="text-slate-300 text-xs">-</span>';
         }
 
         tr.innerHTML = `
@@ -1845,15 +1921,17 @@
             ${supervisorCell}
           </td>
           <td class="p-3 text-center whitespace-nowrap">
-            ${session.role === 'staff' && u.role !== 'staff' ? `
-              <button onclick="resetUserPassword('${u.username}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] font-medium mr-1" title="รีเซ็ตรหัสผ่าน">
-                <i class="fa-solid fa-key text-amber-600"></i>
-              </button>
-            ` : '<span class="text-slate-300 text-xs">-</span>'}
+            ${statusBadge}
+          </td>
+          <td class="p-3 text-center whitespace-nowrap">
+            ${actionButtons}
           </td>
         `;
         tbody.appendChild(tr);
       });
+
+      // Filter search if query exists
+      filterMembersTable();
     }
 
     function saveSupervisorAssignment(traineeUsername) {
@@ -1891,6 +1969,215 @@
       });
     }
 
+    // =========================================================================
+    // 🚫 USER LIFECYCLE: SUSPEND / ACTIVATE / DELETE
+    // =========================================================================
+    async function toggleUserStatus(username) {
+      const session = getActiveSession();
+      if (!session || session.role !== 'staff') {
+        alert('⚠️ อนุญาตเฉพาะ Admin / เจ้าหน้าที่เท่านั้น');
+        return;
+      }
+
+      const localUsers = getLocalUsers();
+      const idx = localUsers.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
+      if (idx === -1) {
+        alert('❌ ไม่พบผู้ใช้งาน');
+        return;
+      }
+
+      const user = localUsers[idx];
+      const willSuspend = !(user.is_suspended === true || user.status === 'suspended');
+      const actionText = willSuspend ? 'ระงับสิทธิ์การใช้งานชั่วคราว' : 'ปลดล็อกสิทธิ์ให้ใช้งานตามปกติ';
+
+      if (!confirm(`ยืนยันการ${actionText} สำหรับบัญชี [${user.full_name} (@${user.username})] หรือไม่?`)) {
+        return;
+      }
+
+      user.is_suspended = willSuspend;
+      user.status = willSuspend ? 'suspended' : 'active';
+      saveLocalUsers(localUsers);
+
+      // Backend sync if GAS configured
+      const gasUrl = (window.apiConfig && window.apiConfig.endpointUrl && !window.apiConfig.endpointUrl.includes('AKfycbybyzm')) 
+        ? window.apiConfig.endpointUrl : null;
+      if (gasUrl && window.navigator.onLine) {
+        try {
+          await fetch(gasUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'toggle_member_status',
+              target_username: user.username,
+              is_suspended: willSuspend,
+              requester_username: session.username,
+              requester_role: session.role
+            })
+          });
+        } catch (e) {
+          console.warn('GAS toggle status failed, saved locally:', e);
+        }
+      }
+
+      alert(`✅ ${actionText} เรียบร้อยแล้ว!`);
+      renderAllMembersList();
+    }
+
+    async function deleteUserAccount(username) {
+      const session = getActiveSession();
+      if (!session || session.role !== 'staff') {
+        alert('⚠️ อนุญาตเฉพาะ Admin / เจ้าหน้าที่เท่านั้น');
+        return;
+      }
+
+      if (username.toLowerCase() === session.username.toLowerCase()) {
+        alert('⚠️ คุณไม่สามารถลบบัญชีของตนเองได้');
+        return;
+      }
+
+      if (!confirm(`⚠️ ยืนยันการ "ลบบัญชีถาวร" สำหรับ [${username}] หรือไม่?\nการกระทำนี้ไม่สามารถย้อนกลับได้!`)) {
+        return;
+      }
+
+      const localUsers = getLocalUsers();
+      const idx = localUsers.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
+      if (idx !== -1) {
+        localUsers.splice(idx, 1);
+        saveLocalUsers(localUsers);
+      }
+
+      // Backend sync
+      const gasUrl = (window.apiConfig && window.apiConfig.endpointUrl && !window.apiConfig.endpointUrl.includes('AKfycbybyzm')) 
+        ? window.apiConfig.endpointUrl : null;
+      if (gasUrl && window.navigator.onLine) {
+        try {
+          await fetch(gasUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'delete_member',
+              target_username: username,
+              requester_username: session.username,
+              requester_role: session.role
+            })
+          });
+        } catch (e) {
+          console.warn('GAS delete user failed, saved locally:', e);
+        }
+      }
+
+      alert(`🗑️ ลบบัญชีผู้ใช้ [${username}] ถาวรเรียบร้อยแล้ว`);
+      renderAllMembersList();
+    }
+
+    // =========================================================================
+    // ✏️ EDIT MEMBER PROFILE MODAL CONTROLLER
+    // =========================================================================
+    function openEditMemberModal(username) {
+      const session = getActiveSession();
+      if (!session || session.role !== 'staff') {
+        alert('⚠️ เฉพาะ Admin / เจ้าหน้าที่เท่านั้นที่สามารถแก้ไขข้อมูลสมาชิกได้');
+        return;
+      }
+
+      const localUsers = getLocalUsers();
+      const user = localUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
+      if (!user) {
+        alert('❌ ไม่พบข้อมูลสมาชิก');
+        return;
+      }
+
+      document.getElementById('edit-member-username-hidden').value = user.username;
+      document.getElementById('edit-member-username').value = `@${user.username}`;
+      document.getElementById('edit-member-fullname').value = user.full_name || '';
+      document.getElementById('edit-member-email').value = user.email || '';
+      document.getElementById('edit-member-role').value = user.role || 'trainee';
+      document.getElementById('edit-member-department').value = user.department || '';
+      document.getElementById('edit-member-disability').value = user.disability_type || '-';
+      
+      const isSuspended = (user.is_suspended === true || user.status === 'suspended');
+      document.getElementById('edit-member-status').value = isSuspended ? 'suspended' : 'active';
+
+      document.getElementById('edit-member-subtitle').innerText = `แก้ไขข้อมูลสำหรับ @${user.username}`;
+      const modal = document.getElementById('edit-member-modal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeEditMemberModal() {
+      const modal = document.getElementById('edit-member-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    async function saveEditMemberProfile(e) {
+      e.preventDefault();
+      const session = getActiveSession();
+      if (!session || session.role !== 'staff') return;
+
+      const username = document.getElementById('edit-member-username-hidden').value;
+      const fullName = document.getElementById('edit-member-fullname').value.trim();
+      const email = document.getElementById('edit-member-email').value.trim();
+      const role = document.getElementById('edit-member-role').value;
+      const department = document.getElementById('edit-member-department').value.trim();
+      const disability = document.getElementById('edit-member-disability').value;
+      const statusVal = document.getElementById('edit-member-status').value;
+      const isSuspended = (statusVal === 'suspended');
+
+      if (!fullName || !email) {
+        alert('⚠️ กรุณากรอกชื่อ-นามสกุล และอีเมลให้ครบถ้วน');
+        return;
+      }
+
+      const localUsers = getLocalUsers();
+      const idx = localUsers.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
+      if (idx === -1) {
+        alert('❌ ไม่พบสมาชิก');
+        return;
+      }
+
+      // Update Local
+      localUsers[idx].full_name = fullName;
+      localUsers[idx].email = email;
+      localUsers[idx].role = role;
+      localUsers[idx].department = department;
+      localUsers[idx].disability_type = disability;
+      localUsers[idx].is_suspended = isSuspended;
+      localUsers[idx].status = isSuspended ? 'suspended' : 'active';
+      saveLocalUsers(localUsers);
+
+      // Backend sync
+      const gasUrl = (window.apiConfig && window.apiConfig.endpointUrl && !window.apiConfig.endpointUrl.includes('AKfycbybyzm')) 
+        ? window.apiConfig.endpointUrl : null;
+      if (gasUrl && window.navigator.onLine) {
+        try {
+          await fetch(gasUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'update_member_profile',
+              target_username: username,
+              full_name: fullName,
+              email: email,
+              role: role,
+              department: department,
+              disability_type: disability,
+              is_suspended: isSuspended,
+              requester_username: session.username,
+              requester_role: session.role
+            })
+          });
+        } catch (err) {
+          console.warn('GAS update profile failed, saved locally:', err);
+        }
+      }
+
+      closeEditMemberModal();
+      alert(`🎉 บันทึกการแก้ไขข้อมูลของ [${fullName}] เรียบร้อยแล้ว!`);
+      renderAllMembersList();
+    }
+
+    // =========================================================================
+    // 🛡️ MODAL ENTRYPOINTS & BATCH SELECTION
+    // =========================================================================
     function openMemberManagementModal() {
       const session = getActiveSession();
       if (!session || (session.role !== 'supervisor' && session.role !== 'staff')) {
@@ -1910,6 +2197,8 @@
         if (subtitle) subtitle.innerText = 'ตรวจสอบและอนุมัติเด็กฝึกงานที่ขออยู่ภายใต้การดูแลของคุณ';
       }
 
+      selectedPendingUsernames.clear();
+      updateBatchUI();
       refreshPendingMemberList();
       if (modal) modal.classList.remove('hidden');
     }
@@ -1919,12 +2208,129 @@
       if (modal) modal.classList.add('hidden');
     }
 
+    function toggleSelectAllPending(masterCheckbox) {
+      const tbody = document.getElementById('pending-members-tbody');
+      if (!tbody) return;
+      const checkboxes = tbody.querySelectorAll('input.pending-item-checkbox');
+      checkboxes.forEach(cb => {
+        // Only select visible ones (matching search filter)
+        const tr = cb.closest('tr');
+        if (tr && tr.style.display !== 'none') {
+          cb.checked = masterCheckbox.checked;
+          const u = cb.getAttribute('data-username');
+          if (masterCheckbox.checked) {
+            selectedPendingUsernames.add(u);
+          } else {
+            selectedPendingUsernames.delete(u);
+          }
+        }
+      });
+      updateBatchUI();
+    }
+
+    function onPendingItemCheck(cb) {
+      const username = cb.getAttribute('data-username');
+      if (cb.checked) {
+        selectedPendingUsernames.add(username);
+      } else {
+        selectedPendingUsernames.delete(username);
+        const master = document.getElementById('master-select-pending');
+        if (master) master.checked = false;
+      }
+      updateBatchUI();
+    }
+
+    function updateBatchUI() {
+      const container = document.getElementById('batch-actions-container');
+      const countSpan = document.getElementById('batch-selected-count');
+      if (!container || !countSpan) return;
+
+      const count = selectedPendingUsernames.size;
+      countSpan.innerText = `เลือก ${count} รายการ`;
+
+      if (count > 0 && currentMgmtTab === 'pending') {
+        container.classList.remove('hidden');
+        container.classList.add('flex');
+      } else {
+        container.classList.add('hidden');
+        container.classList.remove('flex');
+      }
+    }
+
+    async function batchApproveMembers(action) {
+      const session = getActiveSession();
+      if (!session) return;
+
+      const usernames = Array.from(selectedPendingUsernames);
+      if (usernames.length === 0) {
+        alert('⚠️ กรุณาเลือกรายการที่ต้องการดำเนินการอย่างน้อย 1 รายการ');
+        return;
+      }
+
+      const actionText = (action === 'approve') ? 'อนุมัติ' : 'ปฏิเสธและลบ';
+      if (!confirm(`ยืนยันการ${actionText} สมาชิกที่เลือกทั้งหมด ${usernames.length} รายการ หรือไม่?`)) {
+        return;
+      }
+
+      // 1. Google Apps Script Batch Call
+      const gasUrl = (window.apiConfig && window.apiConfig.endpointUrl && !window.apiConfig.endpointUrl.includes('AKfycbybyzm')) 
+        ? window.apiConfig.endpointUrl : null;
+
+      if (gasUrl && window.navigator.onLine) {
+        try {
+          await fetch(gasUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'batch_approve_members',
+              target_usernames: usernames,
+              approve_action: action,
+              requester_username: session.username,
+              requester_role: session.role
+            })
+          });
+        } catch (e) {
+          console.warn('GAS batch approval failed, processing locally:', e);
+        }
+      }
+
+      // 2. Update local database
+      const localUsers = getLocalUsers();
+      const now = new Date().toISOString();
+
+      usernames.forEach(uname => {
+        const idx = localUsers.findIndex(u => u.username.toLowerCase() === uname.toLowerCase());
+        if (idx !== -1) {
+          if (action === 'approve') {
+            localUsers[idx].is_approved = true;
+            localUsers[idx].approved_by = session.username;
+            localUsers[idx].approved_at = now;
+          } else {
+            localUsers.splice(idx, 1);
+          }
+        }
+      });
+      saveLocalUsers(localUsers);
+
+      selectedPendingUsernames.clear();
+      const master = document.getElementById('master-select-pending');
+      if (master) master.checked = false;
+      updateBatchUI();
+
+      alert(`✅ ดำเนินการ${actionText} สมาชิกทั้งหมด ${usernames.length} รายการ เรียบร้อยแล้ว!`);
+      refreshPendingMemberList();
+      updatePendingCountBadge();
+    }
+
+    // =========================================================================
+    // 📋 TAB 1: PENDING MEMBERS
+    // =========================================================================
     async function refreshPendingMemberList() {
       const session = getActiveSession();
       const tbody = document.getElementById('pending-members-tbody');
       if (!tbody || !session) return;
 
-      tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-slate-400"><i class="fa-solid fa-spinner animate-spin mr-1"></i> กำลังโหลดข้อมูลสมาชิก...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-400"><i class="fa-solid fa-spinner animate-spin mr-1"></i> กำลังโหลดข้อมูลสมาชิก...</td></tr>';
 
       let pendingList = [];
       const localUsers = getLocalUsers();
@@ -1945,8 +2351,9 @@
 
       tbody.innerHTML = '';
       if (pendingList.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400"><i class="fa-solid fa-circle-check text-emerald-500 text-lg mb-1 block"></i>ไม่มีสมาชิกที่รอการอนุมัติในสังกัดของคุณในขณะนี้</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400"><i class="fa-solid fa-circle-check text-emerald-500 text-lg mb-1 block"></i>ไม่มีสมาชิกที่รอการอนุมัติในสังกัดของคุณในขณะนี้</td></tr>';
         updatePendingCountBadge(0);
+        updateBatchUI();
         return;
       }
 
@@ -1961,8 +2368,17 @@
 
       pendingList.forEach(m => {
         const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-50 transition';
+        tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
+        tr.setAttribute('data-user', m.username);
+        tr.setAttribute('data-role', m.role);
+        tr.setAttribute('data-search', `${m.full_name} ${m.username} ${m.email} ${m.department || ''}`.toLowerCase());
+
+        const isChecked = selectedPendingUsernames.has(m.username) ? 'checked' : '';
+
         tr.innerHTML = `
+          <td class="p-3 w-10 text-center">
+            <input type="checkbox" onchange="onPendingItemCheck(this)" data-username="${sanitizeHTML(m.username)}" ${isChecked} class="pending-item-checkbox rounded border-slate-300 text-purple-600 focus:ring-purple-500 cursor-pointer">
+          </td>
           <td class="p-3">
             <p class="font-bold text-slate-800 text-xs">${sanitizeHTML(m.full_name)}</p>
             <p class="text-[10px] text-slate-400 font-mono">@${sanitizeHTML(m.username)} | ${sanitizeHTML(m.email)}</p>
@@ -1988,6 +2404,9 @@
         `;
         tbody.appendChild(tr);
       });
+
+      filterMembersTable();
+      updateBatchUI();
     }
 
     function updatePendingCountBadge(count) {
@@ -2060,6 +2479,7 @@
         saveLocalUsers(localUsers);
       }
 
+      selectedPendingUsernames.delete(targetUsername);
       alert(`✅ ดำเนินการ${actionText} บัญชี [${targetUsername}] เรียบร้อยแล้ว`);
       refreshPendingMemberList();
       updatePendingCountBadge();

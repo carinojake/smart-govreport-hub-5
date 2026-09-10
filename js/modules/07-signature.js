@@ -63,10 +63,16 @@
       const label = document.getElementById('pdpa-status-label');
       if (isPdpaEnabled) {
         if (btn) btn.className = 'bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-400 px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition animate-pulse whitespace-nowrap flex-shrink-0';
-        if (label) label.innerText = 'PDPA: เปิด';
+        if (label) {
+          label.innerText = 'เปิดใช้งาน';
+          label.className = 'text-[10px] px-1.5 py-0.5 rounded bg-emerald-800/80 border border-emerald-300 text-white font-bold';
+        }
       } else {
-        if (btn) btn.className = 'bg-blue-950/60 hover:bg-blue-900 text-blue-200 border border-blue-500/40 px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition whitespace-nowrap flex-shrink-0';
-        if (label) label.innerText = 'PDPA: ปิด';
+        if (btn) btn.className = 'bg-blue-950/70 hover:bg-blue-900 text-blue-200 border border-blue-500/40 px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition whitespace-nowrap flex-shrink-0';
+        if (label) {
+          label.innerText = 'ปิด';
+          label.className = 'text-[10px] px-1.5 py-0.5 rounded bg-blue-900/80 border border-blue-500/30 text-slate-200';
+        }
       }
       renderOjtPages();
       renderProfileHeader();

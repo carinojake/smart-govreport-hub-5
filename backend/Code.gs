@@ -145,6 +145,18 @@ function doPost(e) {
       case "approve_member":
         return handleApproveMember(payload);
         
+      case "batch_approve_members":
+        return handleBatchApproveMembers(payload);
+        
+      case "toggle_member_status":
+        return handleToggleMemberStatus(payload);
+        
+      case "delete_member":
+        return handleDeleteMember(payload);
+        
+      case "update_member_profile":
+        return handleUpdateMemberProfile(payload);
+        
       case "sync_logbooks":
         return handleSyncLogbooks(payload);
         
@@ -469,6 +481,150 @@ function handleApproveMember(payload) {
   }
   
   return jsonError("คำสั่งอนุมัติไม่ถูกต้อง");
+}
+
+/**
+ * อนุมัติหรือปฏิเสธบัญชีสมาชิกแบบกลุ่ม (Batch / Bulk Action)
+ */
+function handleBatchApproveMembers(payload) {
+  const { target_usernames, approve_action, requester_username, requester_role } = payload;
+  if (!Array.isArray(target_usernames) || target_usernames.length === 0) {
+    return jsonError("ไม่พบรายการผู้ใช้งานที่ต้องการดำเนินการ");
+  }
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(CONFIG.SHEET_USERS);
+  if (!sheet) return jsonError("Users table not found");
+
+  const data = sheet.getDataRange().getValues();
+  const now = new Date().toISOString();
+  let affectedCount = 0;
+
+  const targetSet = new Set(target_usernames.map(u => String(u).trim().toLowerCase()));
+
+  // ถ้าเป็นการลบ (reject) ให้ลบจากล่างขึ้นบนเพื่อป้องกัน row index เลื่อน
+  if (approve_action === "reject") {
+    for (let i = data.length - 1; i >= 1; i--) {
+      const username = String(data[i][1]).toLowerCase();
+      const userRole = data[i][6];
+      const supUser = String(data[i][9]).toLowerCase();
+
+      if (targetSet.has(username)) {
+        if (requester_role === "staff" || (requester_role === "supervisor" && userRole === "trainee" && supUser === String(requester_username).toLowerCase())) {
+          sheet.deleteRow(i + 1);
+          affectedCount++;
+        }
+      }
+    }
+    return jsonSuccess({ message: `ปฏิเสธและลบบัญชีที่เลือกจำนวน ${affectedCount} รายการเรียบร้อยแล้ว` });
+  } else if (approve_action === "approve") {
+    for (let i = 1; i < data.length; i++) {
+      const username = String(data[i][1]).toLowerCase();
+      const userRole = data[i][6];
+      const supUser = String(data[i][9]).toLowerCase();
+
+      if (targetSet.has(username)) {
+        if (requester_role === "staff" || (requester_role === "supervisor" && userRole === "trainee" && supUser === String(requester_username).toLowerCase())) {
+          const rowIdx = i + 1;
+          sheet.getRange(rowIdx, 11).setValue(true); // is_approved
+          sheet.getRange(rowIdx, 13).setValue(requester_username); // approved_by
+          sheet.getRange(rowIdx, 14).setValue(now); // approved_at
+          affectedCount++;
+        }
+      }
+    }
+    return jsonSuccess({ message: `อนุมัติบัญชีที่เลือกจำนวน ${affectedCount} รายการเรียบร้อยแล้ว` });
+  }
+
+  return jsonError("คำสั่งดำเนินการไม่ถูกต้อง");
+}
+
+/**
+ * ระงับสิทธิ์ชั่วคราว หรือ ปลดล็อกสิทธิ์สมาชิก (Admin Only)
+ */
+function handleToggleMemberStatus(payload) {
+  const { target_username, is_suspended, requester_role } = payload;
+  if (requester_role !== "staff") {
+    return jsonError("อนุญาตเฉพาะ Admin / เจ้าหน้าที่เท่านั้น");
+  }
+
+  const cleanTarget = String(target_username).trim().toLowerCase();
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(CONFIG.SHEET_USERS);
+  if (!sheet) return jsonError("Users table not found");
+
+  const data = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][1]).toLowerCase() === cleanTarget) {
+      const rowIdx = i + 1;
+      // ถ้า is_suspended = true ให้ตั้ง is_approved = false หรือบันทึกสถานะ
+      sheet.getRange(rowIdx, 11).setValue(!is_suspended);
+      return jsonSuccess({ message: `ปรับสถานะผู้ใช้ [${cleanTarget}] เป็น ${is_suspended ? 'ระงับสิทธิ์' : 'ใช้งานปกติ'} เรียบร้อยแล้ว` });
+    }
+  }
+
+  return jsonError("ไม่พบข้อมูลผู้ใช้งานที่ระบุ");
+}
+
+/**
+ * ลบบัญชีสมาชิกถาวร (Admin Only)
+ */
+function handleDeleteMember(payload) {
+  const { target_username, requester_username, requester_role } = payload;
+  if (requester_role !== "staff") {
+    return jsonError("อนุญาตเฉพาะ Admin / เจ้าหน้าที่เท่านั้น");
+  }
+
+  const cleanTarget = String(target_username).trim().toLowerCase();
+  if (cleanTarget === String(requester_username).trim().toLowerCase()) {
+    return jsonError("ไม่สามารถลบบัญชีของตนเองได้");
+  }
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(CONFIG.SHEET_USERS);
+  if (!sheet) return jsonError("Users table not found");
+
+  const data = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][1]).toLowerCase() === cleanTarget) {
+      sheet.deleteRow(i + 1);
+      return jsonSuccess({ message: `ลบบัญชีผู้ใช้ [${cleanTarget}] เรียบร้อยแล้ว` });
+    }
+  }
+
+  return jsonError("ไม่พบข้อมูลผู้ใช้งานที่ต้องการลบ");
+}
+
+/**
+ * อัปเดตข้อมูลโปรไฟล์สมาชิก (Admin Only)
+ */
+function handleUpdateMemberProfile(payload) {
+  const { target_username, full_name, email, role, department, disability_type, is_suspended, requester_role } = payload;
+  if (requester_role !== "staff") {
+    return jsonError("อนุญาตเฉพาะ Admin / เจ้าหน้าที่เท่านั้น");
+  }
+
+  const cleanTarget = String(target_username).trim().toLowerCase();
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(CONFIG.SHEET_USERS);
+  if (!sheet) return jsonError("Users table not found");
+
+  const data = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][1]).toLowerCase() === cleanTarget) {
+      const rowIdx = i + 1;
+      if (full_name) sheet.getRange(rowIdx, 5).setValue(full_name);
+      if (email) sheet.getRange(rowIdx, 6).setValue(email.toLowerCase());
+      if (role) sheet.getRange(rowIdx, 7).setValue(role);
+      if (department !== undefined) sheet.getRange(rowIdx, 8).setValue(department);
+      if (disability_type !== undefined) sheet.getRange(rowIdx, 9).setValue(disability_type);
+      if (is_suspended !== undefined) sheet.getRange(rowIdx, 11).setValue(!is_suspended);
+      
+      return jsonSuccess({ message: `อัปเดตข้อมูลของ [${cleanTarget}] สำเร็จเรียบร้อยแล้ว` });
+    }
+  }
+
+  return jsonError("ไม่พบข้อมูลผู้ใช้งานที่ระบุ");
 }
 
 /**

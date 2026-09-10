@@ -26,13 +26,31 @@ app = FastAPI(
     version="2.5.0"
 )
 
+# CORS Whitelist for Smart GovReport Hub 2.5
+ALLOWED_ORIGINS = [
+    "http://localhost:8085",
+    "http://127.0.0.1:8085",
+    "http://localhost:8086",
+    "http://127.0.0.1:8086",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
 
 # PostgreSQL Configuration
 PG_HOST = os.getenv("PG_HOST", "localhost")
@@ -61,6 +79,7 @@ async def startup_event():
         async with db_pool.acquire() as conn:
             ver = await conn.fetchval("SELECT version()")
             logger.info("Connected to Docker PostgreSQL: %s", ver)
+            await seed_audit_demo_data(conn)
         active_db_status = f"PostgreSQL 16 (Docker Port {PG_PORT} - Connected)"
     except Exception as e:
         logger.error("Failed to connect to PostgreSQL: %s", e)
@@ -394,6 +413,226 @@ async def ai_summarize_week(req: SummarizeRequest):
         "week_num": req.week_num,
         "summary": summary_text
     }
+
+# -----------------------------------------------------------------------------
+# AUDIT LOGGING & CONSOLE ENDPOINTS (Smart GovReport Hub 2.5)
+# -----------------------------------------------------------------------------
+async def record_pg_audit(
+    action: str,
+    target_table: str,
+    user_id: Optional[str] = None,
+    record_id: Optional[str] = None,
+    ip_address: Optional[str] = "127.0.0.1",
+    changed_fields: Optional[Dict[str, Any]] = None
+):
+    """บันทึกประวัติการทำงานเข้าสู่ PostgreSQL audit_logs + Append-only JSONL"""
+    ts = datetime.now().isoformat()
+    fields_json = json.dumps(changed_fields or {}, ensure_ascii=False)
+    
+    # 1. บันทึกลง PostgreSQL
+    if db_pool:
+        try:
+            async with db_pool.acquire() as conn:
+                uid_val = uuid.UUID(user_id) if user_id and len(user_id) == 36 else None
+                await conn.execute(
+                    """
+                    INSERT INTO audit_logs (user_id, action, target_table, record_id, ip_address, changed_fields, created_at)
+                    VALUES ($1, $2, $3, $4, $5, $6::jsonb, NOW())
+                    """,
+                    uid_val, action, target_table, str(record_id) if record_id else None, ip_address, fields_json
+                )
+        except Exception as e:
+            logger.error(f"Audit log write to PostgreSQL error: {e}")
+
+    # 2. บันทึก Append-only JSONL File
+    try:
+        os.makedirs("logs", exist_ok=True)
+        audit_entry = {
+            "timestamp": ts,
+            "action": action,
+            "target_table": target_table,
+            "user_id": user_id,
+            "record_id": record_id,
+            "ip_address": ip_address,
+            "details": changed_fields or {}
+        }
+        with open("logs/backend_audit.jsonl", "a", encoding="utf-8") as f:
+            f.write(json.dumps(audit_entry, ensure_ascii=False) + "\n")
+    except Exception as e:
+        logger.error(f"Audit log append file error: {e}")
+
+async def seed_audit_demo_data(conn: asyncpg.Connection):
+    try:
+        cnt = await conn.fetchval("SELECT COUNT(*) FROM audit_logs")
+        if cnt == 0:
+            demo_logs = [
+                ("a0000001-0000-0000-0000-000000000001", "LOGIN_SUCCESS", "users", "session_auth", "192.168.1.45", {"auth_method": "PIN", "pin_masked": "******", "message": "เข้าสู่ระบบสำเร็จในบทบาท trainee"}),
+                ("a0000001-0000-0000-0000-000000000001", "CREATE", "ojt_reports", "w1_entry", "192.168.1.45", {"week_num": 1, "hours": 4.5, "tasks": "วิเคราะห์ชุดข้อมูลสารสนเทศโครงการ ด้วย PivotTable", "category": "งานบริการสารสนเทศและดูแลระบบ"}),
+                ("a0000001-0000-0000-0000-000000000001", "MASK_PDPA", "report_attachments", "att_001", "192.168.1.45", {"masked": True, "redacted_fields": ["id_card", "phone"], "rectangles": 2}),
+                ("a0000002-0000-0000-0000-000000000002", "SIGN", "signatures", "sig_w1", "192.168.1.12", {"week_num": 1, "role": "supervisor", "status": "APPROVED", "timestamp": datetime.now().isoformat()}),
+                ("a0000002-0000-0000-0000-000000000002", "EVALUATE", "evaluations", "eval_w1", "192.168.1.12", {"week_num": 1, "grade": "A", "total_score": 25, "comments": "ผลงานดีเยี่ยม มีวินัยในการปฏิบัติราชการ"}),
+                ("a0000001-0000-0000-0000-000000000001", "BOLA_BLOCKED", "ojt_reports", "cross_tenant", "192.168.1.88", {"violation": "BOLA / IDOR Violation Attempt", "target_user": "a0000002", "severity": "ALERT"}),
+                (None, "LOGIN_FAILED", "users", "session_auth", "203.0.113.42", {"reason": "PIN ไม่ถูกต้อง 3 ครั้ง", "severity": "WARN"}),
+                ("a0000001-0000-0000-0000-000000000001", "EXPORT_PDF", "ojt_reports", "a4_report", "192.168.1.45", {"week_num": 1, "format": "A4_PDF", "status": "SUCCESS"}),
+                ("a0000001-0000-0000-0000-000000000001", "PDPA_CONSENT", "users", "consent_v25", "192.168.1.45", {"policy_version": "2.5-2569", "consent_status": True})
+            ]
+            for uid, act, tbl, rid, ip, fields in demo_logs:
+                uid_val = uuid.UUID(uid) if uid else None
+                await conn.execute(
+                    """
+                    INSERT INTO audit_logs (user_id, action, target_table, record_id, ip_address, changed_fields, created_at)
+                    VALUES ($1, $2, $3, $4, $5, $6::jsonb, NOW())
+                    """,
+                    uid_val, act, tbl, rid, ip, json.dumps(fields, ensure_ascii=False)
+                )
+            logger.info("Seeded initial demo audit logs into PostgreSQL")
+    except Exception as e:
+        logger.error(f"Failed to seed demo audit logs: {e}")
+
+@app.get("/api/audit-logs")
+async def get_audit_logs(
+    limit: int = 50,
+    offset: int = 0,
+    action: Optional[str] = None,
+    search: Optional[str] = None,
+    conn: asyncpg.Connection = Depends(get_db)
+):
+    query = """
+        SELECT a.id, a.user_id, u.username, u.full_name, u.role as user_role,
+               a.action, a.target_table, a.record_id, a.ip_address, a.changed_fields, a.created_at
+        FROM audit_logs a
+        LEFT JOIN users u ON a.user_id = u.id
+        WHERE 1=1
+    """
+    params = []
+    if action and action.upper() != "ALL":
+        params.append(action.upper())
+        query += f" AND a.action = ${len(params)}"
+    if search:
+        params.append(f"%{search.strip()}%")
+        p_idx = len(params)
+        query += f" AND (a.action ILIKE ${p_idx} OR a.target_table ILIKE ${p_idx} OR u.username ILIKE ${p_idx} OR u.full_name ILIKE ${p_idx} OR a.record_id ILIKE ${p_idx})"
+
+    query += " ORDER BY a.created_at DESC"
+    params.append(limit)
+    query += f" LIMIT ${len(params)}"
+    params.append(offset)
+    query += f" OFFSET ${len(params)}"
+
+    rows = await conn.fetch(query, *params)
+    results = []
+    for r in rows:
+        action_name = r["action"]
+        cat = "AUTH" if "LOGIN" in action_name or "AUTH" in action_name else ("DATA_MUTATION" if action_name in ["CREATE", "UPDATE", "DELETE", "INSERT"] else ("SIGNATURE" if "SIGN" in action_name else ("SECURITY" if "BOLA" in action_name or "ALERT" in action_name else ("COMPLIANCE" if "PDPA" in action_name else "EXPORT"))))
+        sev = "ALERT" if "BLOCKED" in action_name or "ALERT" in action_name else ("WARN" if "FAILED" in action_name or "DELETE" in action_name else ("SUCCESS" if "SIGN" in action_name or "APPROVE" in action_name or "SUCCESS" in action_name else "INFO"))
+        
+        results.append({
+            "id": r["id"],
+            "timestamp": r["created_at"].isoformat() if r["created_at"] else "",
+            "user_id": str(r["user_id"]) if r["user_id"] else None,
+            "username": r["username"] or "ระบบอัตโนมัติ",
+            "full_name": r["full_name"] or "ระบบส่วนกลาง",
+            "user_role": r["user_role"] or "system",
+            "action": action_name,
+            "event_name": action_name,
+            "event_category": cat,
+            "severity": sev,
+            "target_resource": f"{r['target_table']}:{r['record_id'] or ''}",
+            "ip_address": r["ip_address"] or "127.0.0.1",
+            "details": json.loads(r["changed_fields"]) if isinstance(r["changed_fields"], str) else (r["changed_fields"] or {})
+        })
+
+    return {
+        "status": "success",
+        "count": len(results),
+        "data": results
+    }
+
+@app.get("/api/audit-logs/stats")
+async def get_audit_stats(conn: asyncpg.Connection = Depends(get_db)):
+    total = await conn.fetchval("SELECT COUNT(*) FROM audit_logs")
+    alerts = await conn.fetchval("SELECT COUNT(*) FROM audit_logs WHERE action ILIKE '%BLOCKED%' OR action ILIKE '%ALERT%' OR action ILIKE '%WARN%'")
+    mutations = await conn.fetchval("SELECT COUNT(*) FROM audit_logs WHERE action IN ('CREATE', 'UPDATE', 'DELETE', 'INSERT', 'SAVE')")
+    auth_cnt = await conn.fetchval("SELECT COUNT(*) FROM audit_logs WHERE action ILIKE '%AUTH%' OR action ILIKE '%LOGIN%'")
+    users_cnt = await conn.fetchval("SELECT COUNT(DISTINCT user_id) FROM audit_logs WHERE user_id IS NOT NULL")
+    
+    return {
+        "status": "success",
+        "data": {
+            "total_logs": total or 0,
+            "security_alerts": alerts or 0,
+            "data_mutations": mutations or 0,
+            "auth_events": auth_cnt or 0,
+            "unique_users": users_cnt or 0
+        }
+    }
+
+@app.get("/api/audit-logs/export")
+async def export_audit_logs(
+    format: str = "json",
+    action: Optional[str] = None,
+    conn: asyncpg.Connection = Depends(get_db)
+):
+    from fastapi.responses import Response
+    import csv
+    import io
+
+    query = """
+        SELECT a.id, a.created_at, a.user_id, u.username, u.full_name, u.role,
+               a.action, a.target_table, a.record_id, a.ip_address, a.changed_fields
+        FROM audit_logs a
+        LEFT JOIN users u ON a.user_id = u.id
+        ORDER BY a.created_at DESC LIMIT 1000
+    """
+    rows = await conn.fetch(query)
+    
+    if format.lower() == "csv":
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(["ID", "Timestamp", "User ID", "Username", "Full Name", "Role", "Action", "Target Table", "Record ID", "IP Address", "Details"])
+        for r in rows:
+            writer.writerow([
+                r["id"],
+                r["created_at"].isoformat() if r["created_at"] else "",
+                str(r["user_id"]) if r["user_id"] else "",
+                r["username"] or "",
+                r["full_name"] or "",
+                r["role"] or "",
+                r["action"],
+                r["target_table"],
+                r["record_id"] or "",
+                r["ip_address"] or "",
+                json.dumps(r["changed_fields"], ensure_ascii=False) if r["changed_fields"] else "{}"
+            ])
+        output.seek(0)
+        filename = f"smartgov_audit_pg_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        return Response(
+            content=output.getvalue(),
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+    else:
+        items = [
+            {
+                "id": r["id"],
+                "timestamp": r["created_at"].isoformat() if r["created_at"] else "",
+                "user_id": str(r["user_id"]) if r["user_id"] else None,
+                "username": r["username"],
+                "full_name": r["full_name"],
+                "action": r["action"],
+                "target_table": r["target_table"],
+                "record_id": r["record_id"],
+                "ip_address": r["ip_address"],
+                "details": r["changed_fields"]
+            }
+            for r in rows
+        ]
+        filename = f"smartgov_audit_pg_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        return Response(
+            content=json.dumps(items, ensure_ascii=False, indent=2),
+            media_type="application/json",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
 
 if __name__ == "__main__":
     import uvicorn

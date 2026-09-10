@@ -48,10 +48,10 @@ BACKEND_PID=$!
 
 sleep 1
 
-# 3. เริ่มต้น Web Frontend Server (Port 8085)
-echo "🎨 กำลังสตาร์ท Frontend Web Server (Port ${FRONTEND_PORT})..."
+# 3. เริ่มต้น Web Frontend Server ด้วย Secure Dev Server (Port ${FRONTEND_PORT})
+echo "🎨 กำลังสตาร์ท Frontend Web Server (Secure Dev Server Port ${FRONTEND_PORT})..."
 cd "${PROJECT_DIR}" || exit 1
-python3 -m http.server ${FRONTEND_PORT} > /dev/null 2>&1 &
+python3 secure_dev_server.py > /dev/null 2>&1 &
 FRONTEND_PID=$!
 
 sleep 1

@@ -884,8 +884,23 @@
         return;
       }
 
+      const file = fileInput.files[0];
+      const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+      const fileName = file.name.toLowerCase();
+      const isExtValid = fileName.endsWith('.jpg') || fileName.endsWith('.jpeg') || fileName.endsWith('.png') || fileName.endsWith('.webp') || fileName.endsWith('.pdf');
+
+      if (!validTypes.includes(file.type) && !isExtValid) {
+        alert("รองรับเฉพาะไฟล์รูปภาพ (JPG, PNG) หรือ PDF เท่านั้น");
+        return;
+      }
+
+      if (file.size > 10 * 1024 * 1024) {
+        alert("ขนาดไฟล์เกินกว่า 10MB");
+        return;
+      }
+
       const formData = new FormData();
-      formData.append('file', fileInput.files[0]);
+      formData.append('file', file);
       formData.append('username', 'trainee_jake');
       formData.append('week_num', weekSelect.value);
       formData.append('work_date', dateInput.value);
@@ -950,9 +965,25 @@
       const resText = document.getElementById('ai-summary-result-text');
       const runBtn = document.getElementById('btn-run-ai-summary');
 
+      // TC009: ตรวจสอบข้อมูลกิจกรรมในสัปดาห์
+      const weekEntries = (window.liveOjtData && window.liveOjtData[weekNum]) || [];
+      if (!weekEntries || weekEntries.length === 0) {
+        alert("⚠️ ไม่พบข้อมูลกิจกรรมสำหรับนำมาประมวลผลสรุป");
+        if (resText) resText.value = "ไม่พบข้อมูลกิจกรรมสำหรับนำมาประมวลผลสรุป";
+        return;
+      }
+
       runBtn.disabled = true;
       runBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> กำลังวิเคราะห์...';
       resText.value = 'กำลังส่งข้อมูลให้ Google Gemini AI สังเคราะห์รายงานราชการ 3 บรรทัด กรุณารอสักครู่...';
+
+      // TC010: PDPA Sanitizer ก่อนส่ง AI Payload
+      const sanitizedEntries = weekEntries.map(e => {
+        let t = e.task || '';
+        t = t.replace(/\b0[689]\d[- ]?\d{3}[- ]?\d{4}\b|\b0\d{1,2}[- ]?\d{3}[- ]?\d{4}\b/g, '[REDACTED_PHONE]');
+        t = t.replace(/\b(?:\d[- ]?){12}\d\b/g, '[REDACTED_NATIONAL_ID]');
+        return { ...e, task: t };
+      });
 
       try {
         const res = await fetch(`${API_BASE_URL}/api/ai/summarize-week`, {

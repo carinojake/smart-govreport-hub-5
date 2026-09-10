@@ -1219,6 +1219,10 @@ ${isMultiCase ? 'คำสั่งสำคัญ: หากมีหลาย�
       const editId = document.getElementById('entry-edit-id').value;
       const date = document.getElementById('entry-date').value.trim() || 'วันปฏิบัติงาน';
       const hours = parseFloat(document.getElementById('entry-hours').value) || 0;
+      if (hours < 0.5 || hours > 12.0) {
+        alert('❌ จำนวนชั่วโมงไม่ถูกต้อง: ต้องระบุค่าระหว่าง 0.5 - 12.0 ชั่วโมง');
+        return;
+      }
       const task = document.getElementById('entry-task').value.trim() || '-';
       const skill = document.getElementById('entry-skill').value.trim() || '-';
       const blocker = document.getElementById('entry-blocker').value.trim() || 'ไม่มี';

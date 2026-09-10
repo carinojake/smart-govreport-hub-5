@@ -1,4 +1,15 @@
 // Module: 05-logbook-views.js (Smart GovReport Hub 2.5)
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+window.escapeHtml = escapeHtml;
+
     // =========================================================================
     // OJT EDITION SWITCHER: BRIEF (ตารางทางการ A4) VS FULL (ฉบับเต็ม + รูปภาพ)
     // =========================================================================
@@ -153,14 +164,14 @@
           return `
             <tr id="ojt-row-${entry.id}" class="hover:bg-blue-50/40 transition group print:hover:bg-transparent">
               <td class="border border-slate-700 p-1.5 print:p-1 text-left font-medium text-[12.5px] print:text-[10pt] leading-snug align-top">
-                <div class="font-semibold text-slate-900">${entry.date}</div>
+                <div class="font-semibold text-slate-900">${escapeHtml(entry.date)}</div>
               </td>
               <td class="border border-slate-700 p-1.5 print:p-1 text-center font-bold text-slate-900 text-[13px] print:text-[10.5pt] align-middle">
                 ${h.toFixed(1)}
               </td>
               <td class="border border-slate-700 p-1.5 print:p-1 text-left text-[12.5px] print:text-[10pt] leading-snug align-top">
                 <div class="text-slate-800">
-                  <span>${entry.task}</span>
+                  <span>${escapeHtml(entry.task)}</span>
                   <button onclick="openEvidenceModal('${entry.id}')" class="ml-1 inline-flex items-center space-x-1 px-1.5 py-0.2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-[9px] font-semibold border border-blue-200 no-print transition align-middle flex-shrink-0" title="คลิกดูขั้นตอน SOP และหลักฐานฉบับเต็ม">
                     <i class="fa-solid fa-magnifying-glass-chart text-[8px]"></i>
                     <span>ฉบับเต็ม</span>
@@ -168,10 +179,10 @@
                 </div>
               </td>
               <td class="border border-slate-700 p-1.5 print:p-1 text-left text-[12.5px] print:text-[10pt] leading-snug text-slate-800 align-top">
-                ${entry.skill}
+                ${escapeHtml(entry.skill)}
               </td>
               <td class="border border-slate-700 p-1.5 print:p-1 text-left text-[12px] print:text-[9.5pt] leading-snug text-slate-700 align-top">
-                ${entry.blocker || '-'}
+                ${escapeHtml(entry.blocker || '-')}
               </td>
               <td class="border border-slate-700 p-1 text-center no-print align-middle">
                 <div class="flex items-center justify-center space-x-1">
@@ -419,7 +430,7 @@
             <!-- Day Header -->
             <div class="flex items-center justify-between border-b border-slate-200 pb-2 mb-3">
               <div class="flex items-center space-x-2">
-                <span class="px-2.5 py-1 bg-govNavy text-white rounded-lg text-xs font-bold">${row.date}</span>
+                <span class="px-2.5 py-1 bg-govNavy text-white rounded-lg text-xs font-bold">${escapeHtml(row.date)}</span>
                 <span class="px-2.5 py-0.5 bg-emerald-50 text-emerald-800 rounded font-semibold text-xs border border-emerald-200">${row.hours} ชม.</span>
                 <span class="text-xs text-slate-500 font-medium hidden sm:inline">รายการที่ ${toThaiNum(idx + 1)}</span>
               </div>
@@ -448,41 +459,41 @@
               <!-- Left: Detailed SOP and competencies -->
               <div class="lg:col-span-7 space-y-2">
                 <div>
-                  <span class="font-bold text-slate-900 text-sm leading-snug block">${row.task}</span>
+                  <span class="font-bold text-slate-900 text-sm leading-snug block">${escapeHtml(row.task)}</span>
                 </div>
 
                 <div class="bg-blue-50/50 p-2.5 rounded-lg border border-blue-100">
                   <span class="font-bold text-govNavy block text-[11px] mb-1">
                     <i class="fa-solid fa-list-ol mr-1 text-blue-600"></i> ขั้นตอนการปฏิบัติงานเชิงลึก (Step-by-Step SOP):
                   </span>
-                  <div class="text-slate-700 whitespace-pre-wrap leading-relaxed text-[11px] pl-1 font-sarabun">${row.steps || '-'}</div>
+                  <div class="text-slate-700 whitespace-pre-wrap leading-relaxed text-[11px] pl-1 font-sarabun">${escapeHtml(row.steps || '-')}</div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
                   <div class="bg-slate-50 p-2 rounded border border-slate-200">
                     <span class="font-bold text-slate-800 block text-[10px]"><i class="fa-solid fa-screwdriver-wrench mr-1 text-govGold"></i> เครื่องมือ/เทคโนโลยี:</span>
-                    <span class="text-slate-600">${row.tools || '-'}</span>
+                    <span class="text-slate-600">${escapeHtml(row.tools || '-')}</span>
                   </div>
                   <div class="bg-slate-50 p-2 rounded border border-slate-200">
                     <span class="font-bold text-slate-800 block text-[10px]"><i class="fa-solid fa-graduation-cap mr-1 text-govTeal"></i> ความรู้/ทักษะที่ได้รับ:</span>
-                    <span class="text-slate-600">${row.skill || '-'}</span>
+                    <span class="text-slate-600">${escapeHtml(row.skill || '-')}</span>
                   </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
                   <div class="bg-slate-50 p-2 rounded border border-slate-200">
                     <span class="font-bold text-slate-800 block text-[10px]"><i class="fa-solid fa-circle-exclamation mr-1 text-amber-500"></i> ปัญหา/อุปสรรค:</span>
-                    <span class="text-slate-600">${row.blocker || 'ไม่มี'}</span>
+                    <span class="text-slate-600">${escapeHtml(row.blocker || 'ไม่มี')}</span>
                   </div>
                   <div class="bg-slate-50 p-2 rounded border border-slate-200">
                     <span class="font-bold text-slate-800 block text-[10px]"><i class="fa-solid fa-paperclip mr-1 text-blue-500"></i> ชิ้นงาน/เอกสารอ้างอิง:</span>
-                    <span class="text-slate-600">${row.artifacts || '-'}</span>
+                    <span class="text-slate-600">${escapeHtml(row.artifacts || '-')}</span>
                   </div>
                 </div>
 
                 <div class="bg-emerald-50/40 p-2 rounded border border-emerald-200 text-[11px]">
                   <span class="font-bold text-emerald-900 block text-[10px]"><i class="fa-solid fa-chart-line mr-1 text-govTeal"></i> ผลลัพธ์และประโยชน์ต่อองค์กร:</span>
-                  <p class="text-slate-700 italic leading-snug font-sarabun">${row.impact || '-'}</p>
+                  <p class="text-slate-700 italic leading-snug font-sarabun">${escapeHtml(row.impact || '-')}</p>
                 </div>
               </div>
 
