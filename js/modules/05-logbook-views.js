@@ -84,7 +84,7 @@ window.setCondensedEntryCache = setCondensedEntryCache;
           @media print {
             @page {
               size: A4 landscape !important;
-              margin: 6mm 8mm 6mm 8mm !important;
+              margin: 10mm 12mm 10mm 12mm !important;
             }
           }
         `;
@@ -94,7 +94,7 @@ window.setCondensedEntryCache = setCondensedEntryCache;
           @media print {
             @page {
               size: A4 portrait !important;
-              margin: 6mm 8mm 6mm 8mm !important;
+              margin: 10mm 12mm 10mm 12mm !important;
             }
           }
         `;
@@ -104,11 +104,11 @@ window.setCondensedEntryCache = setCondensedEntryCache;
           @media print {
             @page {
               size: A4 portrait !important;
-              margin: 6mm 8mm 6mm 8mm !important;
+              margin: 10mm 12mm 10mm 12mm !important;
             }
             @page a4-landscape {
               size: A4 landscape !important;
-              margin: 6mm 8mm 6mm 8mm !important;
+              margin: 10mm 12mm 10mm 12mm !important;
             }
             .a4-paper.landscape {
               page: a4-landscape !important;
@@ -358,8 +358,8 @@ window.setCondensedEntryCache = setCondensedEntryCache;
         } else {
           // แถวว่างตามแบบฟอร์มกระดาษจริง (ปรับความสูงให้สวยงาม ไม่หดกุด)
           return `
-            <tr class="${isLandscape ? 'h-11 print:h-10' : 'h-14 print:h-12'}">
-              <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-2 print:p-1'} text-left font-medium text-[12px] print:text-[10pt] text-slate-600 align-middle">
+            <tr class="${isLandscape ? 'h-11 print:h-12' : 'h-14 print:h-18'}">
+              <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-2 print:p-1.5'} text-left font-medium text-[12px] print:text-[10pt] text-slate-600 align-middle">
                 ${std.label}...../...../.....
               </td>
               <td class="border border-slate-700 p-1.5 print:p-1 text-center text-[12px] print:text-[10pt] align-middle text-slate-400"></td>

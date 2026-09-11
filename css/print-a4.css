@@ -6,12 +6,12 @@
 @media print {
   @page {
     size: A4 portrait;
-    margin: 6mm 8mm 6mm 8mm;
+    margin: 10mm 12mm 10mm 12mm; /* ปรับขอบให้พอดีแบบฟอร์มราชการ ไม่เว้นกว้างเกินไป */
   }
   
   @page a4-landscape {
     size: A4 landscape;
-    margin: 6mm 8mm 6mm 8mm;
+    margin: 10mm 12mm 10mm 12mm;
   }
 
   body.pdf-landscape {
@@ -27,13 +27,17 @@
     text-shadow: none !important;
   }
 
-  body {
-    background: #ffffff !important;
-    background-color: #ffffff !important;
-    color: #000000 !important;
-    font-size: 10pt !important;
+  html, body {
+    width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    font-family: 'Sarabun', 'TH Sarabun New', 'Prompt', sans-serif !important;
+    font-size: 10pt !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
   /* ซ่อน Navigation, Modals, Backdrops, Buttons ในโหมดพิมพ์ */
@@ -62,13 +66,14 @@
     padding: 0 !important;
   }
 
-  .a4-paper {
+  /* บังคับคอนเทนเนอร์และตารางกางเต็มหน้ากระดาษ 100% */
+  #print-area, .print-page, .a4-paper, [id^="ojt-weekly-page-"] {
     width: 100% !important;
     max-width: 100% !important;
     min-height: auto !important;
     height: auto !important;
     padding: 0 !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
     box-shadow: none !important;
     background: transparent !important;
     border: none !important;
@@ -89,6 +94,8 @@
   table {
     border-collapse: collapse !important;
     width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
     table-layout: fixed !important;
   }
 
@@ -97,25 +104,36 @@
     break-inside: avoid !important;
   }
 
-  td {
+  /* กำหนดขนาดตัวอักษรในเซลล์ให้อ่านสบายตาและคมชัด (10pt ไม่เล็กจิ๋ว) */
+  table th, table td, [id^="ojt-weekly-page-"] th, [id^="ojt-weekly-page-"] tbody td {
+    border: 1px solid #000000 !important;
+    padding: 5px 6px !important;
+    font-size: 10pt !important;
+    line-height: 1.35 !important;
+    vertical-align: top !important;
     word-break: break-word !important;
     overflow-wrap: break-word !important;
     line-break: loose !important;
     text-align: left !important;
   }
 
-  th {
-    word-break: break-word !important;
-    line-break: loose !important;
+  table th, [id^="ojt-weekly-page-"] th {
+    background-color: #f1f5f9 !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    padding: 6px 4px !important;
+    font-size: 10pt !important;
   }
 
   .text-center, td.text-center, th.text-center {
     text-align: center !important;
   }
 
-  /* ป้องกันเบราว์เซอร์ปั๊ม tfoot ซ้ำซ้อน */
-  tfoot {
+  /* ป้องกันช่องลงนามท้ายตารางหลุดไปหน้า 2 และไม่ปั๊มซ้ำ */
+  tfoot, .sign-section, [id^="ojt-weekly-page-"] tfoot {
     display: table-row-group !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
 
   /* ========================================================================= */
@@ -138,36 +156,24 @@
   }
 
   [id^="ojt-weekly-page-"] h2 {
-    font-size: 14pt !important;
-    margin-bottom: 1mm !important;
-    line-height: 1.15 !important;
+    font-size: 15pt !important;
+    margin-bottom: 1.5mm !important;
+    line-height: 1.2 !important;
   }
 
   [id^="ojt-weekly-page-"] .sub-title {
-    font-size: 11pt !important;
+    font-size: 11.5pt !important;
     margin-bottom: 2mm !important;
   }
 
   [id^="ojt-weekly-page-"] .info-line {
-    font-size: 9.5pt !important;
-    line-height: 1.2 !important;
-    margin-bottom: 1.5mm !important;
+    font-size: 10pt !important;
+    line-height: 1.3 !important;
+    margin-bottom: 2mm !important;
   }
 
   [id^="ojt-weekly-page-"] table {
-    margin-bottom: 1.5mm !important;
-  }
-
-  [id^="ojt-weekly-page-"] th {
-    padding: 2.5px 3px !important;
-    font-size: 9.5pt !important;
-    line-height: 1.15 !important;
-  }
-
-  [id^="ojt-weekly-page-"] tbody td {
-    padding: 2px 3.5px !important;
-    font-size: 9pt !important;
-    line-height: 1.2 !important;
+    margin-bottom: 2mm !important;
   }
 
   [id^="ojt-weekly-page-"] tfoot tr,
@@ -177,48 +183,49 @@
   }
 
   [id^="ojt-weekly-page-"] tfoot td {
-    padding: 2px 3.5px !important;
-    font-size: 8.5pt !important;
-    line-height: 1.15 !important;
+    border: 1px solid #000000 !important;
+    padding: 4px 6px !important;
+    font-size: 9.5pt !important;
+    line-height: 1.25 !important;
   }
 
   [id^="ojt-weekly-page-"] tfoot img {
-    max-height: 24px !important;
-    height: 24px !important;
-    margin: 1px auto -2px auto !important;
+    max-height: 28px !important;
+    height: 28px !important;
+    margin: 2px auto -2px auto !important;
   }
 
   [id^="ojt-weekly-page-"] tfoot .sig-line {
-    height: 16px !important;
+    height: 18px !important;
     margin-bottom: 2px !important;
   }
 
   [id^="ojt-weekly-page-"] tfoot p {
-    margin-top: 1px !important;
-    margin-bottom: 1px !important;
-    font-size: 8.5pt !important;
-    line-height: 1.15 !important;
+    margin-top: 1.5px !important;
+    margin-bottom: 1.5px !important;
+    font-size: 9.5pt !important;
+    line-height: 1.2 !important;
   }
 
-  /* Auto-Font Scaling Guardrail เมื่อเนื้อหายาวเกินเกณฑ์ (สัปดาห์ที่ 2 / เคส IT Helpdesk ยาว) */
+  /* Soft Guardrail หากเนื้อหายาวมาก (ยังคงรักษา 9.5pt ไม่อ่านยากเหมือน 7pt) */
   [id^="ojt-weekly-page-"].print-condensed tbody td {
-    padding: 1.2px 2.5px !important;
-    font-size: 7.5pt !important;
-    line-height: 1.1 !important;
+    padding: 3.5px 5px !important;
+    font-size: 9.5pt !important;
+    line-height: 1.2 !important;
   }
   [id^="ojt-weekly-page-"].print-condensed th {
-    padding: 1.5px 2px !important;
-    font-size: 8pt !important;
-    line-height: 1.1 !important;
+    padding: 4px 4px !important;
+    font-size: 9.5pt !important;
+    line-height: 1.2 !important;
   }
   [id^="ojt-weekly-page-"].print-condensed tfoot td {
-    padding: 1.5px 2px !important;
-    font-size: 7.5pt !important;
-    line-height: 1.1 !important;
+    padding: 3px 4px !important;
+    font-size: 9pt !important;
+    line-height: 1.15 !important;
   }
   [id^="ojt-weekly-page-"].print-condensed tfoot img {
-    max-height: 20px !important;
-    height: 20px !important;
+    max-height: 22px !important;
+    height: 22px !important;
   }
 }
 

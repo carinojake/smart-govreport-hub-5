@@ -147,8 +147,8 @@ window.addEventListener('beforeprint', () => {
       const rect = pageEl.getBoundingClientRect();
       const tableEl = pageEl.querySelector('table');
       const tableHeight = tableEl ? tableEl.offsetHeight : 0;
-      if (rect.height > 1000 || tableHeight > 620) {
-        console.warn(`⚠️ [Print Guardrail] Week ${w} table height (${tableHeight}px / total ${rect.height}px) exceeds safe boundary. Applying .print-condensed guardrail.`);
+      if (rect.height > 1080 || tableHeight > 750) {
+        console.warn(`⚠️ [Print Guardrail] Week ${w} table height (${tableHeight}px / total ${rect.height}px) exceeds safe boundary. Applying soft .print-condensed guardrail.`);
         pageEl.classList.add('print-condensed');
       }
     }
