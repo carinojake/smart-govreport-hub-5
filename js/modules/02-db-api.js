@@ -47,14 +47,14 @@ export class DbApiClient {
 
     pill.classList.remove('hidden');
     if (online) {
-      pill.className = 'flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-[11px] text-emerald-300 font-medium shadow-sm backdrop-blur-md whitespace-nowrap flex-shrink-0 transition-all hover:bg-emerald-900/50 hover:border-emerald-400/40 cursor-pointer';
-      const count = telemetry ? (telemetry.saved_reports !== undefined ? telemetry.saved_reports : 1) : 1;
-      textSpan.innerHTML = `<span class="hidden md:inline font-normal text-emerald-200/90">Docker</span> <span class="font-bold text-white tracking-tight">PostgreSQL</span> <span class="text-emerald-300 font-mono text-[10px] bg-emerald-900/60 px-1 py-0.5 rounded border border-emerald-500/30">:5432</span> <span class="bg-emerald-500/20 text-emerald-200 px-1.5 py-0.5 rounded text-[10px] font-mono border border-emerald-500/30">${count} รายการ</span>`;
-      pill.title = `🟢 Docker PostgreSQL 5432 เชื่อมต่อสมบูรณ์ (${count} รายการ) | ${dbName || 'PostgreSQL 5432'}`;
+      pill.className = 'flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-950/70 border border-emerald-500/40 text-[11px] text-emerald-300 font-medium shadow-sm backdrop-blur-md whitespace-nowrap flex-shrink-0 transition-all hover:bg-emerald-900/60 cursor-pointer';
+      const count = telemetry ? (telemetry.saved_reports !== undefined ? telemetry.saved_reports : 4) : 4;
+      textSpan.innerHTML = `<span class="font-bold text-white tracking-tight">PG:5432</span> <span class="bg-emerald-500/20 text-emerald-200 px-1.5 py-0.2 rounded text-[10px] font-mono border border-emerald-500/30">(${count})</span>`;
+      pill.title = `🟢 Docker PostgreSQL 5432 เชื่อมต่อสมบูรณ์ (${count} รายการ) | ${dbName || 'PostgreSQL 5432'} (คลิกเพื่อดูรายละเอียด Container)`;
     } else {
-      pill.className = 'flex items-center space-x-2 px-3 py-1 rounded-full bg-rose-950/60 border border-rose-500/30 text-[11px] text-rose-300 font-medium shadow-sm backdrop-blur-md whitespace-nowrap flex-shrink-0 transition-all hover:bg-rose-900/50 cursor-pointer';
-      textSpan.innerHTML = `<span class="font-bold text-white tracking-tight">PostgreSQL</span> <span class="text-rose-300 font-mono text-[10px] bg-rose-900/60 px-1 py-0.5 rounded border border-rose-500/30">:5432</span> <span class="bg-rose-500/20 text-rose-200 px-1.5 py-0.5 rounded text-[10px] border border-rose-500/30">รอเชื่อมต่อ</span>`;
-      pill.title = `🔴 ไม่สามารถเชื่อมต่อไปยัง Docker PostgreSQL 5432`;
+      pill.className = 'flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-rose-950/70 border border-rose-500/40 text-[11px] text-rose-300 font-medium shadow-sm backdrop-blur-md whitespace-nowrap flex-shrink-0 transition-all hover:bg-rose-900/60 cursor-pointer';
+      textSpan.innerHTML = `<span class="font-bold text-white tracking-tight">PG:5432</span> <span class="bg-rose-500/20 text-rose-200 px-1.5 py-0.2 rounded text-[10px] border border-rose-500/30">(OFF)</span>`;
+      pill.title = `🔴 ไม่สามารถเชื่อมต่อไปยัง Docker PostgreSQL 5432 (คลิกเพื่อดูรายละเอียด)`;
     }
   }
 
