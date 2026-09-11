@@ -1,106 +1,120 @@
-# 🏛️ Smart GovReport Hub 2.5 & OJT Report System
-### ระบบบริหารจัดการและรายงานผลการปฏิบัติงานอัจฉริยะ (มาตรฐานราชการ 4.0)
+# 🏛️ Smart GovReport Hub 2.5 (PostgreSQL 5432 + Modular Architecture)
+### ระบบบริหารจัดการและรายงานผลการปฏิบัติงานอัจฉริยะ 2.5 (รุ่นที่ ๒ - OJT Report System 2.0)
 
-[![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688.svg)](https://fastapi.tiangolo.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI%20AsyncPG-009688.svg)](https://fastapi.tiangolo.com/)
+[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL%2016-336791.svg)](https://www.postgresql.org/)
+[![JavaScript](https://img.shields.io/badge/Frontend-ES6%20Modular-F7DF1E.svg)](#)
 [![WCAG 2.1 AA](https://img.shields.io/badge/Accessibility-WCAG%202.1%20AA-success.svg)](#)
-[![PDPA Ready](https://img.shields.io/badge/Security-PDPA%20Compliant-red.svg)](#)
+[![PDPA Ready](https://img.shields.io/badge/Security-Dual--Layer%20PDPA-red.svg)](#)
 
 ---
 
 ## 📖 ภาพรวมระบบ (System Overview)
 
-**Smart GovReport Hub 2.5** คือระบบดิจิทัลบริหารจัดการและจัดทำรายงานผลการปฏิบัติงานของข้าราชการ/พนักงานราชการ/ผู้ฝึกงานภาครัฐ (OJT 90 ชั่วโมง) และจัดทำหนังสือราชการ (บันทึกข้อความ) ตามระเบียบสำนักนายกรัฐมนตรีว่าด้วยงานสารบรรณ พ.ศ. ๒๕๒๖
-
-ออกแบบบนหลักการ **Modular & Cost-Effective Hybrid Architecture**:
-1. **Core Backend (Tier 1):** พัฒนาด้วย Python 3.12 + FastAPI + SQLite (WAL Mode) / PostgreSQL
-2. **Modern Frontend (V3 Modular):** รองรับ Web Speech API (พิมพ์ด้วยเสียงภาษาไทย), IndexedDB Local-First, และ Cloud Auto-Sync
-3. **Audit & Reconciliation Engine (2.5):** คอนโซลตรวจสอบความถูกต้องของระบบ พร้อมโมดูล Reconcile บัญชีซอฟต์แวร์ป้องกันไวรัสภาครัฐ (Star Cat vs XDR)
+**Smart GovReport Hub 2.5 (Modular Standalone Edition)** คือระบบบริหารจัดการและรายงานผลการปฏิบัติงานอัจฉริยะสำหรับงานสารบรรณภาครัฐและการฝึกงาน (OJT 90 ชั่วโมง) ขับเคลื่อนด้วยสถาปัตยกรรมแบบแยกส่วน (Modular JavaScript ES6 Modules) เชื่อมต่อฐานข้อมูลหลัก **Docker PostgreSQL 16 (Port: 5432)** และรองรับ **FastAPI AsyncPG REST API (Port: 8086)** พร้อมเสิร์ฟหน้าบ้านแบบ Secure HTTP Server **(Port: 8085)**
 
 ---
 
-## 🌟 ฟีเจอร์หลัก (Key Features)
+## 🌟 ฟีเจอร์เด่นในรุ่น 2.5 (Key Features)
 
-- 🎙️ **Thai Speech-to-Text Assistant:** บันทึกงานผ่านเสียงพูดภาษาไทย แปลงเป็นข้อความแบบเรียลไทม์
-- 🛡️ **PDPA Two-Tier Sanitizer & Consent:** ตรวจจับและ Masking ข้อมูลส่วนบุคคล (เลขบัตร ปชช. 13 หลัก, เบอร์โทร, อีเมล) พร้อมระบบบันทึกความยินยอม PDPA
-- 🤖 **AI Gov Polish (Gemini 1.5 Flash):** ขัดเกลาภาษาพูดให้เป็นภาษาราชการที่ถูกต้องตามระเบียบงานสารบรรณ
-- ✍️ **Digital Signature Pad:** รองรับการลงนามดิจิทัล 2 ระดับ (ผู้ฝึกงาน และ ผู้ควบคุมงาน/Supervisor)
-- 📄 **A4 Official Print Engine:** พิมพ์บันทึกข้อความและสมุดบันทึก OJT ตรงตามขนาดกระดาษ A4 มาตรฐาน ตราครุฑ 3 ซม. ไม่ตกขอบ
-- 🔍 **Audit Log Console (Version 2.5):** ระบบบันทึกประวัติการเข้าถึงและการแก้ไขข้อมูลแบบโปร่งใส ตรวจสอบย้อนหลังได้ทุก Transaction
-- 📊 **Executive Dashboard & Reconciliation:** แดชบอร์ดสรุปผลเชิงบริหาร และระบบเปรียบเทียบข้อมูลทรัพย์สินคอมพิวเตอร์/แอนตี้ไวรัส
+1. **Dynamic RBAC Permission Matrix (PostgreSQL-backed):**
+   - จัดการสิทธิ์การเข้าถึงเมนูและโมดูลงาน (View / Edit) ได้แบบ Real-time ราย 4 บทบาทหลัก:
+     - `staff` (ผู้ดูแลระบบ / เจ้าหน้าที่)
+     - `supervisor` (ผู้ควบคุมงาน / พี่เลี้ยง)
+     - `advisor` (อาจารย์นิเทศก์ / ที่ปรึกษา)
+     - `trainee` (ผู้ฝึกปฏิบัติงาน)
+   - บันทึกการเปลี่ยนแปลงลงฐานข้อมูล PostgreSQL ทันที พร้อมระบบ Audit Trail บันทึกประวัติการแก้ไขสิทธิ์
+
+2. **Official A4 Print Engine (Portrait & Landscape Auto-Fitting):**
+   - รองรับการจัดพิมพ์สมุดบันทึก OJT ทั้งแนวตั้งและแนวนอน (A4 Landscape Form) จัดคอลัมน์กว้างสวยงาม พร้อมลายเซ็นดิจิทัล 2 ระดับ
+   - รองรับตัวเลขไทยและมาตรฐานงานสารบรรณ พ.ศ. ๒๕๒๖
+
+3. **Core Modular JavaScript ES6 Architecture:**
+   - แยกตรรกะระบบออกเป็น 14 โมดูลอิสระภายใต้ `js/modules/` (State, DB API, Numeral, Logbook, PDPA, Signature, Membership, Sync Hub, Audit Console, RBAC Manager)
+   - ดูแลรักษาง่าย (Clean Architecture) และโหลดรวดเร็วด้วย Native ES Modules
+
+4. **Multi-Database & Cloud Sync:**
+   - จัดเก็บข้อมูลหลักบน Docker PostgreSQL 16
+   - รองรับการสำรองและซิงค์ข้อมูลกับ Google Sheets ผ่าน Google Apps Script
+
+5. **Automated Backup Utility:**
+   - สคริปต์ `scripts/backup_postgres.sh` สำรองฐานข้อมูล PostgreSQL อัตโนมัติในรูปแบบ Compressed Archive
 
 ---
 
-## 🚀 วิธีการเริ่มต้นใช้งานแบบ 1-Click (Quick Start)
+## 🚀 สถาปัตยกรรมและพอร์ตการทำงาน (System Ports)
 
-### ข้อกำหนดระบบ (Prerequisites)
-- ระบบปฏิบัติการ macOS (Apple Silicon M1/M2/M3 หรือ Intel) หรือ Linux/Windows
-- Python 3.10+ (แนะนำ Python 3.12 ใน `/Users/Shared/my_ai_project/venv`)
+| บริการ (Service) | พอร์ต (Port) | เทคโนโลยี (Technology) | หน้าที่ (Description) |
+|---|---|---|---|
+| **Web Frontend** | `8085` | `secure_dev_server.py` | UI แสดงผลหลัก (Dashboard, OJT Logbook, A4 Print) |
+| **API Backend** | `8086` | FastAPI + AsyncPG (`backend/main.py`) | REST API และ Dynamic RBAC Matrix Service |
+| **Database** | `5432` | Docker PostgreSQL 16 (`smartgov_v25`) | ฐานข้อมูลหลัก จัดเก็บ Users, Reports, Logs, Roles |
 
-### รันระบบบน macOS:
+---
+
+## 🛠️ วิธีการรันระบบ (How to Run)
+
+### 1. เริ่มต้นระบบทั้งหมดในคลิกเดียว:
 ```bash
-# วิธีที่ 1: ดับเบิลคลิกไฟล์ผ่าน Finder
-1_CLICK_START.command
+./1_CLICK_START.command
+```
+หรือรันแยกแต่ละ Service:
 
-# วิธีที่ 2: รันผ่าน Terminal
-chmod +x 1_CLICK_START.sh
-./1_CLICK_START.sh
+```bash
+# 1. รัน Backend API (Port 8086)
+cd backend
+/Users/Shared/my_ai_project/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8086 --reload
+
+# 2. รัน Frontend Web Server (Port 8085)
+python3 secure_dev_server.py
 ```
 
-ระบบจะเปิดเบราว์เซอร์ไปยัง `http://127.0.0.1:8000` ให้อัตโนมัติทันที
+เข้าใช้งานได้ที่: **http://localhost:8085**
+
+---
+
+## 🧪 การทดสอบระบบ (Quality Assurance)
+
+รันชุดทดสอบความถูกต้องแบบอัตโนมัติ (Automated Standalone Test Suite):
+```bash
+python3 test_v2_5_standalone_suite.py
+```
+ผลการทดสอบ: **34/34 Passed (100%)**
 
 ---
 
 ## 📂 โครงสร้างไดเรกทอรี (Directory Structure)
 
 ```text
-smart-govreport-hub-2.5/
-├── 1_CLICK_START.command      # ตัวเปิดระบบด่วนสำหรับ macOS Finder
-├── 1_CLICK_START.sh           # Shell script รันระบบอัตโนมัติ
-├── app.py                     # FastAPI Application หลัก (REST API & Endpoints)
-├── run_server.py              # สคริปต์รันเซิร์ฟเวอร์ Uvicorn
-├── requirements.txt           # รายการ Python dependencies
-├── ojt_system/                # Backend Package โมดูลหลัก
-│   ├── ai_client.py           # ตัวเชื่อมต่อ AI ขัดเกลาภาษาราชการ
-│   ├── database.py            # ตัวจัดการฐานข้อมูล SQLite WAL / Transaction
-│   ├── models.py              # Pydantic Schemas & Data Models
-│   ├── pdpa_sanitizer.py      # เกราะป้องกันข้อมูลส่วนบุคคล PDPA
-│   ├── templates.py           # แม่แบบรายงานและบันทึกข้อความ
-│   └── a4_exporter.py         # ตัวเรนเดอร์เอกสาร A4 สารบรรณ
-├── templates/                 # Jinja2 HTML Templates (index_v1, v2, v3)
-├── static/                    # ไฟล์ Static Assets (CSS, JS, Web Speech, IndexedDB)
-├── docs/                      # เอกสารราชการส่งมอบโครงการ 4 เล่มมาตรฐาน
-│   └── deliverables/
-│       ├── 01_System_Implementation_Report/
-│       ├── 02_Comprehensive_System_Manual/
-│       ├── 03_System_Testing_and_QA_Report/
-│       └── 04_Maintenance_and_Handoff_Plan/
-├── reconcile_antivirus.py     # โมดูล Audit & Reconcile แอนตี้ไวรัสภาครัฐ
-└── test_integration.py        # ชุดทดสอบระบบ Integration Test ครอบคลุม 7 หมวด
+ojt-smartgov-report-v2.5/
+├── 1_CLICK_START.command          # สคริปต์เปิดระบบอัตโนมัติ
+├── backend/
+│   ├── main.py                    # FastAPI Backend API & RBAC Matrix Endpoints
+│   ├── schema_v25.sql             # โครงสร้างฐานข้อมูล PostgreSQL 16
+│   └── .env.example               # ไฟล์ตัวอย่างการตั้งค่า Environment
+├── css/
+│   ├── main.css                   # สไตล์หลักของระบบ
+│   └── print-a4.css               # สไตล์เอกสารสิ่งพิมพ์ A4 Portrait/Landscape
+├── js/
+│   ├── app.js                     # Main ES6 Module Bootstrapper
+│   └── modules/                   # โมดูลระบบ 14 ส่วนย่อย
+│       ├── 01-core-state.js
+│       ├── 02-db-api.js
+│       ├── 03-numeral.js
+│       ├── 05-logbook-views.js
+│       ├── 06-evidence-pdpa.js
+│       ├── 07-signature.js
+│       ├── 09-gov-docs.js
+│       ├── 10-membership.js
+│       ├── 11-sync-hub.js
+│       ├── 12-audit-console.js
+│       └── 14-rbac-manager.js     # โมดูลควบคุม Dynamic RBAC Matrix
+├── scripts/
+│   └── backup_postgres.sh         # สคริปต์สำรองฐานข้อมูล PostgreSQL
+├── index.html                     # หน้าเว็บแอปพลิเคชันหลัก
+├── secure_dev_server.py           # เว็บเซิร์ฟเวอร์ความปลอดภัยสูง (Port 8085)
+└── test_v2_5_standalone_suite.py  # ชุดทดสอบระบบอัตโนมัติ 34 หัวข้อ
 ```
 
 ---
-
-## 🧪 การทดสอบระบบ (Testing & Verification)
-
-ระบบผ่านการทดสอบครอบคลุมทุกฟังก์ชันหลัก 100%:
-```bash
-python3 test_integration.py
-```
-- **ผลการทดสอบ:** ผ่าน 7/7 หมวด (Status 200, PDPA Sanitizer, Multi-role RBAC, Signature, IndexedDB fallback, A4 Export)
-- **มาตรฐาน Accessibility:** ผ่านเกณฑ์ **WCAG 2.1 AA**
-
----
-
-## 📚 เอกสารส่งมอบโครงการ 4 เล่มมาตรฐาน (Project Deliverables)
-อยู่ในโฟลเดอร์ `docs/deliverables/`:
-1. **เล่ม 1:** รายงานจัดทำระบบแบบสมบูรณ์และสถาปัตยกรรมทางเทคนิค (`01_System_Implementation_Report`)
-2. **เล่ม 2:** คู่มือการใช้งานระบบแบบสมบูรณ์ (`02_Comprehensive_System_Manual`)
-3. **เล่ม 3:** รายงานผลการทดสอบระบบและการประกันคุณภาพ (`03_System_Testing_and_QA_Report`)
-4. **เล่ม 4:** แผนการบำรุงรักษาและการฝึกอบรม/ส่งมอบงาน (`04_Maintenance_and_Handoff_Plan`)
-
----
-
-## 📄 ใบอนุญาต (License)
-โครงการนี้เผยแพร่ภายใต้สัญญาอนุญาต **MIT License**
+© 2026 Smart GovReport Hub - สำนักงานปลัดกระทรวงยุติธรรม ศูนย์เทคโนโลยีสารสนเทศและการสื่อสาร (ศทส.)

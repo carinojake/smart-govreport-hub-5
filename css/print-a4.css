@@ -1,0 +1,196 @@
+/* ==========================================================================
+   🏛️ SMART GOVREPORT HUB 2.5 - STRICT A4 PRINT STYLESHEET
+   การันตี 1 สัปดาห์ 1 หน้า A4 ลายเซ็นไม่ตกไปอยู่หน้า 2 เสมอ 100%
+   ========================================================================== */
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 6mm 8mm 6mm 8mm;
+  }
+  
+  @page a4-landscape {
+    size: A4 landscape;
+    margin: 6mm 8mm 6mm 8mm;
+  }
+
+  body.pdf-landscape {
+    page: a4-landscape !important;
+  }
+
+  .a4-paper.landscape {
+    page: a4-landscape !important;
+  }
+  
+  *, *::before, *::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-size: 10pt !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* ซ่อน Navigation, Modals, Backdrops, Buttons ในโหมดพิมพ์ */
+  aside, nav, header, footer, .no-print,
+  [id$="-modal"], [class*="backdrop-blur"], [class*="fixed inset-0"],
+  button:not(.allow-print) {
+    display: none !important;
+  }
+
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .hidden, [hidden], section.hidden, div.hidden {
+    display: none !important;
+  }
+
+  section:not(.hidden) {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .a4-paper {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    border: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .page-break {
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+
+  .a4-paper:last-of-type, .page-break:last-of-type {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    table-layout: fixed !important;
+  }
+
+  tr, td, th {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  td {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  /* ========================================================================= */
+  /* กฎเฉพาะแบบบันทึก 1 สัปดาห์ 1 หน้า A4 (SIGNATURE PROTECTION GUARANTEE)    */
+  /* ========================================================================= */
+  [id^="ojt-weekly-page-"] {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    max-height: 282mm !important;
+    box-sizing: border-box !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  [id^="ojt-weekly-page-"] h2 {
+    font-size: 14pt !important;
+    margin-bottom: 1mm !important;
+    line-height: 1.15 !important;
+  }
+
+  [id^="ojt-weekly-page-"] .sub-title {
+    font-size: 11pt !important;
+    margin-bottom: 2mm !important;
+  }
+
+  [id^="ojt-weekly-page-"] .info-line {
+    font-size: 9.5pt !important;
+    line-height: 1.2 !important;
+    margin-bottom: 1.5mm !important;
+  }
+
+  [id^="ojt-weekly-page-"] table {
+    margin-bottom: 1.5mm !important;
+  }
+
+  [id^="ojt-weekly-page-"] th {
+    padding: 2.5px 3px !important;
+    font-size: 9.5pt !important;
+    line-height: 1.15 !important;
+  }
+
+  [id^="ojt-weekly-page-"] tbody td {
+    padding: 2px 3.5px !important;
+    font-size: 9pt !important;
+    line-height: 1.2 !important;
+  }
+
+  [id^="ojt-weekly-page-"] tfoot tr,
+  [id^="ojt-weekly-page-"] tfoot td {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  [id^="ojt-weekly-page-"] tfoot td {
+    padding: 2px 3.5px !important;
+    font-size: 8.5pt !important;
+    line-height: 1.15 !important;
+  }
+
+  [id^="ojt-weekly-page-"] tfoot img {
+    max-height: 24px !important;
+    height: 24px !important;
+    margin: 1px auto -2px auto !important;
+  }
+
+  [id^="ojt-weekly-page-"] tfoot .sig-line {
+    height: 16px !important;
+    margin-bottom: 2px !important;
+  }
+
+  [id^="ojt-weekly-page-"] tfoot p {
+    margin-top: 1px !important;
+    margin-bottom: 1px !important;
+    font-size: 8.5pt !important;
+    line-height: 1.15 !important;
+  }
+}
+
+/* Screen Preview Simulation for Landscape A4 */
+.a4-paper.landscape {
+  width: 297mm;
+  min-height: 210mm;
+  padding: 14mm 16mm 14mm 16mm;
+  max-width: 98vw;
+}
+
+@media (max-width: 1200px) {
+  .a4-paper.landscape {
+    width: 100%;
+    min-height: auto;
+    padding: 1rem;
+    overflow-x: auto;
+  }
+}
