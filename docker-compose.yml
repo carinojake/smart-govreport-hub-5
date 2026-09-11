@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  smartgov_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smartgov_hub_prod
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      # ผูกพอร์ตเฉพาะ 127.0.0.1 เพื่อให้เรียกผ่าน Nginx Reverse Proxy เท่านั้น (ป้องกันการยิงเข้า 8000 ตรงจากภายนอก)
+      - "127.0.0.1:8000:8000"
+    volumes:
+      # Persistent Storage: ข้อมูลและบันทึกจะไม่สูญหายเมื่อรีสตาร์ตคอนเทนเนอร์
+      - ./ojt_logbook.db:/app/ojt_logbook.db
+      - ./logs:/app/logs
+      - ./backups:/app/backups
+    environment:
+      - SMARTGOV_DB_PATH=/app/ojt_logbook.db
+      - SMARTGOV_AUDIT_LOG_PATH=/app/logs/pdpa_audit.jsonl
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/auth/users"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.25'
+          memory: 256M

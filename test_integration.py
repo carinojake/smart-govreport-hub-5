@@ -43,9 +43,16 @@ class TestSmartGovReportHub(unittest.TestCase):
     def test_1_root_page(self):
         res = client.get("/")
         self.assertEqual(res.status_code, 200)
-        self.assertIn("Smart GovReport Hub", res.text)
+        self.assertIn("Smart GovReport Hub 2.5", res.text)
         self.assertIn("pdpaConsentModal", res.text)
-        print("✓ 1. Root dashboard and PDPA modal loaded")
+
+        # Legacy routes /v1, /v2, /v3 must redirect to 2.5
+        for legacy_route in ["/v1", "/v2", "/v3"]:
+            redir_res = client.get(legacy_route, follow_redirects=False)
+            self.assertEqual(redir_res.status_code, 307)
+            self.assertEqual(redir_res.headers["location"], "/")
+
+        print("✓ 1. Root dashboard 2.5 loaded & legacy V1/V2/V3 successfully redirected")
 
     def test_2_users_list_secrecy_and_pin_login(self):
         res = client.get("/api/v1/auth/users")

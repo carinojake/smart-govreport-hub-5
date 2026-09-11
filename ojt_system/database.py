@@ -182,6 +182,44 @@ class OJTDatabase:
             conn.execute("CREATE INDEX IF NOT EXISTS idx_audit_user_id ON ojt_audit_logs(user_id);")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_audit_category ON ojt_audit_logs(event_category);")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_audit_severity ON ojt_audit_logs(severity);")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_activities_trainee_week ON ojt_activities(trainee_id, week_number);")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_activities_date ON ojt_activities(activity_date);")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_memos_trainee_week ON ojt_memos(trainee_id, week_number);")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_evaluations_trainee_week ON ojt_evaluations(trainee_id, week_number);")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_signatures_trainee_week ON ojt_signatures(trainee_id, week_number);")
+
+            # Dynamic RBAC Tables
+            conn.execute("""
+            CREATE TABLE IF NOT EXISTS ojt_roles (
+                role_id TEXT PRIMARY KEY,
+                role_name TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            """)
+
+            conn.execute("""
+            CREATE TABLE IF NOT EXISTS ojt_menus (
+                menu_id TEXT PRIMARY KEY,
+                module_key TEXT NOT NULL UNIQUE,
+                menu_label TEXT NOT NULL,
+                menu_category TEXT DEFAULT 'sidebar',
+                menu_icon TEXT,
+                sort_order INTEGER DEFAULT 0,
+                is_active INTEGER DEFAULT 1
+            );
+            """)
+
+            conn.execute("""
+            CREATE TABLE IF NOT EXISTS ojt_role_menu_permissions (
+                role_id TEXT NOT NULL,
+                menu_id TEXT NOT NULL,
+                can_view INTEGER DEFAULT 1,
+                can_edit INTEGER DEFAULT 0,
+                PRIMARY KEY (role_id, menu_id),
+                FOREIGN KEY (role_id) REFERENCES ojt_roles(role_id) ON DELETE CASCADE,
+                FOREIGN KEY (menu_id) REFERENCES ojt_menus(menu_id) ON DELETE CASCADE
+            );
+            """)
 
             conn.commit()
 
@@ -342,6 +380,70 @@ class OJTDatabase:
                     json.dumps(exps, ensure_ascii=False),
                     json.dumps(skills, ensure_ascii=False)
                 ))
+
+            # --- Seed RBAC Roles, Menus, Permissions ---
+            roles_seed = [
+                ("admin", "ผู้ดูแลระบบ/ผู้บริหาร (Admin Superuser)"),
+                ("supervisor", "ผู้ควบคุมงาน/พี่เลี้ยง (Supervisor/Mentor)"),
+                ("trainee", "ผู้ฝึกปฏิบัติงาน (Trainee)")
+            ]
+            for r in roles_seed:
+                conn.execute("INSERT OR IGNORE INTO ojt_roles (role_id, role_name) VALUES (?, ?)", r)
+
+            menus_seed = [
+                ("m_dash", "dashboard", "แดชบอร์ดภาพรวมรายงาน", "sidebar", "fa-solid fa-chart-pie", 1),
+                ("m_log", "ojt-log", "สมุดบันทึกการฝึกภาคปฏิบัติ", "sidebar", "fa-solid fa-book-bookmark", 2),
+                ("m_proj", "project-summary", "รายงานบริหารโครงการ", "sidebar", "fa-solid fa-diagram-project", 3),
+                ("m_memo", "official-memo", "บันทึกข้อความราชการ", "sidebar", "fa-solid fa-stamp", 4),
+                ("m_port", "portfolio-report", "รายงานสมรรถนะ Portfolio", "sidebar", "fa-solid fa-award", 5),
+                ("m_audit", "audit-console", "ศูนย์ตรวจสอบประวัติระบบ", "sidebar", "fa-solid fa-terminal", 6),
+                ("m_ai_polish", "ai-polish", "AI Polish ขัดเกลาภาษาราชการ", "widget", "fa-solid fa-wand-magic-sparkles", 7),
+                ("m_backup_json", "backup-json", "สำรองข้อมูล JSON", "toolbar", "fa-solid fa-file-arrow-down", 8)
+            ]
+            for m in menus_seed:
+                conn.execute("""
+                INSERT OR IGNORE INTO ojt_menus (menu_id, module_key, menu_label, menu_category, menu_icon, sort_order)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """, m)
+
+            # Default Role Permissions Matrix
+            # Admin: all visible & editable
+            # Supervisor: all visible & editable except audit (view only)
+            # Trainee: hides dashboard, audit-console, backup-json
+            default_permissions = [
+                # ADMIN
+                ("admin", "m_dash", 1, 1),
+                ("admin", "m_log", 1, 1),
+                ("admin", "m_proj", 1, 1),
+                ("admin", "m_memo", 1, 1),
+                ("admin", "m_port", 1, 1),
+                ("admin", "m_audit", 1, 1),
+                ("admin", "m_ai_polish", 1, 1),
+                ("admin", "m_backup_json", 1, 1),
+                # SUPERVISOR
+                ("supervisor", "m_dash", 1, 0),
+                ("supervisor", "m_log", 1, 1),
+                ("supervisor", "m_proj", 1, 1),
+                ("supervisor", "m_memo", 1, 1),
+                ("supervisor", "m_port", 1, 1),
+                ("supervisor", "m_audit", 1, 0),
+                ("supervisor", "m_ai_polish", 1, 1),
+                ("supervisor", "m_backup_json", 1, 1),
+                # TRAINEE
+                ("trainee", "m_dash", 0, 0),
+                ("trainee", "m_log", 1, 1),
+                ("trainee", "m_proj", 1, 1),
+                ("trainee", "m_memo", 1, 1),
+                ("trainee", "m_port", 1, 0),
+                ("trainee", "m_audit", 0, 0),
+                ("trainee", "m_ai_polish", 1, 1),
+                ("trainee", "m_backup_json", 0, 0)
+            ]
+            for p in default_permissions:
+                conn.execute("""
+                INSERT OR IGNORE INTO ojt_role_menu_permissions (role_id, menu_id, can_view, can_edit)
+                VALUES (?, ?, ?, ?)
+                """, p)
 
             conn.commit()
 
@@ -858,3 +960,77 @@ class OJTDatabase:
                 user_agent=e[8],
                 details=e[9]
             )
+
+    # =========================================================================
+    # RBAC Management Methods
+    # =========================================================================
+    def get_role_permissions(self, role_id: str) -> List[Dict[str, Any]]:
+        with self.get_connection() as conn:
+            rows = conn.execute("""
+                SELECT m.menu_id, m.module_key, m.menu_label, m.menu_category, m.menu_icon, m.sort_order,
+                       p.can_view, p.can_edit
+                FROM ojt_menus m
+                JOIN ojt_role_menu_permissions p ON m.menu_id = p.menu_id
+                WHERE p.role_id = ? AND m.is_active = 1
+                ORDER BY m.sort_order ASC
+            """, (role_id,)).fetchall()
+            return [dict(r) for r in rows]
+
+    def get_user_effective_permissions(self, user_id: str) -> Dict[str, Any]:
+        with self.get_connection() as conn:
+            user = self.get_user_by_id(user_id)
+            if not user:
+                role = "trainee"
+            else:
+                role = user.get("role", "trainee")
+
+            perms = self.get_role_permissions(role)
+            can_view_map = {p["module_key"]: bool(p["can_view"]) for p in perms}
+            can_edit_map = {p["module_key"]: bool(p["can_edit"]) for p in perms}
+
+            return {
+                "user_id": user_id if user else None,
+                "role": role,
+                "permissions": perms,
+                "can_view_map": can_view_map,
+                "can_edit_map": can_edit_map
+            }
+
+    def get_full_permission_matrix(self) -> Dict[str, Any]:
+        with self.get_connection() as conn:
+            roles = [dict(r) for r in conn.execute("SELECT role_id, role_name FROM ojt_roles ORDER BY role_id ASC").fetchall()]
+            menus = [dict(r) for r in conn.execute("SELECT menu_id, module_key, menu_label, menu_category, sort_order FROM ojt_menus WHERE is_active = 1 ORDER BY sort_order ASC").fetchall()]
+            raw_perms = conn.execute("SELECT role_id, menu_id, can_view, can_edit FROM ojt_role_menu_permissions").fetchall()
+            
+            matrix: Dict[str, Dict[str, Dict[str, int]]] = {}
+            for r in roles:
+                matrix[r["role_id"]] = {}
+
+            for p in raw_perms:
+                rid = p["role_id"]
+                mid = p["menu_id"]
+                if rid not in matrix:
+                    matrix[rid] = {}
+                matrix[rid][mid] = {
+                    "can_view": int(p["can_view"]),
+                    "can_edit": int(p["can_edit"])
+                }
+
+            return {
+                "roles": roles,
+                "menus": menus,
+                "matrix": matrix
+            }
+
+    def update_permission(self, role_id: str, menu_id: str, can_view: int, can_edit: int) -> bool:
+        with self.get_connection() as conn:
+            conn.execute("""
+                INSERT INTO ojt_role_menu_permissions (role_id, menu_id, can_view, can_edit)
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT(role_id, menu_id) DO UPDATE SET
+                    can_view = excluded.can_view,
+                    can_edit = excluded.can_edit
+            """, (role_id, menu_id, can_view, can_edit))
+            conn.commit()
+            return True
+

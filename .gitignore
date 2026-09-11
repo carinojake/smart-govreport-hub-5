@@ -51,3 +51,7 @@ test_*.db*
 .env
 .env.local
 .env.*.local
+
+# Backups
+backups/
+*.tar.gz

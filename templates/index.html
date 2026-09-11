@@ -54,12 +54,29 @@
     .a4-paper {
       width: 210mm;
       min-height: 297mm;
-      padding: 20mm 15mm 20mm 20mm;
+      padding: 16mm 14mm 16mm 14mm;
       margin: 0 auto;
       background: #ffffff;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
       box-sizing: border-box;
       position: relative;
+      transition: width 0.2s ease, min-height 0.2s ease;
+    }
+
+    /* Landscape Mode for A4 Report (หน้ากระดาษแนวนอน 297mm x 210mm) */
+    .a4-paper.landscape {
+      width: 297mm;
+      min-height: 210mm;
+      padding: 10mm 14mm 10mm 14mm;
+      max-width: 100%;
+    }
+
+    @media (max-width: 1100px) {
+      .a4-paper.landscape {
+        width: 100%;
+        min-height: auto;
+        padding: 1.25rem;
+      }
     }
 
     @media (max-width: 900px) {
@@ -74,33 +91,71 @@
     @media print {
       @page {
         size: A4 portrait;
-        margin: 7mm 10mm 7mm 10mm;
+        margin: 6mm 8mm 6mm 8mm;
       }
+
+      @page a4-landscape {
+        size: A4 landscape;
+        margin: 6mm 8mm 6mm 8mm;
+      }
+
+      .a4-paper.landscape,
+      .page-landscape {
+        page: a4-landscape !important;
+      }
+
       *, *::before, *::after {
         box-shadow: none !important;
         text-shadow: none !important;
       }
-      body {
+
+      html, body {
         background: #ffffff !important;
         background-color: #ffffff !important;
         color: #000000 !important;
-        font-size: 10.5pt !important;
+        font-size: 10pt !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+      }
+
+      /* Cleanly and strictly hide all web UI, headers, sidebars, controls, buttons, and modals in print */
+      .version-switcher-bar,
+      header,
+      #app-header,
+      aside,
+      #app-sidebar,
+      nav,
+      .no-print,
+      [class*="no-print"],
+      button,
+      input,
+      select,
+      .modal,
+      [id$="-modal"],
+      .fixed,
+      .sticky,
+      #quick-log-banner,
+      #controls-bar,
+      #evidence-modal, #decision-matrix-modal, #crud-entry-modal, 
+      #profile-edit-modal, #delete-confirm-modal, #ai-polish-modal,
+      #signature-modal, #apiSyncModal, #qrSyncModal,
+      #loginModal, #registerModal, #screenLockOverlay {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
         margin: 0 !important;
         padding: 0 !important;
       }
-      /* Cleanly hide sidebar, topbar, navigation, buttons, and modals in print */
-      aside, nav, header, #app-sidebar, #app-header, .no-print,
-      #evidence-modal, #decision-matrix-modal, #crud-entry-modal, 
-      #profile-edit-modal, #delete-confirm-modal, #ai-polish-modal,
-      #signature-modal {
-        display: none !important;
-      }
+
       main {
         margin: 0 !important;
         padding: 0 !important;
         width: 100% !important;
         max-width: 100% !important;
+        display: block !important;
       }
+
       .hidden, [hidden], section.hidden, div.hidden, .a4-paper.hidden {
         display: none !important;
         page-break-before: avoid !important;
@@ -108,6 +163,7 @@
         break-before: avoid !important;
         break-after: avoid !important;
       }
+
       section:not(.hidden) {
         display: block !important;
         position: static !important;
@@ -115,6 +171,7 @@
         margin: 0 !important;
         padding: 0 !important;
       }
+
       .a4-paper {
         width: 100% !important;
         max-width: 100% !important;
@@ -126,27 +183,36 @@
         background: transparent !important;
         border: none !important;
       }
+
       .page-break {
         page-break-after: always !important;
         break-after: page !important;
       }
-      .a4-paper:last-of-type, .page-break:last-of-type {
+
+      .a4-paper:last-of-type, .page-break:last-of-type, .a4-paper:last-child {
         page-break-after: avoid !important;
         break-after: avoid !important;
       }
-      /* Hide all no-print elements and table action columns */
-      .no-print, th.no-print, td.no-print {
+
+      /* Strictly hide all no-print elements and table action columns */
+      .no-print, th.no-print, td.no-print, .action-col, th:last-child.no-print, td:last-child.no-print {
         display: none !important;
+        width: 0 !important;
+        padding: 0 !important;
+        border: none !important;
       }
+
       table {
         border-collapse: collapse !important;
         width: 100% !important;
         table-layout: fixed !important;
       }
+
       tr, td, th {
         page-break-inside: avoid !important;
         break-inside: avoid !important;
       }
+
       td {
         word-break: break-word !important;
         overflow-wrap: break-word !important;
@@ -212,25 +278,27 @@
   <script src="/static/js/image-compressor.js"></script>
   <script src="/static/js/voice-input.js"></script>
   <script src="/static/js/conflict-detector.js"></script>
+  <!-- Dynamic PDF Print Orientation Style -->
+  <style id="dynamic-print-orientation"></style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-govNavy selection:text-white" id="main-body">
-  <!-- Top Version Switcher Bar (V1, V2, V3) -->
+  <!-- Top Version Bar (Smart GovReport Hub 2.5) -->
   <div class="version-switcher-bar no-print">
     <div class="flex items-center gap-2">
-      <span class="font-bold text-sky-400 flex items-center gap-1.5">
-        <i class="fa-solid fa-server text-xs"></i> Smart GovReport Hub V3
+      <span class="font-bold text-amber-400 flex items-center gap-1.5">
+        <i class="fa-solid fa-crown text-xs"></i> Smart GovReport Hub 2.5
       </span>
       <span class="text-slate-400">|</span>
-      <span class="text-slate-300">Modular Front + IndexedDB + Voice &amp; Drive</span>
+      <span class="text-slate-200 font-medium">รุ่นมาตรฐานหลัก (Unified Production Core)</span>
       <span id="v3-quota-badge" class="ml-2 storage-badge-v3">
-        <i class="fa-solid fa-database text-xs text-emerald-600"></i> <span id="v3-quota-text">IndexedDB: พร้อมใช้งาน (&gt;1GB)</span>
+        <i class="fa-solid fa-database text-xs text-emerald-400"></i> <span id="v3-quota-text">IndexedDB + WAL พร้อมใช้งาน</span>
       </span>
     </div>
-    <div class="version-nav-links">
-      <span class="text-slate-400 mr-1 text-[11px]">สลับเวอร์ชัน:</span>
-      <a href="/v1" class="version-pill inactive" title="V1 Legacy Reference Monolith"><i class="fa-solid fa-box-archive"></i> V1 (Legacy)</a>
-      <a href="/v2" class="version-pill inactive" title="V2 Production Monolith"><i class="fa-solid fa-shield-halved"></i> V2 (Prod)</a>
-      <a href="/v3" class="version-pill active" title="V3 Modular Active"><i class="fa-solid fa-bolt text-amber-300"></i> V3 (Current Active)</a>
+    <div class="version-nav-links flex items-center gap-2">
+      <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[11px] font-semibold flex items-center gap-1">
+        <i class="fa-solid fa-circle-check text-[10px]"></i> Version 2.5 Active
+      </span>
+      <span class="text-slate-400 text-[11px] hidden sm:inline">(V1 / V2 / V3 รวมเข้าสู่ 2.5)</span>
     </div>
   </div>
 
@@ -245,8 +313,8 @@
             <i class="fa-solid fa-file-signature"></i>
           </div>
           <div>
-            <h1 class="font-bold text-base sm:text-lg tracking-wide leading-tight">Smart GovReport Hub</h1>
-            <p class="text-xs text-slate-300">ระบบบริหารจัดการและจัดทำรายงานราชการอัจฉริยะ (รุ่นที่ 1)</p>
+            <h1 class="font-bold text-base sm:text-lg tracking-wide leading-tight">Smart GovReport Hub 2.5</h1>
+            <p class="text-xs text-slate-300">ระบบบริหารจัดการและจัดทำรายงานราชการอัจฉริยะ (Unified Production Standard)</p>
           </div>
         </div>
 
@@ -269,6 +337,12 @@
               <option value="staff" class="text-slate-900 font-medium">⚙️ 4. เจ้าหน้าที่ Staff/Admin</option>
             </select>
           </div>
+
+          <!-- Admin Dynamic RBAC Matrix Button (Visible only to Admin) -->
+          <button onclick="RBACManager.openMatrixModal()" id="btn-admin-rbac" title="จัดการสิทธิ์เมนูและโมดูล (Dynamic RBAC Matrix)" class="hidden bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-400/40 px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition">
+            <i class="fa-solid fa-key text-purple-300"></i>
+            <span class="hidden md:inline">จัดการสิทธิ์ (RBAC)</span>
+          </button>
 
           <!-- Quick Screen Lock Button (6-digit PIN protected) -->
           <button onclick="SecurityManager.lockScreen()" title="ล็อคหน้าจอทันที (ปลดล็อคด้วย PIN 6 หลัก)" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-400/40 px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition">
@@ -402,7 +476,7 @@
         </div>
 
         <!-- AI Assistant / Polish Quick Tool -->
-        <div class="p-3.5 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl border border-emerald-200">
+        <div id="widget-ai-polish" class="p-3.5 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl border border-emerald-200">
           <div class="flex items-center space-x-2 text-govTeal font-bold text-xs mb-1.5">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
             <span>AI Polish ขัดเกลาภาษาราชการ</span>
@@ -425,7 +499,7 @@
           </div>
           <p class="text-[10px] text-slate-500 leading-tight">บันทึกอัตโนมัติลง LocalStorage และซิงค์ Google Sheets / API</p>
           <div class="grid grid-cols-2 gap-1.5 pt-0.5">
-            <button onclick="exportDataJSON()" class="p-1.5 bg-white hover:bg-slate-100 text-slate-700 rounded-lg border border-slate-300 text-[10px] font-semibold flex items-center justify-center space-x-1 transition shadow-2xs">
+            <button onclick="exportDataJSON()" id="btn-backup-json" class="p-1.5 bg-white hover:bg-slate-100 text-slate-700 rounded-lg border border-slate-300 text-[10px] font-semibold flex items-center justify-center space-x-1 transition shadow-2xs">
               <i class="fa-solid fa-file-arrow-down text-govTeal"></i>
               <span>สำรอง JSON</span>
             </button>
@@ -703,6 +777,22 @@
               </button>
             </div>
 
+            <!-- PDF Orientation Selector: Landscape vs Portrait vs Mixed -->
+            <div class="flex items-center p-1 bg-purple-50 border border-purple-200 rounded-xl space-x-1" title="เลือกการวางแนวกระดาษสำหรับการพิมพ์และเซฟ PDF">
+              <button onclick="setPdfOrientation('landscape')" id="btn-orient-landscape" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-govNavy text-white shadow-xs transition flex items-center space-x-1" title="แนวนอน (Landscape): ตารางกว้าง อ่านง่าย ตัวหนังสือไม่บีบ สวยงามที่สุด">
+                <i class="fa-solid fa-table-columns text-amber-300"></i>
+                <span>แนวนอน (Landscape) ✨</span>
+              </button>
+              <button onclick="setPdfOrientation('portrait')" id="btn-orient-portrait" class="px-2.5 py-1 text-xs font-bold rounded-lg text-slate-700 hover:bg-purple-100 transition flex items-center space-x-1" title="แนวตั้ง (Portrait): เอกสารทรงสูงตามระเบียบสารบรรณ">
+                <i class="fa-solid fa-file-lines text-purple-600"></i>
+                <span>แนวตั้ง (Portrait)</span>
+              </button>
+              <button onclick="setPdfOrientation('mixed')" id="btn-orient-mixed" class="px-2.5 py-1 text-xs font-bold rounded-lg text-slate-700 hover:bg-purple-100 transition flex items-center space-x-1" title="ผสมผสาน (Mixed): หน้าปกแนวตั้ง + ตารางสัปดาห์แนวนอน">
+                <i class="fa-solid fa-layer-group text-sky-600"></i>
+                <span>ปกตั้ง + ตารางนอน</span>
+              </button>
+            </div>
+
             <!-- Strategic Decision Matrix Trigger -->
             <button onclick="openDecisionMatrixModal()" class="px-2.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl text-xs font-semibold shadow-sm transition flex items-center space-x-1">
               <i class="fa-solid fa-lightbulb"></i>
@@ -718,8 +808,9 @@
             <button onclick="openProfileEditModal()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition">
               <i class="fa-solid fa-pen-to-square mr-1"></i> แก้ไขข้อมูล
             </button>
-            <button onclick="window.print()" class="px-3 py-1.5 bg-govNavy hover:bg-govNavyLight text-white rounded-lg text-xs font-semibold shadow-sm transition">
-              <i class="fa-solid fa-print mr-1"></i> พิมพ์ / เซฟ PDF
+            <button onclick="printOjtReport()" class="px-3 py-1.5 bg-govNavy hover:bg-govNavyLight text-white rounded-lg text-xs font-semibold shadow-sm transition cursor-pointer flex items-center space-x-1.5">
+              <i class="fa-solid fa-print text-amber-300"></i>
+              <span>พิมพ์ / เซฟ PDF</span>
             </button>
           </div>
         </div>
@@ -3405,6 +3496,11 @@ function doGet(e) {
 
     // Tab Switching Function
     function switchTab(tabId) {
+      if (window.RBACManager && !window.RBACManager.canView(tabId)) {
+        alert(`⚠️ สงวนสิทธิ์การเข้าถึงโมดูลนี้ (Access Denied)\n\nบทบาทปัจจุบันของท่าน (${SecurityManager.currentRole}) ยังไม่ได้รับสิทธิ์เปิดใช้งานโมดูลนี้ครับ\nระบบนำท่านกลับมายังหน้าสมุดบันทึก OJT เรียบร้อยแล้ว`);
+        tabId = 'ojt-log';
+      }
+
       const views = ['dashboard', 'ojt-log', 'project-summary', 'official-memo', 'portfolio-report', 'audit-console'];
       views.forEach(v => {
         const el = document.getElementById('view-' + v);
@@ -3517,6 +3613,82 @@ function doGet(e) {
     }
 
     // =========================================================================
+    // PDF ORIENTATION CONTROL: LANDSCAPE (แนวนอน) VS PORTRAIT (แนวตั้ง) VS MIXED
+    // =========================================================================
+    let currentPdfOrientation = localStorage.getItem('ojt_pdf_orientation') || 'landscape';
+
+    function applyPdfOrientationStyle() {
+      const styleTag = document.getElementById('dynamic-print-orientation');
+      const body = document.getElementById('main-body') || document.body;
+      if (!styleTag) return;
+
+      if (currentPdfOrientation === 'landscape') {
+        styleTag.innerHTML = `
+          @media print {
+            @page {
+              size: A4 landscape !important;
+              margin: 6mm 8mm 6mm 8mm !important;
+            }
+          }
+        `;
+        body.classList.add('pdf-landscape');
+      } else if (currentPdfOrientation === 'portrait') {
+        styleTag.innerHTML = `
+          @media print {
+            @page {
+              size: A4 portrait !important;
+              margin: 6mm 8mm 6mm 8mm !important;
+            }
+          }
+        `;
+        body.classList.remove('pdf-landscape');
+      } else if (currentPdfOrientation === 'mixed') {
+        styleTag.innerHTML = `
+          @media print {
+            @page {
+              size: A4 portrait !important;
+              margin: 6mm 8mm 6mm 8mm !important;
+            }
+            @page a4-landscape {
+              size: A4 landscape !important;
+              margin: 6mm 8mm 6mm 8mm !important;
+            }
+            .a4-paper.landscape {
+              page: a4-landscape !important;
+            }
+          }
+        `;
+        body.classList.remove('pdf-landscape');
+      }
+    }
+
+    function setPdfOrientation(mode) {
+      currentPdfOrientation = mode;
+      localStorage.setItem('ojt_pdf_orientation', mode);
+
+      const btnLandscape = document.getElementById('btn-orient-landscape');
+      const btnPortrait = document.getElementById('btn-orient-portrait');
+      const btnMixed = document.getElementById('btn-orient-mixed');
+
+      const activeClass = 'px-2.5 py-1 text-xs font-bold rounded-lg bg-govNavy text-white shadow-xs transition flex items-center space-x-1';
+      const inactiveClass = 'px-2.5 py-1 text-xs font-bold rounded-lg text-slate-700 hover:bg-purple-100 transition flex items-center space-x-1';
+
+      if (btnLandscape) btnLandscape.className = (mode === 'landscape' ? activeClass : inactiveClass);
+      if (btnPortrait) btnPortrait.className = (mode === 'portrait' ? activeClass : inactiveClass);
+      if (btnMixed) btnMixed.className = (mode === 'mixed' ? activeClass : inactiveClass);
+
+      applyPdfOrientationStyle();
+      renderOjtPages();
+    }
+
+    function printOjtReport() {
+      applyPdfOrientationStyle();
+      setTimeout(() => {
+        window.print();
+      }, 80);
+    }
+
+    // =========================================================================
     // OJT EDITION SWITCHER: BRIEF (ตารางทางการ A4) VS FULL (ฉบับเต็ม + รูปภาพ)
     // =========================================================================
     let currentOjtEdition = 'brief'; // 'brief' or 'full'
@@ -3604,7 +3776,7 @@ function doGet(e) {
       renderDualSignatureSection(selectedWeek);
     }
 
-        // ฟังก์ชันดึงหมายเลขวันจากข้อความวันที่ (รองรับทั้งเลขอารบิกและเลขไทย เพื่อเรียงวันที่ 1, 2, 3...)
+    // ฟังก์ชันดึงหมายเลขวันจากข้อความวันที่ (รองรับทั้งเลขอารบิกและเลขไทย เพื่อเรียงวันที่ 1, 2, 3...)
     function extractDayNumber(dateStr) {
       if (!dateStr) return 999;
       const arabicStr = String(dateStr).replace(/[๐-๙]/g, d => "๐๑๒๓๔๕๖๗๘๙".indexOf(d));
@@ -3637,8 +3809,9 @@ function doGet(e) {
       const pageNum = pageNumOverride || (isMultiWeek ? (weekNum + 1) : (currentOjtViewMode === 'cover-and-week' ? 2 : 1));
       const totalPageLabel = isMultiWeek ? totalPages : (currentOjtViewMode === 'cover-and-week' ? 2 : 1);
 
+      const isLandscape = (currentPdfOrientation === 'landscape' || currentPdfOrientation === 'mixed');
+
       // วันมาตรฐาน 5 วันทำการ (จันทร์ - ศุกร์)
-      // กรณีสัปดาห์ที่ 1 เริ่ม อังคาร 1 ก.ย. 69 ตัดแถวว่างวันจันทร์ออกเพื่อความสะอาดตาและประหยัดพื้นที่ 1 หน้ากระดาษ
       let standardDays = [
         { label: 'จันทร์', prefix: 'จันทร์' },
         { label: 'อังคาร', prefix: 'อังคาร' },
@@ -3656,7 +3829,6 @@ function doGet(e) {
       // แมปข้อมูลตามวันในสัปดาห์
       const usedEntryIds = new Set();
       const rowsHTML = standardDays.map(std => {
-        // หา entry ที่ตรงกับวันนี้
         const entry = data.find(r => {
           if (usedEntryIds.has(r.id)) return false;
           const dStr = (r.date || '').trim();
@@ -3667,14 +3839,14 @@ function doGet(e) {
           usedEntryIds.add(entry.id);
           const h = parseFloat(entry.hours) || 0;
           return `
-            <tr class="hover:bg-blue-50/40 transition group print:hover:bg-transparent">
-              <td class="border border-slate-700 p-1.5 print:p-1 text-left font-medium text-[12.5px] print:text-[10pt] leading-snug align-top">
+            <tr class="hover:bg-blue-50/40 transition group print:hover:bg-transparent ${isLandscape ? 'min-h-[46px]' : 'min-h-[42px]'}">
+              <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-1.5 print:p-1'} text-left font-medium ${isLandscape ? 'text-[13px] print:text-[10pt]' : 'text-[12.5px] print:text-[9.5pt]'} leading-snug align-top">
                 <div class="font-semibold text-slate-900">${entry.date}</div>
               </td>
-              <td class="border border-slate-700 p-1.5 print:p-1 text-center font-bold text-slate-900 text-[13px] print:text-[10.5pt] align-middle">
+              <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-1.5 print:p-1'} text-center font-bold text-slate-900 ${isLandscape ? 'text-[14px] print:text-[10.5pt]' : 'text-[13px] print:text-[10pt]'} align-middle">
                 ${h.toFixed(1)}
               </td>
-              <td class="border border-slate-700 p-1.5 print:p-1 text-left text-[12.5px] print:text-[10pt] leading-snug align-top">
+              <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-1.5 print:p-1'} text-left ${isLandscape ? 'text-[13px] print:text-[10pt]' : 'text-[12px] print:text-[9.5pt]'} leading-snug align-top">
                 <div class="text-slate-800">
                   <span>${maskPdpaContent(entry.task)}</span>
                   <button onclick="openEvidenceModal('${entry.id}')" class="ml-1 inline-flex items-center space-x-1 px-1.5 py-0.2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-[9px] font-semibold border border-blue-200 no-print transition align-middle flex-shrink-0" title="คลิกดูขั้นตอน SOP และหลักฐานฉบับเต็ม">
@@ -3683,10 +3855,10 @@ function doGet(e) {
                   </button>
                 </div>
               </td>
-              <td class="border border-slate-700 p-1.5 print:p-1 text-left text-[12.5px] print:text-[10pt] leading-snug text-slate-800 align-top">
+              <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-1.5 print:p-1'} text-left ${isLandscape ? 'text-[13px] print:text-[10pt]' : 'text-[12px] print:text-[9.5pt]'} leading-snug text-slate-800 align-top">
                 ${maskPdpaContent(entry.skill)}
               </td>
-              <td class="border border-slate-700 p-1.5 print:p-1 text-left text-[12px] print:text-[9.5pt] leading-snug text-slate-700 align-top">
+              <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-1.5 print:p-1'} text-left ${isLandscape ? 'text-[12.5px] print:text-[9.5pt]' : 'text-[11.5px] print:text-[9pt]'} leading-snug text-slate-700 align-top">
                 ${maskPdpaContent(entry.blocker || '-')}
               </td>
               <td class="border border-slate-700 p-1 text-center no-print align-middle">
@@ -3709,10 +3881,10 @@ function doGet(e) {
             </tr>
           `;
         } else {
-          // แถวว่างตามแบบฟอร์มกระดาษจริง
+          // แถวว่างตามแบบฟอร์มกระดาษจริง (ปรับความสูงให้สวยงาม ไม่หดกุด)
           return `
-            <tr class="h-9 print:h-8">
-              <td class="border border-slate-700 p-1.5 print:p-1 text-left font-medium text-[12px] print:text-[10pt] text-slate-600 align-middle">
+            <tr class="${isLandscape ? 'h-11 print:h-10' : 'h-14 print:h-12'}">
+              <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-2 print:p-1'} text-left font-medium text-[12px] print:text-[10pt] text-slate-600 align-middle">
                 ${std.label}...../...../.....
               </td>
               <td class="border border-slate-700 p-1.5 print:p-1 text-center text-[12px] print:text-[10pt] align-middle text-slate-400"></td>
@@ -3726,12 +3898,12 @@ function doGet(e) {
       }).join('');
 
       return `
-        <div id="ojt-weekly-page-${weekNum}" class="a4-paper font-sarabun text-slate-900 leading-normal page-break shadow-md mb-8">
+        <div id="ojt-weekly-page-${weekNum}" class="a4-paper font-sarabun text-slate-900 leading-normal page-break shadow-md mb-8 ${isLandscape ? 'landscape' : ''}">
           
           <!-- Header (แบบฟอร์มราชการกึ่งกลางตรงตามต้นฉบับจริง) -->
           <div class="text-center pt-1 pb-2 print:pt-0 print:pb-1 relative">
-            <h2 class="text-lg print:text-base font-bold tracking-normal text-black">แบบบันทึกการปฏิบัติงานประจำสัปดาห์</h2>
-            <div class="text-base print:text-sm font-bold text-black mt-0.5">
+            <h2 class="${isLandscape ? 'text-xl print:text-lg' : 'text-lg print:text-base'} font-bold tracking-normal text-black">แบบบันทึกการปฏิบัติงานประจำสัปดาห์</h2>
+            <div class="${isLandscape ? 'text-base print:text-sm' : 'text-base print:text-sm'} font-bold text-black mt-0.5">
               สัปดาห์ที่<span class="inline-block border-b border-dotted border-black min-w-[3rem] text-center font-bold px-2 mx-1">${toThaiNum(weekNum)}</span>
             </div>
             
@@ -3747,7 +3919,40 @@ function doGet(e) {
             </div>
           </div>
 
-          <!-- Section: ข้อมูลผู้ฝึกภาคปฏิบัติ (3 บรรทัด เส้นประ จุดไข่ปลา ตามต้นฉบับเป๊ะ) -->
+          ${isLandscape ? `
+          <!-- Section: ข้อมูลผู้ฝึกภาคปฏิบัติ (Landscape 2 Columns จัดเต็มพื้นที่) -->
+          <div class="text-[13px] print:text-[10.5pt] leading-snug text-black mb-2.5 print:mb-2 space-y-1">
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex items-baseline min-w-0">
+                <span class="font-normal whitespace-nowrap">ข้าพเจ้า (นาย/นางสาว)</span>
+                <span class="border-b border-dotted border-black flex-1 ml-2 px-2 font-medium text-slate-900 truncate">
+                  ${formatTraineeNameWithTitle(profileData.traineeName)}
+                </span>
+              </div>
+              <div class="flex items-baseline min-w-0">
+                <span class="font-normal whitespace-nowrap">ชื่อหน่วยงาน</span>
+                <span class="border-b border-dotted border-black flex-1 ml-2 px-2 font-medium text-slate-900 truncate">
+                  ${profileData.orgName}
+                </span>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex items-baseline min-w-0">
+                <span class="font-normal whitespace-nowrap">ผู้ควบคุมการฝึกงาน</span>
+                <span class="border-b border-dotted border-black flex-1 ml-2 px-2 font-medium text-slate-900 truncate">
+                  ${profileData.supervisorName}
+                </span>
+              </div>
+              <div class="flex items-baseline min-w-0">
+                <span class="font-normal whitespace-nowrap">ตำแหน่ง</span>
+                <span class="border-b border-dotted border-black flex-1 ml-2 px-2 font-medium text-slate-900 truncate">
+                  ${profileData.supervisorPos}
+                </span>
+              </div>
+            </div>
+          </div>
+          ` : `
+          <!-- Section: ข้อมูลผู้ฝึกภาคปฏิบัติ (Portrait 3 Lines ตามมาตรฐาน) -->
           <div class="text-[13px] print:text-[11px] leading-snug text-black mb-2 print:mb-1.5 space-y-0.5">
             <div class="flex items-baseline">
               <span class="font-normal whitespace-nowrap">ข้าพเจ้า (นาย/นางสาว)</span>
@@ -3776,17 +3981,18 @@ function doGet(e) {
               </div>
             </div>
           </div>
+          `}
 
-          <!-- Official Logbook Table (ตรงตามแบบฟอร์มกระดาษราชการ 1:1) -->
+          <!-- Official Logbook Table (สัดส่วนคอลัมน์กว้างสวยงาม) -->
           <div class="w-full">
-            <table class="w-full border-collapse border border-slate-700 text-[13px] print:text-[10.5pt] mb-2 print:mb-1">
+            <table class="w-full border-collapse border border-slate-700 ${isLandscape ? 'text-[13px] print:text-[10pt]' : 'text-[12.5px] print:text-[9.5pt]'} mb-2 print:mb-1">
               <thead>
-                <tr class="bg-white text-center font-bold text-black">
-                  <th class="border border-slate-700 p-1.5 print:p-1 w-[14%] print:w-[14%] font-bold text-center">วัน/เดือน/ปี</th>
-                  <th class="border border-slate-700 p-1.5 print:p-1 w-[8%] print:w-[8%] font-bold text-center leading-tight">จำนวน<br>ชั่วโมง</th>
-                  <th class="border border-slate-700 p-1.5 print:p-1 w-[38%] print:w-[41%] font-bold text-center">งานที่ปฏิบัติโดยย่อ</th>
-                  <th class="border border-slate-700 p-1.5 print:p-1 w-[22%] print:w-[23%] font-bold text-center leading-tight">ความรู้/ทักษะ<br>ที่ได้รับ</th>
-                  <th class="border border-slate-700 p-1.5 print:p-1 w-[13%] print:w-[14%] font-bold text-center leading-tight">ปัญหา/<br>อุปสรรค</th>
+                <tr class="bg-slate-50 print:bg-transparent text-center font-bold text-black">
+                  <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[13%] print:w-[13%]' : 'p-1.5 print:p-1 w-[14%] print:w-[14%]'} font-bold text-center">วัน/เดือน/ปี</th>
+                  <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[7%] print:w-[7%]' : 'p-1.5 print:p-1 w-[8%] print:w-[8%]'} font-bold text-center leading-tight">จำนวน<br>ชั่วโมง</th>
+                  <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[42%] print:w-[42%]' : 'p-1.5 print:p-1 w-[40%] print:w-[41%]'} font-bold text-center">งานที่ปฏิบัติโดยย่อ</th>
+                  <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[23%] print:w-[23%]' : 'p-1.5 print:p-1 w-[23%] print:w-[23%]'} font-bold text-center leading-tight">ความรู้/ทักษะ<br>ที่ได้รับ</th>
+                  <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[15%] print:w-[15%]' : 'p-1.5 print:p-1 w-[15%] print:w-[14%]'} font-bold text-center leading-tight">ปัญหา/<br>อุปสรรค</th>
                   <th class="border border-slate-700 p-1 w-[5%] no-print text-center font-normal text-slate-500">จัดการ</th>
                 </tr>
               </thead>
@@ -3796,14 +4002,14 @@ function doGet(e) {
               <tfoot>
                 <!-- Integrated Footer Matching Official Paper Form (Symmetric Dual Digital / Manual Signatures) -->
                 <tr>
-                  <td class="border border-slate-700 p-2 print:p-1 font-bold text-black text-center text-[12px] print:text-[10pt] leading-snug align-middle">
+                  <td class="border border-slate-700 ${isLandscape ? 'p-2.5 print:p-1.5' : 'p-2 print:p-1'} font-bold text-black text-center text-[12px] print:text-[10pt] leading-snug align-middle">
                     จำนวนชั่วโมงรวมใน<br>รายงานฉบับนี้
                   </td>
-                  <td class="border border-slate-700 p-1.5 print:p-1 text-center font-black text-black text-[15px] print:text-[12pt] align-middle">
+                  <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1' : 'p-1.5 print:p-1'} text-center font-black text-black ${isLandscape ? 'text-[16px] print:text-[12pt]' : 'text-[15px] print:text-[12pt]'} align-middle">
                     ${toThaiNum(weekHours.toFixed(1))}
                   </td>
                   <!-- Signature Trainee Block -->
-                  <td class="border border-slate-700 p-2.5 print:p-1.5 text-center align-top text-[12px] print:text-[10pt] leading-snug">
+                  <td class="border border-slate-700 ${isLandscape ? 'p-3 print:p-2' : 'p-2.5 print:p-1.5'} text-center align-top text-[12px] print:text-[10pt] leading-snug">
                     <p class="mb-1 font-medium text-black">ขอรับรองว่ารายงานฉบับนี้เป็นความจริงทุกประการ</p>
                     ${securityState.traineeSignatures && securityState.traineeSignatures[weekNum] ? `
                       <div class="my-0.5">
@@ -3830,7 +4036,7 @@ function doGet(e) {
                     `}
                   </td>
                   <!-- Signature Supervisor Block (Colspan 2) -->
-                  <td class="border border-slate-700 p-2.5 print:p-1.5 text-center align-top text-[12px] print:text-[10pt] leading-snug" colspan="2">
+                  <td class="border border-slate-700 ${isLandscape ? 'p-3 print:p-2' : 'p-2.5 print:p-1.5'} text-center align-top text-[12px] print:text-[10pt] leading-snug" colspan="2">
                     <p class="mb-1 font-medium text-black">ขอรับรองว่ารายงานฉบับนี้เป็นความจริงทุกประการ</p>
                     ${securityState.signatures && securityState.signatures[weekNum] ? `
                       <div class="my-0.5">
@@ -6215,6 +6421,7 @@ function doGet(e) {
           pullDataFromApi(true);
         }
       });
+      setPdfOrientation(currentPdfOrientation);
       renderProfile();
       renderProjectSummary();
       changeOjtWeek();
@@ -6835,6 +7042,300 @@ function doGet(e) {
     }
 
     /**
+     * Dynamic RBAC Manager:
+     * - Controls Dynamic Visibility of Sidebar tabs, Widgets, Toolbar actions
+     * - Intercepts switchTab() for Route-level Security
+     * - Fetches and renders Dynamic RBAC Matrix Modal for Admin
+     */
+    const RBACManager = {
+      userPermissions: null,
+      currentRole: 'trainee',
+      fallbackRoleMap: {
+        trainee: {
+          'dashboard': false,
+          'ojt-log': true,
+          'project-summary': true,
+          'official-memo': true,
+          'portfolio-report': true,
+          'audit-console': false,
+          'ai-polish': true,
+          'backup-json': false
+        },
+        supervisor: {
+          'dashboard': true,
+          'ojt-log': true,
+          'project-summary': true,
+          'official-memo': true,
+          'portfolio-report': true,
+          'audit-console': true,
+          'ai-polish': true,
+          'backup-json': true
+        },
+        advisor: {
+          'dashboard': true,
+          'ojt-log': true,
+          'project-summary': true,
+          'official-memo': true,
+          'portfolio-report': true,
+          'audit-console': true,
+          'ai-polish': true,
+          'backup-json': true
+        },
+        admin: {
+          'dashboard': true,
+          'ojt-log': true,
+          'project-summary': true,
+          'official-memo': true,
+          'portfolio-report': true,
+          'audit-console': true,
+          'ai-polish': true,
+          'backup-json': true
+        },
+        staff: {
+          'dashboard': true,
+          'ojt-log': true,
+          'project-summary': true,
+          'official-memo': true,
+          'portfolio-report': true,
+          'audit-console': true,
+          'ai-polish': true,
+          'backup-json': true
+        }
+      },
+
+      async loadPermissions(role) {
+        this.currentRole = role || 'trainee';
+        try {
+          const res = await fetch('/api/v1/rbac/my-permissions', {
+            headers: {
+              'x-user-id': SecurityManager.currentUserId || 'usr_jake',
+              'Authorization': `Bearer ${localStorage.getItem('smartgov_token') || ''}`
+            }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.can_view_map) {
+              this.userPermissions = data.can_view_map;
+            }
+          }
+        } catch (e) {
+          console.warn('[RBAC] Offline or API unreachable, using fallback matrix:', e);
+        }
+
+        if (!this.userPermissions) {
+          this.userPermissions = this.fallbackRoleMap[this.currentRole] || this.fallbackRoleMap.trainee;
+        }
+
+        this.applyVisibility();
+      },
+
+      canView(moduleKey) {
+        if (!this.userPermissions) {
+          const fallback = this.fallbackRoleMap[this.currentRole] || this.fallbackRoleMap.trainee;
+          return fallback[moduleKey] !== false;
+        }
+        return this.userPermissions[moduleKey] !== false;
+      },
+
+      applyVisibility() {
+        // 1. Sidebar Tab Buttons
+        const tabMap = {
+          'dashboard': document.getElementById('btn-tab-dashboard'),
+          'ojt-log': document.getElementById('btn-tab-ojt-log'),
+          'project-summary': document.getElementById('btn-tab-project-summary'),
+          'official-memo': document.getElementById('btn-tab-official-memo'),
+          'portfolio-report': document.getElementById('btn-tab-portfolio-report'),
+          'audit-console': document.getElementById('btn-tab-audit-console')
+        };
+
+        for (const [key, btn] of Object.entries(tabMap)) {
+          if (btn) {
+            if (this.canView(key)) {
+              btn.classList.remove('hidden');
+            } else {
+              btn.classList.add('hidden');
+            }
+          }
+        }
+
+        // 2. Sidebar Widgets
+        const aiPolish = document.getElementById('widget-ai-polish');
+        if (aiPolish) {
+          if (this.canView('ai-polish')) aiPolish.classList.remove('hidden');
+          else aiPolish.classList.add('hidden');
+        }
+
+        const backupBtn = document.getElementById('btn-backup-json');
+        if (backupBtn) {
+          if (this.canView('backup-json')) backupBtn.classList.remove('hidden');
+          else backupBtn.classList.add('hidden');
+        }
+
+        // 3. Admin RBAC Button in Header (Admin & Staff only)
+        const adminBtn = document.getElementById('btn-admin-rbac');
+        const isAdmin = (this.currentRole === 'admin' || this.currentRole === 'staff');
+        if (adminBtn) {
+          if (isAdmin) adminBtn.classList.remove('hidden');
+          else adminBtn.classList.add('hidden');
+        }
+
+        // 4. If current active view is not permitted, bounce to ojt-log!
+        const views = ['dashboard', 'ojt-log', 'project-summary', 'official-memo', 'portfolio-report', 'audit-console'];
+        for (const v of views) {
+          const viewEl = document.getElementById('view-' + v);
+          if (viewEl && !viewEl.classList.contains('hidden')) {
+            if (!this.canView(v)) {
+              console.warn(`[RBAC] Current view ${v} restricted for role ${this.currentRole}, bouncing to ojt-log`);
+              switchTab('ojt-log');
+              break;
+            }
+          }
+        }
+      },
+
+      async openMatrixModal() {
+        const modal = document.getElementById('rbacMatrixModal');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        const loadingEl = document.getElementById('rbacModalLoading');
+        const contentEl = document.getElementById('rbacModalContent');
+        if (loadingEl) loadingEl.classList.remove('hidden');
+        if (contentEl) contentEl.classList.add('hidden');
+
+        try {
+          const res = await fetch('/api/v1/rbac/matrix', {
+            headers: {
+              'x-user-id': SecurityManager.currentUserId || 'usr_admin',
+              'Authorization': `Bearer ${localStorage.getItem('smartgov_token') || ''}`
+            }
+          });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || `HTTP ${res.status}`);
+          }
+          const data = await res.json();
+          this.renderMatrixTable(data);
+        } catch (err) {
+          alert('❌ เกิดข้อผิดพลาดในการโหลดเมทริกซ์สิทธิ์: ' + err.message);
+          this.closeMatrixModal();
+        }
+      },
+
+      closeMatrixModal() {
+        const modal = document.getElementById('rbacMatrixModal');
+        if (modal) modal.classList.add('hidden');
+      },
+
+      renderMatrixTable(data) {
+        const loadingEl = document.getElementById('rbacModalLoading');
+        const contentEl = document.getElementById('rbacModalContent');
+        if (loadingEl) loadingEl.classList.add('hidden');
+        if (contentEl) contentEl.classList.remove('hidden');
+
+        const tbody = document.getElementById('rbacMatrixTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        const roles = data.roles || [];
+        const menus = data.menus || [];
+        const matrix = data.matrix || {};
+
+        menus.forEach(menu => {
+          const tr = document.createElement('tr');
+          tr.className = 'border-b border-slate-100 hover:bg-slate-50 transition';
+
+          let tdMenu = `
+            <td class="px-4 py-3 text-left">
+              <div class="font-bold text-slate-800 text-xs flex items-center gap-1.5">
+                <i class="${menu.menu_icon || 'fa-solid fa-folder'} text-govNavy w-4 text-center"></i>
+                <span>${menu.menu_label}</span>
+              </div>
+              <div class="text-[10px] text-slate-400 font-mono">${menu.module_key} (${menu.menu_category})</div>
+            </td>
+          `;
+
+          let roleCols = '';
+          roles.forEach(role => {
+            const perm = (matrix[role.role_id] && matrix[role.role_id][menu.menu_id]) || { can_view: 0, can_edit: 0 };
+            roleCols += `
+              <td class="px-3 py-3 text-center border-l border-slate-100">
+                <div class="flex items-center justify-center gap-3">
+                  <label class="inline-flex items-center gap-1 text-[11px] font-medium text-slate-700 cursor-pointer">
+                    <input type="checkbox" data-role="${role.role_id}" data-menu="${menu.menu_id}" data-type="can_view"
+                      ${perm.can_view === 1 ? 'checked' : ''} class="rounded text-govNavy focus:ring-govNavy h-3.5 w-3.5">
+                    <span>ดู</span>
+                  </label>
+                  <label class="inline-flex items-center gap-1 text-[11px] font-medium text-slate-700 cursor-pointer">
+                    <input type="checkbox" data-role="${role.role_id}" data-menu="${menu.menu_id}" data-type="can_edit"
+                      ${perm.can_edit === 1 ? 'checked' : ''} class="rounded text-emerald-600 focus:ring-emerald-600 h-3.5 w-3.5">
+                    <span>แก้</span>
+                  </label>
+                </div>
+              </td>
+            `;
+          });
+
+          tr.innerHTML = tdMenu + roleCols;
+          tbody.appendChild(tr);
+        });
+      },
+
+      async saveMatrixChanges() {
+        const checkboxes = document.querySelectorAll('#rbacMatrixTableBody input[type="checkbox"]');
+        const permMap = {};
+
+        checkboxes.forEach(cb => {
+          const roleId = cb.dataset.role;
+          const menuId = cb.dataset.menu;
+          const type = cb.dataset.type;
+          const key = `${roleId}___${menuId}`;
+
+          if (!permMap[key]) {
+            permMap[key] = { role_id: roleId, menu_id: menuId, can_view: 0, can_edit: 0 };
+          }
+          permMap[key][type] = cb.checked ? 1 : 0;
+        });
+
+        const permissions = Object.values(permMap);
+        const saveBtn = document.getElementById('btnSaveRbacMatrix');
+        if (saveBtn) {
+          saveBtn.disabled = true;
+          saveBtn.innerText = 'กำลังบันทึก...';
+        }
+
+        try {
+          const res = await fetch('/api/v1/rbac/matrix', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-user-id': SecurityManager.currentUserId || 'usr_admin',
+              'Authorization': `Bearer ${localStorage.getItem('smartgov_token') || ''}`
+            },
+            body: JSON.stringify({ permissions })
+          });
+
+          if (!res.ok) {
+            const errJson = await res.json().catch(() => ({}));
+            throw new Error(errJson.detail || `HTTP ${res.status}`);
+          }
+
+          alert('✓ บันทึกสิทธิ์ Dynamic RBAC Matrix เรียบร้อยแล้ว!');
+          this.closeMatrixModal();
+          this.userPermissions = null; // force reload from DB
+          await this.loadPermissions(SecurityManager.currentRole);
+        } catch (err) {
+          alert('❌ บันทึกสิทธิ์ไม่สำเร็จ: ' + err.message);
+        } finally {
+          if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerText = 'บันทึกการเปลี่ยนแปลงสิทธิ์';
+          }
+        }
+      }
+    };
+    window.RBACManager = RBACManager;
+
+    /**
      * SecurityManager: Authentication, Auto-Lock 15 Min, RBAC Core
      */
     const SecurityManager = {
@@ -7011,6 +7512,9 @@ function doGet(e) {
         }
 
         updateSecurityUI();
+        if (window.RBACManager) {
+          RBACManager.loadPermissions(roleKey);
+        }
       },
 
       resetIdleTimer() {
@@ -8078,6 +8582,79 @@ async function submitQuickLog() {
       </form>
     </div>
   </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: DYNAMIC RBAC PERMISSION MATRIX                    -->
+  <!-- ======================================================== -->
+  <div id="rbacMatrixModal" class="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4 hidden no-print">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50/50 rounded-t-3xl">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-lg shadow-xs">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-govNavy flex items-center gap-2">
+              ศูนย์จัดการสิทธิ์เมนูและโมดูล (Dynamic RBAC Matrix)
+            </h3>
+            <p class="text-xs text-slate-500">กำหนดสิทธิ์การมองเห็น (View) และการแก้ไข (Edit) รายบทบาทแบบเรียลไทม์</p>
+          </div>
+        </div>
+        <button type="button" onclick="RBACManager.closeMatrixModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold p-1 cursor-pointer">&times;</button>
+      </div>
+
+      <!-- Loading State -->
+      <div id="rbacModalLoading" class="p-12 text-center text-slate-500">
+        <i class="fa-solid fa-circle-notch fa-spin text-3xl text-govNavy mb-3"></i>
+        <p class="text-sm font-medium">กำลังโหลดตารางสิทธิ์จากฐานข้อมูล SQLite...</p>
+      </div>
+
+      <!-- Modal Body (Table) -->
+      <div id="rbacModalContent" class="p-6 overflow-y-auto flex-1 hidden">
+        <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-slate-100 text-slate-700 text-xs font-bold uppercase tracking-wider">
+              <tr>
+                <th class="px-4 py-3.5">โมดูล / เมนูงาน</th>
+                <th class="px-3 py-3.5 text-center border-l border-slate-200">ผู้ดูแลระบบ (Admin)</th>
+                <th class="px-3 py-3.5 text-center border-l border-slate-200">ผู้ควบคุมงาน (Supervisor)</th>
+                <th class="px-3 py-3.5 text-center border-l border-slate-200">ผู้ฝึกปฏิบัติงาน (Trainee)</th>
+              </tr>
+            </thead>
+            <tbody id="rbacMatrixTableBody" class="divide-y divide-slate-100 text-xs">
+              <!-- Dynamically rendered -->
+            </tbody>
+          </table>
+        </div>
+        <div class="mt-4 p-3.5 bg-amber-50 rounded-xl border border-amber-200 text-amber-800 text-[11px] flex items-start gap-2">
+          <i class="fa-solid fa-circle-info text-amber-600 mt-0.5"></i>
+          <div>
+            <b>คำแนะนำ:</b> สิทธิ์ <b>ดู (View)</b> ควบคุมการมองเห็นปุ่มในแถบเมนูและทูลบาร์ ส่วนสิทธิ์ <b>แก้ (Edit)</b> ควบคุมการบันทึก/ส่งเอกสาร เมื่อคลิกบันทึก การตั้งค่าจะมีผลกับผู้ใช้งานทันทีโดยไม่ต้องรีสตาร์ตเซิร์ฟเวอร์
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-between p-4 px-6 border-t border-slate-100 bg-slate-50 rounded-b-3xl">
+        <span class="text-[11px] text-slate-400 font-medium flex items-center gap-1">
+          <i class="fa-solid fa-database text-xs text-emerald-600"></i> SQLite Live Sync Matrix
+        </span>
+        <div class="flex gap-2">
+          <button type="button" onclick="RBACManager.closeMatrixModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-semibold transition cursor-pointer">
+            ยกเลิก
+          </button>
+          <button type="button" id="btnSaveRbacMatrix" onclick="RBACManager.saveMatrixChanges()" class="px-5 py-2 bg-govNavy hover:bg-govNavyLight text-white rounded-xl text-xs font-semibold shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>บันทึกการเปลี่ยนแปลงสิทธิ์</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 
 <script>
 function showRegisterModal() {

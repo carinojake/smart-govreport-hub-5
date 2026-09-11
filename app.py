@@ -10,7 +10,7 @@ from typing import Optional, List, Dict, Any
 import csv
 import io
 from fastapi import FastAPI, Request, HTTPException, Depends, Header, UploadFile, File, Form
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, Response
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, Response, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
@@ -20,23 +20,62 @@ from ojt_system.models import OJTActivityRecord, OfficialMemoRecord, SupervisorF
 from ojt_system.pdpa_sanitizer import PDPASanitizer
 from ojt_system.ai_client import OJTAIClient
 
-# Logging Configuration
+from logging.handlers import RotatingFileHandler
+from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Logging Configuration with Rotation (Max 10MB, 5 Backups)
 os.makedirs("logs", exist_ok=True)
+file_handler = RotatingFileHandler(
+    "logs/app.log",
+    maxBytes=10 * 1024 * 1024,
+    backupCount=5,
+    encoding="utf-8"
+)
+stream_handler = logging.StreamHandler()
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    handlers=[
-        logging.FileHandler("logs/app.log", encoding="utf-8"),
-        logging.StreamHandler()
-    ]
+    handlers=[file_handler, stream_handler]
 )
 logger = logging.getLogger("smartgov_hub")
+
+# Environment & Production Security Gates
+ENV_MODE = os.getenv("ENVIRONMENT", "development").lower()
+IS_PRODUCTION = ENV_MODE == "production"
 
 app = FastAPI(
     title="Smart GovReport Hub - OJT 90 Hours & Official Memo System",
     description="ระบบบริหารจัดการและจัดทำรายงานราชการอัจฉริยะ (OJT 90 ชม.) สอดคล้องตามมาตรฐานงานสารบรรณ และ พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 (PDPA)",
-    version="3.0.0"
+    version="3.0.0",
+    docs_url=None if IS_PRODUCTION else "/docs",
+    redoc_url=None if IS_PRODUCTION else "/redoc",
+    openapi_url=None if IS_PRODUCTION else "/openapi.json"
 )
+
+# CORS Middleware Configuration
+allowed_origins_raw = os.getenv("ALLOWED_ORIGINS", "http://localhost:8000,http://127.0.0.1:8000")
+allowed_origins = [o.strip() for o in allowed_origins_raw.split(",") if o.strip()]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+)
+
+# Security Headers Middleware
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
 
 # Configuration & Initialization
 DB_PATH = os.getenv("SMARTGOV_DB_PATH", "ojt_logbook.db")
@@ -223,29 +262,28 @@ class PDPAConsentRequest(BaseModel):
     agreed_purposes: List[str] = ["daily_log", "photos"]
     signature_hash: str = ""
 
-# --- Routes ---
+class UpdatePermissionItem(BaseModel):
+    role_id: str
+    menu_id: str
+    can_view: int
+    can_edit: int
+
+class UpdatePermissionMatrixRequest(BaseModel):
+    permissions: List[UpdatePermissionItem]
+
+# --- Routes (Smart GovReport Hub 2.5 - Official Unified Core) ---
 
 @app.get("/", response_class=HTMLResponse)
-@app.get("/v3", response_class=HTMLResponse)
-async def serve_dashboard_v3():
-    """หน้าจอหลัก Smart GovReport Hub V3 (Modular Front + IndexedDB + Drive Attachment)"""
-    if os.path.exists("templates/index_v3.html"):
-        return FileResponse("templates/index_v3.html")
+async def serve_dashboard_2_5():
+    """หน้าจอหลัก Smart GovReport Hub 2.5 (Unified Production Standard)"""
     return FileResponse("templates/index.html")
 
-@app.get("/v2", response_class=HTMLResponse)
-async def serve_dashboard_v2():
-    """หน้าจอ Smart GovReport Hub V2 (Current Production Monolith)"""
-    if os.path.exists("templates/index_v2.html"):
-        return FileResponse("templates/index_v2.html")
-    return FileResponse("templates/index.html")
-
-@app.get("/v1", response_class=HTMLResponse)
-async def serve_dashboard_v1():
-    """หน้าจอ Smart GovReport Hub V1 (Legacy Monolith Reference)"""
-    if os.path.exists("templates/index_v1.html"):
-        return FileResponse("templates/index_v1.html")
-    return FileResponse("reference_template.html")
+@app.get("/v3")
+@app.get("/v2")
+@app.get("/v1")
+async def redirect_legacy_versions():
+    """ยุติการพัฒนาแยกสาย V1, V2, V3 โดยรวมศูนย์ส่งต่อเข้าสู่ Smart GovReport Hub 2.5"""
+    return RedirectResponse(url="/", status_code=307)
 
 # 1. Auth & Profiles
 @app.get("/api/v1/auth/users")
@@ -331,6 +369,61 @@ def get_assigned_trainees(current_user: Dict[str, Any] = Depends(get_current_use
             all_u = db.list_all_users()
             trainees = [u for u in all_u if u["role"] == "trainee"]
     return {"status": "success", "trainees": trainees}
+
+# --- RBAC Dynamic Permission Endpoints ---
+@app.get("/api/v1/rbac/my-permissions")
+def get_my_permissions(request: Request, current_user: Dict[str, Any] = Depends(get_current_user)):
+    """คืนค่ารายการสิทธิ์การมองเห็นและแก้ไขของผู้ใช้ปัจจุบัน (RBAC Effective Permissions)"""
+    user_id = current_user["user_id"]
+    perms = db.get_user_effective_permissions(user_id)
+    return {"status": "success", **perms}
+
+@app.get("/api/v1/rbac/matrix")
+def get_rbac_matrix(request: Request, current_user: Dict[str, Any] = Depends(get_current_user)):
+    """ดึงตารางสิทธิ์ Dynamic RBAC ทั้งระบบ (สงวนสิทธิ์ Admin เท่านั้น)"""
+    if current_user.get("role") != "admin":
+        record_audit(
+            request=request,
+            event_category="SECURITY",
+            event_name="UNAUTHORIZED_RBAC_READ",
+            severity="ALERT",
+            target_resource="rbac_matrix",
+            details={"violation": "Non-admin attempted to read RBAC Matrix"},
+            user=current_user
+        )
+        raise HTTPException(status_code=403, detail="สงวนสิทธิ์การเข้าถึงเมทริกซ์สิทธิ์สำหรับผู้ดูแลระบบ (Admin) เท่านั้น")
+    matrix = db.get_full_permission_matrix()
+    return {"status": "success", **matrix}
+
+@app.post("/api/v1/rbac/matrix")
+def update_rbac_matrix(req: UpdatePermissionMatrixRequest, request: Request, current_user: Dict[str, Any] = Depends(get_current_user)):
+    """อัปเดตสิทธิ์ Dynamic RBAC (สงวนสิทธิ์ Admin เท่านั้น)"""
+    if current_user.get("role") != "admin":
+        record_audit(
+            request=request,
+            event_category="SECURITY",
+            event_name="UNAUTHORIZED_RBAC_UPDATE",
+            severity="ALERT",
+            target_resource="rbac_matrix",
+            details={"violation": "Non-admin attempted to update RBAC Matrix"},
+            user=current_user
+        )
+        raise HTTPException(status_code=403, detail="สงวนสิทธิ์การแก้ไขสิทธิ์สำหรับผู้ดูแลระบบ (Admin) เท่านั้น")
+
+    for item in req.permissions:
+        db.update_permission(item.role_id, item.menu_id, item.can_view, item.can_edit)
+
+    record_audit(
+        request=request,
+        event_category="SECURITY",
+        event_name="RBAC_MATRIX_UPDATED",
+        severity="INFO",
+        target_resource="rbac_matrix",
+        details={"updated_count": len(req.permissions)},
+        user=current_user
+    )
+
+    return {"status": "success", "message": f"อัปเดตสิทธิ์เรียบร้อยแล้ว {len(req.permissions)} รายการ"}
 
 # 2. OJT Activities (Isolated by Trainee)
 @app.get("/api/v1/activities")
@@ -688,6 +781,19 @@ def get_portfolio_data(target_id: str = Depends(get_target_trainee_id)):
 # 8. Sync Hub & Full Export
 @app.get("/api/v1/export/sync-payload")
 def get_export_payload(request: Request, target_id: str = Depends(get_target_trainee_id), current_user: Dict[str, Any] = Depends(get_current_user)):
+    user_perms = db.get_user_effective_permissions(current_user["user_id"])
+    if not user_perms["can_view_map"].get("backup-json", False):
+        record_audit(
+            request=request,
+            event_category="SECURITY",
+            event_name="UNAUTHORIZED_EXPORT_BLOCKED",
+            severity="ALERT",
+            target_resource=f"sync_payload_{target_id}",
+            details={"violation": "User without backup-json permission attempted to export raw payload"},
+            user=current_user
+        )
+        raise HTTPException(status_code=403, detail="สงวนสิทธิ์การดาวน์โหลดข้อมูลสำรอง JSON สำหรับผู้ควบคุมงานและผู้ดูแลระบบเท่านั้น")
+
     payload = db.export_all_data_for_sync(target_id)
     record_audit(
         request=request,
