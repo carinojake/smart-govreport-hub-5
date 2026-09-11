@@ -10,7 +10,65 @@ function escapeHtml(str) {
 }
 window.escapeHtml = escapeHtml;
 
-    // =========================================================================
+// =========================================================================
+// A4 AI CONDENSER PRESETS & CACHING (การันตี 1 สัปดาห์ 5 วัน 1 หน้า A4)
+// =========================================================================
+const DEFAULT_CONDENSED_PRESETS = {
+  "2-1": {
+    task: "ให้บริการสนับสนุนทางเทคนิค Helpdesk รีโมต AnyDesk รวม 3 เคส (ต่ออายุ License ThaiWPS และติดตั้งชุดแบบอักษรราชการ TH Sarabun IT๙) ให้แก่ศูนย์บริการร่วมฯ และ กองยุทธศาสตร์และแผนงาน",
+    skill: "การบริหารสิทธิ์ซอฟต์แวร์สำนักงาน, ติดตั้งฟอนต์ราชการ และการแก้ปัญหาระยะไกลตาม SLA",
+    blocker: "ไม่มี (ต่ออายุ License และติดตั้งฟอนต์สำเร็จครบถ้วนตามเกณฑ์ SLA ภายในเวลาทำการ)"
+  },
+  "2-2": {
+    task: "ให้บริการสนับสนุนระยะไกล (AnyDesk) ต่ออายุสิทธิ์ ThaiWPS ให้แก่กองกลาง พร้อมติดตั้งกำหนดค่าไดรเวอร์เครื่องพิมพ์เครือข่ายและสแกนเนอร์",
+    skill: "การสนับสนุนเทคนิคระยะไกล, บริหารสิทธิ์ซอฟต์แวร์ และการกำหนดค่าอุปกรณ์ต่อพ่วงในวง LAN",
+    blocker: "เครื่องพิมพ์ตรวจไม่พบใน LAN จึงกำหนด Static IP Port ต่ออายุ License สำเร็จใน 15 นาที"
+  },
+  "2-3": {
+    task: "ติดตั้งเครื่องพิมพ์ HP LaserJet P3015 ให้แก่ สร. และแก้ไขปัญหาเครื่องพิมพ์ไม่ตอบสนองให้แก่ สยจ.สิงห์บุรี ผ่าน AnyDesk",
+    skill: "การติดตั้งแก้ปัญหาเครื่องพิมพ์, การสนับสนุนเทคนิคระยะไกล และการวิเคราะห์ปัญหาเฉพาะหน้า",
+    blocker: "ติดตั้งไดรเวอร์ตรงรุ่นและแก้ไขข้อขัดข้องให้ทั้งสองหน่วยงานสำเร็จสมบูรณ์ตามเกณฑ์ SLA"
+  },
+  "2-4": {
+    task: "จัดทำสรุปรายงานสถิติประจำสัปดาห์ด้วย Microsoft Excel ขั้นสูง และทะเบียนคุมงานบริการไอที",
+    skill: "การใช้ฟังก์ชัน SUMIFS, COUNTIFS, XLOOKUP วิเคราะห์ข้อมูลเชิงปริมาณ",
+    blocker: "ไม่มี (ลดเวลาสรุปผลจาก 2 ชม. เหลือ 5 นาที)"
+  },
+  "2-5": {
+    task: "ประชุมติดตามความก้าวหน้าโครงการประจำสัปดาห์ (Weekly Stand-up) และรับมอบหมายภารกิจสัปดาห์ที่ 3",
+    skill: "การสื่อสารรายงานผลงาน (Agile Stand-up) และการวางแผนงานประจำสัปดาห์",
+    blocker: "ไม่มี"
+  }
+};
+
+let condensedState = JSON.parse(localStorage.getItem('ojt_condensed_state') || '{"2": true}');
+let condensedCache = JSON.parse(localStorage.getItem('ojt_condensed_cache') || '{}');
+
+function isWeekCondensed(weekNum) {
+  return condensedState[weekNum] === undefined ? (weekNum === 2) : !!condensedState[weekNum];
+}
+window.isWeekCondensed = isWeekCondensed;
+
+function getCondensedEntry(entryId) {
+  if (condensedCache[entryId]) return condensedCache[entryId];
+  if (DEFAULT_CONDENSED_PRESETS[entryId]) return DEFAULT_CONDENSED_PRESETS[entryId];
+  return null;
+}
+window.getCondensedEntry = getCondensedEntry;
+
+function toggleWeekCondensed(weekNum) {
+  condensedState[weekNum] = !isWeekCondensed(weekNum);
+  localStorage.setItem('ojt_condensed_state', JSON.stringify(condensedState));
+  renderOjtPages();
+}
+window.toggleWeekCondensed = toggleWeekCondensed;
+
+function setCondensedEntryCache(entryId, data) {
+  condensedCache[entryId] = data;
+  localStorage.setItem('ojt_condensed_cache', JSON.stringify(condensedCache));
+}
+window.setCondensedEntryCache = setCondensedEntryCache;
+
     // PDF ORIENTATION CONTROL: LANDSCAPE (แนวนอน) VS PORTRAIT (แนวตั้ง) VS MIXED
     // =========================================================================
     let currentPdfOrientation = localStorage.getItem('ojt_pdf_orientation') || 'landscape';
@@ -244,6 +302,12 @@ window.escapeHtml = escapeHtml;
         if (entry) {
           usedEntryIds.add(entry.id);
           const h = parseFloat(entry.hours) || 0;
+          const isCondensed = isWeekCondensed(weekNum);
+          const cond = isCondensed ? getCondensedEntry(entry.id) : null;
+          const displayTask = (cond && cond.task) ? cond.task : entry.task;
+          const displaySkill = (cond && cond.skill) ? cond.skill : entry.skill;
+          const displayBlocker = (cond && cond.blocker) ? cond.blocker : (entry.blocker || '-');
+
           return `
             <tr id="ojt-row-${entry.id}" class="hover:bg-blue-50/40 transition group print:hover:bg-transparent ${isLandscape ? 'min-h-[46px]' : 'min-h-[42px]'}">
               <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-1.5 print:p-1'} text-left font-medium ${isLandscape ? 'text-[13px] print:text-[10pt]' : 'text-[12.5px] print:text-[9.5pt]'} leading-snug align-top">
@@ -254,7 +318,12 @@ window.escapeHtml = escapeHtml;
               </td>
               <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-1.5 print:p-1'} text-left ${isLandscape ? 'text-[13px] print:text-[10pt]' : 'text-[12px] print:text-[9.5pt]'} leading-snug align-top">
                 <div class="text-slate-800">
-                  <span>${escapeHtml(entry.task)}</span>
+                  <span>${escapeHtml(displayTask)}</span>
+                  ${cond ? `
+                    <span class="ml-1 inline-flex items-center px-1.5 py-0.2 bg-purple-50 text-purple-700 rounded text-[9px] font-bold border border-purple-200 no-print align-middle" title="สรุปย่อตามระเบียบสารบรรณ เพื่อการพิมพ์ A4 สัปดาห์ละ 1 หน้า">
+                      ✨ ย่อ A4
+                    </span>
+                  ` : ''}
                   <button onclick="openEvidenceModal('${entry.id}')" class="ml-1 inline-flex items-center space-x-1 px-1.5 py-0.2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-[9px] font-semibold border border-blue-200 no-print transition align-middle flex-shrink-0" title="คลิกดูขั้นตอน SOP และหลักฐานฉบับเต็ม">
                     <i class="fa-solid fa-magnifying-glass-chart text-[8px]"></i>
                     <span>ฉบับเต็ม</span>
@@ -262,10 +331,10 @@ window.escapeHtml = escapeHtml;
                 </div>
               </td>
               <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-1.5 print:p-1'} text-left ${isLandscape ? 'text-[13px] print:text-[10pt]' : 'text-[12px] print:text-[9.5pt]'} leading-snug text-slate-800 align-top">
-                ${escapeHtml(entry.skill)}
+                ${escapeHtml(displaySkill)}
               </td>
               <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-1.5 print:p-1'} text-left ${isLandscape ? 'text-[12.5px] print:text-[9.5pt]' : 'text-[11.5px] print:text-[9pt]'} leading-snug text-slate-700 align-top">
-                ${escapeHtml(entry.blocker || '-')}
+                ${escapeHtml(displayBlocker)}
               </td>
               <td class="border border-slate-700 p-1 text-center no-print align-middle">
                 <div class="flex items-center justify-center space-x-1">
@@ -303,6 +372,8 @@ window.escapeHtml = escapeHtml;
         }
       }).join('');
 
+      const isCurrentWeekCondensed = isWeekCondensed(weekNum);
+
       return `
         <div id="ojt-weekly-page-${weekNum}" class="a4-paper font-sarabun text-slate-900 leading-normal page-break shadow-md mb-8 ${isLandscape ? 'landscape' : ''}">
           
@@ -312,6 +383,20 @@ window.escapeHtml = escapeHtml;
             <h2 class="${isLandscape ? 'text-xl print:text-lg' : 'text-lg print:text-base'} font-bold tracking-normal text-black">แบบบันทึกการปฏิบัติงานประจำสัปดาห์</h2>
             <div class="${isLandscape ? 'text-base print:text-sm' : 'text-base print:text-sm'} font-bold text-black mt-0.5">
               สัปดาห์ที่<span class="inline-block border-b border-dotted border-black min-w-[3rem] text-center font-bold px-2 mx-1">${toThaiNum(weekNum)}</span>
+            </div>
+
+            <!-- A4 AI Condenser Badge & Quick Toggle (no-print) -->
+            <div class="absolute top-1 left-0 flex items-center space-x-1.5 p-1 bg-white/95 border border-purple-200 rounded-lg shadow-2xs no-print text-[10px]">
+              ${isCurrentWeekCondensed ? `
+                <span class="px-1.5 py-0.5 bg-purple-100 text-purple-800 font-bold rounded flex items-center space-x-1">
+                  <i class="fa-solid fa-wand-magic-sparkles text-purple-600"></i>
+                  <span>✨ ย่อ A4 พอดี 1 หน้า</span>
+                </span>
+                <button type="button" onclick="toggleWeekCondensed(${weekNum})" class="text-blue-600 hover:text-blue-800 underline font-medium cursor-pointer" title="สลับเป็นข้อความฉบับเต็ม">ดูฉบับเต็ม</button>
+              ` : `
+                <span class="px-1.5 py-0.5 bg-slate-100 text-slate-600 font-medium rounded">ฉบับเต็ม</span>
+                <button type="button" onclick="toggleWeekCondensed(${weekNum})" class="text-purple-700 hover:text-purple-900 underline font-bold cursor-pointer" title="ปรับย่อขนาดข้อความให้พอดี 1 หน้า A4">✨ ปรับ A4 (5 วัน)</button>
+              `}
             </div>
             
             <!-- Digital Evidence Button (no-print) -->
@@ -390,16 +475,16 @@ window.escapeHtml = escapeHtml;
           </div>
           `}
 
-          <!-- Official Logbook Table (สัดส่วนคอลัมน์กว้างสวยงาม) -->
+          <!-- Official Logbook Table (สัดส่วนคอลัมน์กว้างสวยงาม 12% | 6% | 38% | 23% | 21%) -->
           <div class="w-full">
             <table class="w-full border-collapse border border-slate-700 ${isLandscape ? 'text-[13px] print:text-[10pt]' : 'text-[12.5px] print:text-[9.5pt]'} mb-2 print:mb-1">
               <thead>
                 <tr class="bg-white text-center font-bold text-black">
-                  <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[13%] print:w-[13%]' : 'p-1.5 print:p-1 w-[14%] print:w-[14%]'} font-bold text-center">วัน/เดือน/ปี</th>
-                  <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[7%] print:w-[7%]' : 'p-1.5 print:p-1 w-[8%] print:w-[8%]'} font-bold text-center leading-tight">จำนวน<br>ชั่วโมง</th>
-                  <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[42%] print:w-[42%]' : 'p-1.5 print:p-1 w-[40%] print:w-[41%]'} font-bold text-center">งานที่ปฏิบัติโดยย่อ</th>
+                  <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[12%] print:w-[12%]' : 'p-1.5 print:p-1 w-[12%] print:w-[12%]'} font-bold text-center">วัน/เดือน/ปี</th>
+                  <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[6%] print:w-[6%]' : 'p-1.5 print:p-1 w-[6%] print:w-[6%]'} font-bold text-center leading-tight">จำนวน<br>ชั่วโมง</th>
+                  <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[38%] print:w-[38%]' : 'p-1.5 print:p-1 w-[38%] print:w-[38%]'} font-bold text-center">งานที่ปฏิบัติโดยย่อ</th>
                   <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[23%] print:w-[23%]' : 'p-1.5 print:p-1 w-[23%] print:w-[23%]'} font-bold text-center leading-tight">ความรู้/ทักษะ<br>ที่ได้รับ</th>
-                  <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[15%] print:w-[15%]' : 'p-1.5 print:p-1 w-[15%] print:w-[14%]'} font-bold text-center leading-tight">ปัญหา/<br>อุปสรรค</th>
+                  <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[21%] print:w-[21%]' : 'p-1.5 print:p-1 w-[21%] print:w-[21%]'} font-bold text-center leading-tight">ปัญหา/<br>อุปสรรค</th>
                   <th class="border border-slate-700 p-1 w-[5%] no-print text-center font-normal text-slate-500">จัดการ</th>
                 </tr>
               </thead>

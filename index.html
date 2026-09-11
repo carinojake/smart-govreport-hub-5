@@ -392,9 +392,14 @@
           </button>
 
           <!-- Security Screen Lock & Role Switcher Button (Compact Icon) -->
-          <button onclick="openSecurityModal()" id="security-role-btn" class="w-8 h-8 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-600 flex items-center justify-center shadow-sm transition flex-shrink-0 cursor-pointer" title="คลิกเพื่อเปลี่ยนรหัส PIN หรือสลับสิทธิ์การใช้งาน">
+          <button onclick="openSecurityModal()" id="security-role-btn" class="w-8 h-8 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-600 flex items-center justify-center shadow-sm transition flex-shrink-0 cursor-pointer" title="คลิกเพื่อล็อคหน้าจอหรือสลับสิทธิ์การใช้งาน">
             <i id="security-icon" class="fa-solid fa-lock-open text-emerald-400 text-xs"></i>
             <span id="security-role-label" class="sr-only">ผู้ฝึกงาน</span>
+          </button>
+
+          <!-- Trainee / User Direct PIN Change Button (Compact Emerald Key Icon) -->
+          <button onclick="openDirectPinChangeModal()" id="topbar-pin-btn" class="w-8 h-8 rounded-lg bg-emerald-950/70 hover:bg-emerald-900 text-emerald-200 border border-emerald-500/40 flex items-center justify-center shadow-sm transition flex-shrink-0 cursor-pointer" title="🔑 เปลี่ยนรหัส PIN ส่วนตัวสำหรับลงนามดิจิทัล">
+            <i class="fa-solid fa-key text-emerald-400 text-xs"></i>
           </button>
 
           <!-- Capsule Profile & Sign Out (Compact & Clean Single Capsule) -->
@@ -434,11 +439,17 @@
               <p id="sidebar-user-role" class="text-[11px] text-slate-500 truncate" title="บทบาท">IT Specialist & Data Admin</p>
             </div>
           </div>
-          <!-- Quick Logout Button inside Profile Card -->
-          <button onclick="handleLogout()" class="w-full py-1.5 px-2.5 bg-white hover:bg-rose-50 text-rose-600 hover:text-rose-700 border border-rose-200 hover:border-rose-300 rounded-lg text-xs font-semibold flex items-center justify-center space-x-1.5 transition shadow-2xs cursor-pointer" title="ออกจากระบบ Smart GovReport Hub">
-            <i class="fa-solid fa-arrow-right-from-bracket text-rose-500 text-xs"></i>
-            <span>ออกจากระบบ (Sign Out)</span>
-          </button>
+          <!-- Profile Card Actions (เปลี่ยน PIN & ออกจากระบบ) -->
+          <div class="grid grid-cols-2 gap-1.5 pt-0.5">
+            <button onclick="openDirectPinChangeModal('trainee')" class="py-1.5 px-2 bg-amber-50 hover:bg-amber-100 text-amber-700 hover:text-amber-800 border border-amber-200 hover:border-amber-300 rounded-lg text-xs font-semibold flex items-center justify-center space-x-1 transition shadow-2xs cursor-pointer" title="เปลี่ยนรหัส PIN ส่วนตัวสำหรับลงนาม">
+              <i class="fa-solid fa-key text-amber-500 text-xs"></i>
+              <span>เปลี่ยน PIN</span>
+            </button>
+            <button onclick="handleLogout()" class="py-1.5 px-2 bg-white hover:bg-rose-50 text-rose-600 hover:text-rose-700 border border-rose-200 hover:border-rose-300 rounded-lg text-xs font-semibold flex items-center justify-center space-x-1 transition shadow-2xs cursor-pointer" title="ออกจากระบบ Smart GovReport Hub">
+              <i class="fa-solid fa-arrow-right-from-bracket text-rose-500 text-xs"></i>
+              <span>ออกระบบ</span>
+            </button>
+          </div>
         </div>
 
         <!-- Global Quick Search in Sidebar -->
@@ -1415,6 +1426,11 @@
 
           <!-- Action Buttons -->
           <div class="flex items-center space-x-2">
+            <!-- Gemini A4 AI Condenser Button -->
+            <button onclick="openGeminiA4CondenserModal()" class="px-3 py-1.5 bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center space-x-1.5 cursor-pointer" title="ปรับย่อเนื้องานให้พอดี 1 หน้า A4 (5 วัน 40 ชม.) ป้องกันตารางล้นหน้า">
+              <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
+              <span>✨ Gemini ปรับ A4 (5 วัน)</span>
+            </button>
             <!-- SPRINT 2.2: Gemini AI 3-Line Summary Button -->
             <button onclick="openGeminiSummaryModal()" class="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center space-x-1.5">
               <i class="fa-solid fa-brain text-amber-300"></i>
@@ -4549,9 +4565,15 @@ function doGet(e) {
 
       <!-- PIN Check -->
       <div class="space-y-1.5" id="sig-pin-step">
-        <label id="sig-pin-label" class="block text-xs font-semibold text-slate-700">
-          <i class="fa-solid fa-key mr-1 text-govGold"></i> ระบุ PIN ผู้ควบคุมงาน (มากกว่า 6 หลัก):
-        </label>
+        <div class="flex items-center justify-between">
+          <label id="sig-pin-label" class="block text-xs font-semibold text-slate-700">
+            <i class="fa-solid fa-key mr-1 text-govGold"></i> ระบุ PIN ผู้ควบคุมงาน (มากกว่า 6 หลัก):
+          </label>
+          <button type="button" onclick="openDirectPinChangeModal()" class="text-[11px] text-amber-600 hover:text-amber-800 font-bold flex items-center space-x-1 cursor-pointer" title="คลิกเพื่อเปลี่ยนรหัส PIN ส่วนตัว">
+            <i class="fa-solid fa-pen-to-square text-[10px]"></i>
+            <span>🖊️ เปลี่ยนรหัส PIN</span>
+          </button>
+        </div>
         <input type="password" id="sig-supervisor-pin" placeholder="ป้อน PIN (ค่าเริ่มต้น: 999999)" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs tracking-widest text-center font-mono focus:ring-govNavy focus:border-govNavy">
         <p id="sig-pin-note" class="text-[10px] text-slate-400">เฉพาะผู้ได้รับมอบหมายที่มีรหัสผ่านเท่านั้นที่สามารถอนุมัติและประทับตรารับรองได้</p>
       </div>
@@ -4588,6 +4610,86 @@ function doGet(e) {
         <button type="button" onclick="submitSupervisorSignature()" class="px-5 py-2 bg-govNavy hover:bg-govNavyLight text-white rounded-xl text-xs font-semibold shadow transition flex items-center space-x-1.5">
           <i class="fa-solid fa-check-double"></i>
           <span id="sig-submit-btn-text">อนุมัติและล็อคข้อมูลสัปดาห์นี้</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: DIRECT USER PIN CHANGE (สำหรับผู้ฝึกภาคปฏิบัติ และผู้ควบคุมงาน) -->
+  <!-- ========================================================================= -->
+  <div id="direct-pin-change-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 no-print">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b pb-3">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg shadow-2xs border border-amber-200">
+            <i class="fa-solid fa-key"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-slate-800">ตั้งค่าเปลี่ยนรหัส PIN ส่วนตัว</h3>
+            <p class="text-xs text-slate-500">สำหรับยืนยันตัวตนในการลงนามดิจิทัล (Digital Signature)</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeDirectPinChangeModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Role Info Banner -->
+      <div class="p-3 bg-gradient-to-r from-blue-50 to-indigo-50/50 rounded-2xl border border-blue-200 text-xs flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-id-badge text-govNavy text-base"></i>
+          <div>
+            <span class="text-slate-500 block text-[10px]">บทบาทที่เปลี่ยนรหัส:</span>
+            <span id="direct-pin-role-badge" class="font-bold text-slate-800">ผู้ฝึกภาคปฏิบัติ (คนพิการ)</span>
+          </div>
+        </div>
+        <div>
+          <select id="direct-pin-role" onchange="onDirectPinRoleChange()" class="p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:ring-govNavy">
+            <option value="trainee">ผู้ฝึกภาคปฏิบัติ</option>
+            <option value="supervisor">ผู้ควบคุมงาน</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Form Inputs -->
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">
+            <span>PIN ปัจจุบัน:</span>
+            <span id="direct-cur-pin-hint" class="text-[10px] text-slate-400 font-normal ml-1">PIN ค่าเริ่มต้นคือ 123456</span>
+          </label>
+          <input type="password" id="direct-current-pin" placeholder="ใส่รหัส PIN เดิม..." class="w-full p-2.5 border border-slate-300 rounded-xl text-xs text-center font-mono tracking-widest focus:ring-2 focus:ring-govNavy focus:border-govNavy">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">
+            <span>PIN ใหม่ (ตัวเลขอย่างน้อย 6 หลัก):</span>
+          </label>
+          <input type="password" id="direct-new-pin" placeholder="กำหนด PIN ใหม่ 6 หลัก..." class="w-full p-2.5 border border-slate-300 rounded-xl text-xs text-center font-mono tracking-widest focus:ring-2 focus:ring-govNavy focus:border-govNavy">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">
+            <span>ยืนยัน PIN ใหม่:</span>
+          </label>
+          <input type="password" id="direct-confirm-pin" placeholder="ใส่ PIN ใหม่อีกครั้ง..." class="w-full p-2.5 border border-slate-300 rounded-xl text-xs text-center font-mono tracking-widest focus:ring-2 focus:ring-govNavy focus:border-govNavy">
+        </div>
+      </div>
+
+      <!-- Security Notice -->
+      <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-[11px] text-slate-600 leading-snug flex items-start space-x-2">
+        <i class="fa-solid fa-shield-halved text-emerald-600 mt-0.5"></i>
+        <span>รหัส PIN จะถูกเข้ารหัสด้วยมาตรฐานความปลอดภัย <b>SHA-256</b> ป้องกันการปลอมแปลงและใช้รับรองเอกสารทางราชการ</span>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-end space-x-2 pt-2 border-t">
+        <button type="button" onclick="closeDirectPinChangeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition cursor-pointer">
+          ยกเลิก
+        </button>
+        <button type="button" onclick="submitDirectPinChange()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-sm transition flex items-center space-x-1.5 cursor-pointer">
+          <i class="fa-solid fa-floppy-disk"></i>
+          <span>บันทึกรหัส PIN ใหม่</span>
         </button>
       </div>
     </div>
@@ -5326,6 +5428,81 @@ function doGet(e) {
         <button onclick="applyAiSummaryToWeeklyNotes()" class="py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md flex items-center justify-center space-x-1.5 transition">
           <i class="fa-solid fa-file-import text-amber-300"></i>
           <span>บันทึกลงในสรุป OJT</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: GEMINI A4 AI CONDENSER (ปรับตาราง 5 วัน 1 หน้า A4) -->
+  <!-- ========================================================================= -->
+  <div id="gemini-a4-condenser-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 overflow-y-auto no-print">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-slate-100 my-8 space-y-4 max-h-[90vh] overflow-y-auto animate-fade-in">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b pb-3">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-700 to-indigo-700 text-white flex items-center justify-center text-lg shadow">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-900">✨ Gemini ปรับ A4 (5 วัน) (A4 AI Condenser)</h3>
+            <p class="text-xs text-slate-500">ย่อสรุปเนื้องานให้กระชับสละสลวย รับประกันพิมพ์ 1 สัปดาห์พอดี 1 หน้า A4</p>
+          </div>
+        </div>
+        <button onclick="closeGeminiA4CondenserModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Controls & Week Selector -->
+      <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="font-bold text-slate-700">เลือกสัปดาห์:</span>
+            <select id="a4-condenser-week-select" onchange="updateA4CondenserModalUI()" class="p-1.5 bg-white border border-slate-300 rounded-xl font-bold focus:ring-govNavy">
+              <option value="1">สัปดาห์ที่ 1</option>
+              <option value="2" selected>สัปดาห์ที่ 2 (IT Helpdesk 5 วัน)</option>
+              <option value="3">สัปดาห์ที่ 3</option>
+              <option value="4">สัปดาห์ที่ 4</option>
+              <option value="5">สัปดาห์ที่ 5</option>
+            </select>
+          </div>
+          <div id="a4-condenser-status-badge">
+            <span class="text-purple-700 bg-purple-100 px-2.5 py-1 rounded-full font-bold">✓ กำลังใช้โหมด: ย่อพอดี 1 หน้า A4</span>
+          </div>
+        </div>
+
+        <div class="p-2.5 bg-purple-50/70 border border-purple-200 rounded-xl text-[11px] text-purple-900 leading-snug flex items-start space-x-2">
+          <i class="fa-solid fa-circle-check text-purple-600 mt-0.5 flex-shrink-0"></i>
+          <span><b>ระบบ Local Cache ประหยัด Token:</b> มีชุดข้อความย่อสรุปมาตรฐานสารบรรณบรรจุไว้ในเครื่อง เปิดดูและพิมพ์ได้ทันที และข้อมูลฉบับเต็มยังคงอยู่ในระบบ 100% ผ่านปุ่ม 'ฉบับเต็ม'</span>
+        </div>
+      </div>
+
+      <!-- Entries Comparison Preview -->
+      <div class="space-y-2">
+        <label class="block text-xs font-bold text-slate-700">พรีวิวเนื้องานในสัปดาห์ที่เลือก:</label>
+        <div id="a4-condenser-preview-list" class="max-h-60 overflow-y-auto space-y-2 p-1 bg-slate-50/50 rounded-2xl border border-slate-200">
+          <!-- Populated by updateA4CondenserModalUI() -->
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="space-y-2 pt-2 border-t text-xs">
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="applyA4CondenserCurrentWeek()" class="py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl font-bold shadow transition flex items-center justify-center space-x-1.5 cursor-pointer">
+            <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
+            <span>ใช้โหมดย่อ A4 สัปดาห์นี้</span>
+          </button>
+          <button onclick="restoreFullOjtCurrentWeek()" class="py-2.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-xl font-bold shadow-2xs transition flex items-center justify-center space-x-1.5 cursor-pointer">
+            <i class="fa-solid fa-rotate-left text-blue-600"></i>
+            <span>กลับเป็นฉบับเต็ม</span>
+          </button>
+        </div>
+        <button onclick="applyA4CondenserAllWeeks()" class="w-full py-2 bg-slate-100 hover:bg-purple-50 text-slate-700 hover:text-purple-800 border border-slate-200 hover:border-purple-300 rounded-xl font-semibold transition flex items-center justify-center space-x-1 cursor-pointer">
+          <i class="fa-solid fa-check-double text-purple-600"></i>
+          <span>เปิดใช้โหมดย่อ A4 กับทุกสัปดาห์ (1-5)</span>
         </button>
       </div>
 

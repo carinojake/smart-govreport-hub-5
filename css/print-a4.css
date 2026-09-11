@@ -100,18 +100,41 @@
   td {
     word-break: break-word !important;
     overflow-wrap: break-word !important;
+    line-break: loose !important;
+    text-align: left !important;
+  }
+
+  th {
+    word-break: break-word !important;
+    line-break: loose !important;
+  }
+
+  .text-center, td.text-center, th.text-center {
+    text-align: center !important;
+  }
+
+  /* ป้องกันเบราว์เซอร์ปั๊ม tfoot ซ้ำซ้อน */
+  tfoot {
+    display: table-row-group !important;
   }
 
   /* ========================================================================= */
   /* กฎเฉพาะแบบบันทึก 1 สัปดาห์ 1 หน้า A4 (SIGNATURE PROTECTION GUARANTEE)    */
   /* ========================================================================= */
   [id^="ojt-weekly-page-"] {
+    page-break-before: always !important;
+    break-before: page !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
     max-height: 282mm !important;
     box-sizing: border-box !important;
     padding: 0 !important;
     margin: 0 !important;
+  }
+
+  [id^="ojt-weekly-page-"]:first-of-type {
+    page-break-before: auto !important;
+    break-before: auto !important;
   }
 
   [id^="ojt-weekly-page-"] h2 {
@@ -175,6 +198,27 @@
     margin-bottom: 1px !important;
     font-size: 8.5pt !important;
     line-height: 1.15 !important;
+  }
+
+  /* Auto-Font Scaling Guardrail เมื่อเนื้อหายาวเกินเกณฑ์ (สัปดาห์ที่ 2 / เคส IT Helpdesk ยาว) */
+  [id^="ojt-weekly-page-"].print-condensed tbody td {
+    padding: 1.2px 2.5px !important;
+    font-size: 7.5pt !important;
+    line-height: 1.1 !important;
+  }
+  [id^="ojt-weekly-page-"].print-condensed th {
+    padding: 1.5px 2px !important;
+    font-size: 8pt !important;
+    line-height: 1.1 !important;
+  }
+  [id^="ojt-weekly-page-"].print-condensed tfoot td {
+    padding: 1.5px 2px !important;
+    font-size: 7.5pt !important;
+    line-height: 1.1 !important;
+  }
+  [id^="ojt-weekly-page-"].print-condensed tfoot img {
+    max-height: 20px !important;
+    height: 20px !important;
   }
 }
 

@@ -136,4 +136,29 @@ function setupPostgresAutoSync() {
   }
 }
 
-console.log('✅ [Smart GovReport Hub 2.5] Modular Loader Ready & Docker PostgreSQL hooks active.');
+// =========================================================================
+// AUTO-FONT SCALING GUARDRAIL FOR STRICT A4 PRINT (1 สัปดาห์ 1 หน้า A4 100%)
+// =========================================================================
+window.addEventListener('beforeprint', () => {
+  console.log('🖨️ [Print Guardrail] Inspecting OJT weekly tables height before printing...');
+  for (let w = 1; w <= 5; w++) {
+    const pageEl = document.getElementById(`ojt-weekly-page-${w}`);
+    if (pageEl) {
+      const rect = pageEl.getBoundingClientRect();
+      const tableEl = pageEl.querySelector('table');
+      const tableHeight = tableEl ? tableEl.offsetHeight : 0;
+      if (rect.height > 1000 || tableHeight > 620) {
+        console.warn(`⚠️ [Print Guardrail] Week ${w} table height (${tableHeight}px / total ${rect.height}px) exceeds safe boundary. Applying .print-condensed guardrail.`);
+        pageEl.classList.add('print-condensed');
+      }
+    }
+  }
+});
+
+window.addEventListener('afterprint', () => {
+  document.querySelectorAll('[id^="ojt-weekly-page-"].print-condensed').forEach(el => {
+    el.classList.remove('print-condensed');
+  });
+});
+
+console.log('✅ [Smart GovReport Hub 5] Modular Loader Ready & Docker PostgreSQL hooks active.');

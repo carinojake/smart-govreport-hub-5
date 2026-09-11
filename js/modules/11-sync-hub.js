@@ -1108,6 +1108,113 @@
       closeGeminiSummaryModal();
     }
 
+    // =========================================================================
+    // SPRINT 2.5: GEMINI A4 AI CONDENSER FUNCTIONS
+    // =========================================================================
+    function openGeminiA4CondenserModal() {
+      const modal = document.getElementById('gemini-a4-condenser-modal');
+      if (!modal) return;
+      modal.classList.remove('hidden');
+      const weekSel = document.getElementById('ojt-week-select');
+      const targetSel = document.getElementById('a4-condenser-week-select');
+      if (weekSel && targetSel) {
+        targetSel.value = weekSel.value;
+      }
+      updateA4CondenserModalUI();
+    }
+
+    function closeGeminiA4CondenserModal() {
+      const modal = document.getElementById('gemini-a4-condenser-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function updateA4CondenserModalUI() {
+      const targetSel = document.getElementById('a4-condenser-week-select');
+      const weekNum = parseInt(targetSel ? targetSel.value : 2) || 2;
+      const statusBadge = document.getElementById('a4-condenser-status-badge');
+      const previewList = document.getElementById('a4-condenser-preview-list');
+      const isCond = typeof isWeekCondensed === 'function' ? isWeekCondensed(weekNum) : false;
+
+      if (statusBadge) {
+        if (isCond) {
+          statusBadge.innerHTML = '<span class="text-purple-700 bg-purple-100 px-2.5 py-1 rounded-full font-bold">✓ กำลังใช้โหมด: ย่อพอดี 1 หน้า A4 (Condensed)</span>';
+        } else {
+          statusBadge.innerHTML = '<span class="text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full font-medium">โหมด: ข้อความฉบับเต็ม (Full Detail)</span>';
+        }
+      }
+
+      if (previewList) {
+        const entries = (window.liveOjtData && window.liveOjtData[weekNum]) || [];
+        if (entries.length === 0) {
+          previewList.innerHTML = '<div class="p-4 text-center text-slate-400">ไม่พบรายการบันทึกในสัปดาห์นี้</div>';
+          return;
+        }
+
+        previewList.innerHTML = entries.map(e => {
+          const cond = typeof getCondensedEntry === 'function' ? getCondensedEntry(e.id) : null;
+          return `
+            <div class="p-2.5 bg-white border border-slate-200 rounded-xl space-y-1 text-xs">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-govNavy">${e.date} (${e.hours} ชม.)</span>
+                ${cond ? '<span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-1.5 py-0.5 rounded">มีข้อความย่อในระบบ</span>' : '<span class="text-[10px] text-slate-400">ใช้ข้อความจริง</span>'}
+              </div>
+              <div class="text-slate-600 text-[11px]"><b class="text-slate-700">เดิม:</b> ${escapeHtml(e.task)}</div>
+              ${cond ? `<div class="text-purple-900 bg-purple-50/70 p-1.5 rounded-lg text-[11px]"><b class="text-purple-700">ย่อ A4:</b> ${escapeHtml(cond.task)}</div>` : ''}
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function applyA4CondenserCurrentWeek() {
+      const targetSel = document.getElementById('a4-condenser-week-select');
+      const weekNum = parseInt(targetSel ? targetSel.value : 2) || 2;
+      if (typeof toggleWeekCondensed === 'function') {
+        if (!isWeekCondensed(weekNum)) {
+          toggleWeekCondensed(weekNum);
+        } else {
+          renderOjtPages();
+        }
+      }
+      updateA4CondenserModalUI();
+      alert(`✨ เปิดใช้งานโหมด 'ย่อพอดี 1 หน้า A4' สำหรับสัปดาห์ที่ ${toThaiNum(weekNum)} สำเร็จแล้ว!\nตารางสัปดาห์นี้จะมีความสูงไม่เกิน 1 หน้ากระดาษ A4 เมื่อสั่งพิมพ์ครับ`);
+      closeGeminiA4CondenserModal();
+    }
+
+    function restoreFullOjtCurrentWeek() {
+      const targetSel = document.getElementById('a4-condenser-week-select');
+      const weekNum = parseInt(targetSel ? targetSel.value : 2) || 2;
+      if (typeof toggleWeekCondensed === 'function') {
+        if (isWeekCondensed(weekNum)) {
+          toggleWeekCondensed(weekNum);
+        } else {
+          renderOjtPages();
+        }
+      }
+      updateA4CondenserModalUI();
+      alert(`🔄 สลับกลับเป็น 'ฉบับเต็ม' สำหรับสัปดาห์ที่ ${toThaiNum(weekNum)} เรียบร้อยครับ`);
+      closeGeminiA4CondenserModal();
+    }
+
+    function applyA4CondenserAllWeeks() {
+      for (let w = 1; w <= 5; w++) {
+        if (typeof isWeekCondensed === 'function' && !isWeekCondensed(w)) {
+          if (typeof toggleWeekCondensed === 'function') toggleWeekCondensed(w);
+        }
+      }
+      updateA4CondenserModalUI();
+      alert(`✨ เปิดใช้งานโหมด 'ย่อพอดี 1 หน้า A4' ให้กับทุกสัปดาห์ (1-5) สำเร็จแล้ว!`);
+      closeGeminiA4CondenserModal();
+    }
+
+    window.openGeminiA4CondenserModal = openGeminiA4CondenserModal;
+    window.closeGeminiA4CondenserModal = closeGeminiA4CondenserModal;
+    window.updateA4CondenserModalUI = updateA4CondenserModalUI;
+    window.applyA4CondenserCurrentWeek = applyA4CondenserCurrentWeek;
+    window.restoreFullOjtCurrentWeek = restoreFullOjtCurrentWeek;
+    window.applyA4CondenserAllWeeks = applyA4CondenserAllWeeks;
+
+
     // SPRINT 3: Executive Dashboard Loader
     let cachedExecutiveData = null;
 
