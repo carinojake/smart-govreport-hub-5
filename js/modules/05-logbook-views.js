@@ -308,6 +308,7 @@ window.escapeHtml = escapeHtml;
           
           <!-- Header (แบบฟอร์มราชการกึ่งกลางตรงตามต้นฉบับจริง) -->
           <div class="text-center pt-1 pb-2 print:pt-0 print:pb-1 relative">
+            <div class="text-[10px] print:text-[8pt] text-slate-500 font-semibold tracking-wide mb-0.5">Smart GovReport Hub 5 (โครงการส่งเสริมและเตรียมความพร้อมสำหรับการจ้างงานคนพิการในหน่วยงานภาครัฐ 90 ชั่วโมง)</div>
             <h2 class="${isLandscape ? 'text-xl print:text-lg' : 'text-lg print:text-base'} font-bold tracking-normal text-black">แบบบันทึกการปฏิบัติงานประจำสัปดาห์</h2>
             <div class="${isLandscape ? 'text-base print:text-sm' : 'text-base print:text-sm'} font-bold text-black mt-0.5">
               สัปดาห์ที่<span class="inline-block border-b border-dotted border-black min-w-[3rem] text-center font-bold px-2 mx-1">${toThaiNum(weekNum)}</span>
@@ -486,7 +487,7 @@ window.escapeHtml = escapeHtml;
 
           <!-- Document Footer -->
           <div class="mt-1 pt-1 border-t border-slate-300 text-[10px] print:text-[9px] text-slate-500 flex justify-between">
-            <span>เอกสารอ้างอิง: แบบบันทึกการปฏิบัติงานประจำสัปดาห์ (หลักสูตรส่งเสริมและเตรียมความพร้อมสำหรับการจ้างงานคนพิการฯ)</span>
+            <span>เอกสารอ้างอิง: Smart GovReport Hub 5 (โครงการส่งเสริมและเตรียมความพร้อมสำหรับการจ้างงานคนพิการในหน่วยงานภาครัฐ 90 ชั่วโมง) • แบบบันทึกประจำสัปดาห์</span>
             <span>หน้า ${toThaiNum(pageNum)} จาก ${toThaiNum(totalPageLabel)}</span>
           </div>
         </div>
@@ -637,6 +638,7 @@ window.escapeHtml = escapeHtml;
           <div class="flex items-start justify-between border-b-2 border-slate-800 pb-2 mb-3">
             <div class="w-16 hidden sm:block"></div>
             <div class="text-center flex-1">
+              <div class="text-[10px] text-slate-500 font-semibold tracking-wide mb-0.5">Smart GovReport Hub 5 (โครงการส่งเสริมและเตรียมความพร้อมสำหรับการจ้างงานคนพิการในหน่วยงานภาครัฐ 90 ชั่วโมง)</div>
               <h2 class="text-xl font-bold tracking-wide text-slate-900">แบบบันทึกการปฏิบัติงานประจำสัปดาห์ (ฉบับเต็ม)</h2>
               <p class="text-xs text-slate-600 mt-0.5">โครงการส่งเสริมและเตรียมความพร้อมสำหรับการจ้างงานคนพิการในหน่วยงานภาครัฐ</p>
             </div>
@@ -755,7 +757,7 @@ window.escapeHtml = escapeHtml;
 
           <!-- Document Footer -->
           <div class="mt-2 pt-1 border-t border-slate-300 text-[9px] text-slate-400 flex justify-between">
-            <span>เอกสารอ้างอิง: แบบบันทึกการปฏิบัติงานประจำสัปดาห์ (ฉบับเต็ม) • โครงการส่งเสริมและเตรียมความพร้อมสำหรับการจ้างงานคนพิการฯ</span>
+            <span>เอกสารอ้างอิง: Smart GovReport Hub 5 (โครงการส่งเสริมและเตรียมความพร้อมสำหรับการจ้างงานคนพิการในหน่วยงานภาครัฐ 90 ชั่วโมง) • แบบบันทึกการปฏิบัติงานประจำสัปดาห์ (ฉบับเต็ม)</span>
             <span>หน้า ${toThaiNum(pageNum)} จาก ${toThaiNum(totalPageLabel)}</span>
           </div>
         </div>

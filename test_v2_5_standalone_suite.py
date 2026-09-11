@@ -26,38 +26,38 @@ def run_suite():
         else:
             print(f"  ❌ [FAIL] {desc}")
 
-    # 1. Test 2.5 Frontend on Port 8085
+    # 1. Test 5.0 Frontend on Port 8085
     try:
         with urllib.request.urlopen("http://localhost:8085/") as res:
-            check("v2.5 Frontend on Port 8085 returns HTTP 200", res.status == 200)
+            check("v5 Frontend on Port 8085 returns HTTP 200", res.status == 200)
             content = res.read().decode('utf-8')
-            check("v2.5 Index contains Smart GovReport Hub 2.5", "Smart GovReport Hub 2.5" in content)
-            check("v2.5 Index loads ES module app.js", 'type="module" src="js/app.js"' in content)
-            check("v2.5 Index contains Docker PostgreSQL 5432 live badge", "pg-docker-pill" in content)
-            check("v2.5 Index contains all 6 authentic views", 
+            check("Index contains Smart GovReport Hub 5", "Smart GovReport Hub 5" in content)
+            check("Index loads ES module app.js", 'type="module" src="js/app.js"' in content)
+            check("Index contains Docker PostgreSQL 5432 live badge", "pg-docker-pill" in content)
+            check("Index contains all 6 authentic views", 
                   "view-dashboard" in content and 
                   "view-ojt-log" in content and 
                   "view-project-summary" in content and 
                   "view-official-memo" in content and 
                   "view-portfolio-report" in content and 
                   "view-executive-overview" in content)
-            check("v2.5 Index contains core modals (Signature, Sync, PDPA)", 
+            check("Index contains core modals (Signature, Sync, PDPA)", 
                   "signature-modal" in content and "api-sync-modal" in content and "ojt-photo-modal" in content)
             # Approval Gate Enhanced Verification
-            check("v2.5 Index contains Member Management & Approval Gate Modal", "member-management-modal" in content)
-            check("v2.5 Index contains Search & Filter Toolbar in Approval Gate", "mgmt-search-input" in content and "mgmt-role-filter" in content)
-            check("v2.5 Index contains Batch Actions Bar in Approval Gate", "batch-actions-container" in content and "master-select-pending" in content)
-            check("v2.5 Index contains Edit Member Profile Modal", "edit-member-modal" in content and "edit-member-form" in content)
+            check("Index contains Member Management & Approval Gate Modal", "member-management-modal" in content)
+            check("Index contains Search & Filter Toolbar in Approval Gate", "mgmt-search-input" in content and "mgmt-role-filter" in content)
+            check("Index contains Batch Actions Bar in Approval Gate", "batch-actions-container" in content and "master-select-pending" in content)
+            check("Index contains Edit Member Profile Modal", "edit-member-modal" in content and "edit-member-form" in content)
     except Exception as e:
-        check(f"v2.5 Frontend reachable: {e}", False)
+        check(f"Frontend reachable: {e}", False)
 
-    # 2. Test 2.5 Backend on Port 8086 with Docker PostgreSQL 5432
+    # 2. Test Backend on Port 8086 with Docker PostgreSQL 5432
     try:
         with urllib.request.urlopen("http://127.0.0.1:8086/api/health") as res:
-            check("v2.5 Backend on Port 8086 returns HTTP 200", res.status == 200)
+            check("Backend on Port 8086 returns HTTP 200", res.status == 200)
             data = json.loads(res.read().decode('utf-8'))
-            check("v2.5 Backend health status is online", data.get("status") == "online")
-            check("v2.5 Backend version is 2.5.0", data.get("version") == "2.5.0")
+            check("Backend health status is online", data.get("status") == "online")
+            check("Backend version is 5.0.0", data.get("version") == "5.0.0")
             db_name = data.get("database", "")
             check("Active Database is Docker PostgreSQL 5432 Full Connection", "PostgreSQL" in db_name and "5432" in db_name)
             telemetry = data.get("telemetry", {})

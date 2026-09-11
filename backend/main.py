@@ -44,9 +44,9 @@ ENV_MODE = os.getenv("ENVIRONMENT", "development").lower()
 IS_PRODUCTION = ENV_MODE == "production"
 
 app = FastAPI(
-    title="Smart GovReport Hub 2.5 API",
+    title="Smart GovReport Hub 5 API",
     description="ระบบรายงาน OJT และสารสนเทศภาครัฐ เชื่อมต่อ Docker PostgreSQL เต็มรูปแบบ",
-    version="2.5.0",
+    version="5.0.0",
     docs_url=None if IS_PRODUCTION else "/docs",
     redoc_url=None if IS_PRODUCTION else "/redoc",
     openapi_url=None if IS_PRODUCTION else "/openapi.json"
@@ -200,8 +200,8 @@ async def health(conn: asyncpg.Connection = Depends(get_db)):
         report_count = await conn.fetchval("SELECT COUNT(*) FROM ojt_reports")
         return {
             "status": "online",
-            "version": "2.5.0",
-            "app": "Smart GovReport Hub 2.5",
+            "version": "5.0.0",
+            "app": "Smart GovReport Hub 5",
             "database": "PostgreSQL 16 (Docker Port 5432 - Full Connection)",
             "telemetry": {
                 "active_users": user_count,
