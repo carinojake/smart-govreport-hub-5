@@ -277,12 +277,10 @@
             </span>
           </div>
 
-          <!-- DROPDOWN 1: ศูนย์ควบคุมระบบ (SYSTEM HUB) -->
+          <!-- DROPDOWN 1: ศูนย์ควบคุมระบบ (SYSTEM HUB - Compact Icon) -->
           <div class="relative">
-            <button id="btn-system-hub-toggle" onclick="toggleSystemHubDropdown(event)" class="bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-600 px-2.5 py-1 rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition whitespace-nowrap flex-shrink-0 cursor-pointer" title="ศูนย์ควบคุมระบบและเครื่องมือสำรองข้อมูล">
-              <i class="fa-solid fa-sliders text-govGold"></i>
-              <span class="hidden md:inline">เครื่องมือระบบ</span>
-              <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-0.5"></i>
+            <button id="btn-system-hub-toggle" onclick="toggleSystemHubDropdown(event)" class="w-8 h-8 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-600 flex items-center justify-center shadow-sm transition flex-shrink-0 cursor-pointer" title="ศูนย์ควบคุมระบบและเครื่องมือสำรองข้อมูล">
+              <i class="fa-solid fa-sliders text-govGold text-xs"></i>
             </button>
 
             <!-- System Hub Dropdown Menu -->
@@ -337,12 +335,10 @@
             </div>
           </div>
 
-          <!-- DROPDOWN 2: การเข้าถึง (ACCESSIBILITY & PDPA) -->
+          <!-- DROPDOWN 2: การเข้าถึง (ACCESSIBILITY & PDPA - Compact Icon) -->
           <div class="relative">
-            <button id="btn-a11y-toggle" onclick="toggleA11yDropdown(event)" class="bg-blue-950/70 hover:bg-blue-900 text-blue-200 border border-blue-500/40 px-2.5 py-1 rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition whitespace-nowrap flex-shrink-0 cursor-pointer" title="การเข้าถึงและโหมดพรางข้อมูล PDPA">
-              <i class="fa-solid fa-universal-access text-teal-300"></i>
-              <span class="hidden lg:inline">การเข้าถึง</span>
-              <i class="fa-solid fa-chevron-down text-[10px] text-blue-300/80 ml-0.5"></i>
+            <button id="btn-a11y-toggle" onclick="toggleA11yDropdown(event)" class="w-8 h-8 rounded-lg bg-blue-950/70 hover:bg-blue-900 text-blue-200 border border-blue-500/40 flex items-center justify-center shadow-sm transition flex-shrink-0 cursor-pointer" title="การเข้าถึง (WCAG) และโหมดพรางข้อมูล PDPA">
+              <i class="fa-solid fa-universal-access text-teal-300 text-xs"></i>
             </button>
 
             <!-- A11y Dropdown Menu -->
@@ -385,33 +381,29 @@
           </div>
 
           <!-- Member Management & Approval Button (Visible to Supervisor & Admin) -->
-          <button onclick="openMemberManagementModal()" id="btn-member-mgmt" class="hidden bg-purple-950/70 hover:bg-purple-900 text-purple-200 border border-purple-500/40 px-2.5 py-1 rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition whitespace-nowrap flex-shrink-0 cursor-pointer" title="จัดการรายชื่อและอนุมัติสมาชิกใหม่">
-            <i class="fa-solid fa-users-gear text-purple-400"></i>
-            <span class="hidden md:inline">จัดการสมาชิก</span>
-            <span id="pending-count-badge" class="hidden bg-amber-500 text-slate-900 text-[10px] px-1.5 py-0.2 rounded-full font-bold">0</span>
+          <button onclick="openMemberManagementModal()" id="btn-member-mgmt" class="hidden w-8 h-8 rounded-lg bg-purple-950/70 hover:bg-purple-900 text-purple-200 border border-purple-500/40 relative flex items-center justify-center shadow-sm transition flex-shrink-0 cursor-pointer" title="จัดการรายชื่อและอนุมัติสมาชิกใหม่">
+            <i class="fa-solid fa-users-gear text-purple-400 text-xs"></i>
+            <span id="pending-count-badge" class="hidden absolute -top-1 -right-1 bg-amber-500 text-slate-900 text-[9px] w-4 h-4 rounded-full font-bold flex items-center justify-center">0</span>
           </button>
 
           <!-- Admin Dynamic RBAC Matrix Button (Visible only to Admin/Staff) -->
-          <button onclick="RBACManager.openMatrixModal()" id="btn-admin-rbac" class="hidden bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-400/40 px-2.5 py-1 rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition whitespace-nowrap flex-shrink-0 cursor-pointer" title="จัดการสิทธิ์เมนูและโมดูล (Dynamic RBAC Matrix)">
-            <i class="fa-solid fa-key text-purple-300"></i>
-            <span class="hidden lg:inline">จัดการสิทธิ์ (RBAC)</span>
+          <button onclick="RBACManager.openMatrixModal()" id="btn-admin-rbac" class="hidden w-8 h-8 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-400/40 flex items-center justify-center shadow-sm transition flex-shrink-0 cursor-pointer" title="จัดการสิทธิ์เมนูและโมดูล (Dynamic RBAC Matrix)">
+            <i class="fa-solid fa-key text-purple-300 text-xs"></i>
           </button>
 
-          <!-- Security Screen Lock & Role Switcher Button -->
-          <button onclick="openSecurityModal()" id="security-role-btn" class="bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-600 px-2.5 py-1 rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition whitespace-nowrap flex-shrink-0 cursor-pointer" title="คลิกเพื่อล็อคหน้าจอ หรือสลับบทบาทด้วย PIN">
-            <i id="security-icon" class="fa-solid fa-lock-open text-emerald-400"></i>
-            <span id="security-role-label" class="hidden md:inline">ผู้ฝึกงาน</span>
+          <!-- Security Screen Lock & Role Switcher Button (Compact Icon) -->
+          <button onclick="openSecurityModal()" id="security-role-btn" class="w-8 h-8 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-600 flex items-center justify-center shadow-sm transition flex-shrink-0 cursor-pointer" title="คลิกเพื่อเปลี่ยนรหัส PIN หรือสลับสิทธิ์การใช้งาน">
+            <i id="security-icon" class="fa-solid fa-lock-open text-emerald-400 text-xs"></i>
+            <span id="security-role-label" class="sr-only">ผู้ฝึกงาน</span>
           </button>
 
           <!-- Capsule Profile & Sign Out (Compact & Clean Single Capsule) -->
-          <div id="user-display-container" class="flex items-center space-x-2 bg-white/10 hover:bg-white/15 px-2.5 py-1 rounded-full border border-white/15 text-xs whitespace-nowrap flex-shrink-0 transition shadow-xs">
-            <div class="flex items-center space-x-1.5">
-              <span class="w-6 h-6 rounded-full bg-govGold/20 text-govGold flex items-center justify-center text-xs font-bold border border-govGold/30 flex-shrink-0">
-                <i class="fa-solid fa-user text-[11px]"></i>
-              </span>
-              <span id="user-display-name" class="font-bold text-white truncate max-w-[80px] sm:max-w-[120px]">นายเจค</span>
-              <span id="user-display-role" class="bg-govGold/20 text-govGold text-[9px] px-1.5 py-0.5 rounded-full border border-govGold/30 font-semibold hidden sm:inline">ผู้ดูแลระบบ</span>
-            </div>
+          <div id="user-display-container" class="flex items-center space-x-1.5 bg-white/10 hover:bg-white/15 pl-2 pr-1 py-1 rounded-full border border-white/15 text-xs whitespace-nowrap flex-shrink-0 transition shadow-xs">
+            <span class="w-6 h-6 rounded-full bg-govGold/20 text-govGold flex items-center justify-center text-xs font-bold border border-govGold/30 flex-shrink-0">
+              <i class="fa-solid fa-user text-[11px]"></i>
+            </span>
+            <span id="user-display-name" class="font-bold text-white text-xs max-w-[70px] sm:max-w-[100px] truncate">นายเจค</span>
+            <span id="user-display-role" class="sr-only">ผู้ดูแลระบบ</span>
             <button onclick="handleLogout()" class="w-6 h-6 rounded-full bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center transition shadow-sm border border-rose-400/40 cursor-pointer hover:scale-105 active:scale-95 flex-shrink-0" title="ออกจากระบบ (Sign Out)">
               <i class="fa-solid fa-power-off text-[10px]"></i>
             </button>
