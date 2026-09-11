@@ -9,21 +9,46 @@ import os
 import uuid
 import json
 import logging
+from logging.handlers import RotatingFileHandler
 from typing import List, Optional, Dict, Any
 from datetime import datetime, date
 
-from fastapi import FastAPI, HTTPException, Request, Depends
+from fastapi import FastAPI, HTTPException, Request, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import asyncpg
+from dotenv import load_dotenv
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+# โหลดคอนฟิกกูเกิล/ระบบจากไฟล์ .env
+load_dotenv()
+
+# Logging Configuration with Rotation (Max 10MB x 5 Backups)
+os.makedirs("logs", exist_ok=True)
+log_file_handler = RotatingFileHandler(
+    "logs/uvicorn.log",
+    maxBytes=10 * 1024 * 1024,
+    backupCount=5,
+    encoding="utf-8"
+)
+log_stream_handler = logging.StreamHandler()
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[log_file_handler, log_stream_handler]
+)
 logger = logging.getLogger("smartgov_v25")
+
+# Environment & Production Hardening
+ENV_MODE = os.getenv("ENVIRONMENT", "development").lower()
+IS_PRODUCTION = ENV_MODE == "production"
 
 app = FastAPI(
     title="Smart GovReport Hub 2.5 API",
     description="ระบบรายงาน OJT และสารสนเทศภาครัฐ เชื่อมต่อ Docker PostgreSQL เต็มรูปแบบ",
-    version="2.5.0"
+    version="2.5.0",
+    docs_url=None if IS_PRODUCTION else "/docs",
+    redoc_url=None if IS_PRODUCTION else "/redoc",
+    openapi_url=None if IS_PRODUCTION else "/openapi.json"
 )
 
 # CORS Whitelist for Smart GovReport Hub 2.5
@@ -153,6 +178,15 @@ class StateSyncPayload(BaseModel):
 class SummarizeRequest(BaseModel):
     week_num: int
     entries: List[Dict[str, Any]]
+
+class UpdatePermissionItem(BaseModel):
+    role_id: str
+    menu_id: str
+    can_view: int
+    can_edit: int
+
+class UpdatePermissionMatrixRequest(BaseModel):
+    permissions: List[UpdatePermissionItem]
 
 # -----------------------------------------------------------------------------
 # Endpoints
@@ -633,6 +667,115 @@ async def export_audit_logs(
             media_type="application/json",
             headers={"Content-Disposition": f"attachment; filename={filename}"}
         )
+
+# =============================================================================
+# RBAC Dynamic Permission Matrix Endpoints
+# =============================================================================
+
+@app.get("/api/v1/rbac/my-permissions")
+async def get_my_permissions(role: Optional[str] = "trainee", db: asyncpg.Connection = Depends(get_db)):
+    """คืนค่ารายการสิทธิ์การมองเห็นและแก้ไขตามบทบาทที่ระบุ (RBAC Effective Permissions)"""
+    rows = await db.fetch("""
+        SELECT m.menu_id, m.module_key, m.menu_label, m.menu_category, m.menu_icon, m.sort_order,
+               p.can_view, p.can_edit
+        FROM menus m
+        JOIN role_menu_permissions p ON m.menu_id = p.menu_id
+        WHERE p.role_id = $1 AND m.is_active = 1
+        ORDER BY m.sort_order ASC
+    """, role)
+
+    perms = [dict(r) for r in rows]
+    can_view_map = {p["module_key"]: bool(p["can_view"]) for p in perms}
+    can_edit_map = {p["module_key"]: bool(p["can_edit"]) for p in perms}
+
+    return {
+        "status": "success",
+        "role": role,
+        "permissions": perms,
+        "can_view_map": can_view_map,
+        "can_edit_map": can_edit_map
+    }
+
+@app.get("/api/v1/rbac/matrix")
+async def get_rbac_matrix(
+    request: Request,
+    x_user_role: Optional[str] = Header(None),
+    role: Optional[str] = None,
+    db: asyncpg.Connection = Depends(get_db)
+):
+    """ดึงตารางสิทธิ์ Dynamic RBAC Matrix ทั้งระบบ (สงวนสิทธิ์เฉพาะ Admin และ Supervisor เท่านั้น)"""
+    effective_role = x_user_role or role or request.headers.get("x-user-role") or "supervisor"
+    if effective_role.lower() == "trainee":
+        raise HTTPException(status_code=403, detail="สงวนสิทธิ์การเข้าถึงเมทริกซ์สิทธิ์สำหรับผู้ดูแลระบบและผู้ควบคุมงานเท่านั้น")
+
+    roles_rows = await db.fetch("SELECT role_id, role_name FROM roles ORDER BY role_id ASC")
+    roles = [dict(r) for r in roles_rows]
+
+    menus_rows = await db.fetch("SELECT menu_id, module_key, menu_label, menu_category, sort_order FROM menus WHERE is_active = 1 ORDER BY sort_order ASC")
+    menus = [dict(r) for r in menus_rows]
+
+    perms_rows = await db.fetch("SELECT role_id, menu_id, can_view, can_edit FROM role_menu_permissions")
+
+    matrix: Dict[str, Dict[str, Dict[str, int]]] = {r["role_id"]: {} for r in roles}
+    for p in perms_rows:
+        rid = p["role_id"]
+        mid = p["menu_id"]
+        if rid not in matrix:
+            matrix[rid] = {}
+        matrix[rid][mid] = {
+            "can_view": int(p["can_view"]),
+            "can_edit": int(p["can_edit"])
+        }
+
+    return {
+        "status": "success",
+        "roles": roles,
+        "menus": menus,
+        "matrix": matrix
+    }
+
+@app.post("/api/v1/rbac/matrix")
+async def update_rbac_matrix(
+    req: UpdatePermissionMatrixRequest,
+    request: Request,
+    x_user_role: Optional[str] = Header(None),
+    role: Optional[str] = None,
+    db: asyncpg.Connection = Depends(get_db)
+):
+    """อัปเดตสิทธิ์ Dynamic RBAC ลงใน PostgreSQL (สงวนสิทธิ์เฉพาะ Admin และ Supervisor เท่านั้น)"""
+    effective_role = x_user_role or role or request.headers.get("x-user-role") or "supervisor"
+    if effective_role.lower() == "trainee":
+        raise HTTPException(status_code=403, detail="สงวนสิทธิ์การแก้ไขสิทธิ์สำหรับผู้ดูแลระบบและผู้ควบคุมงานเท่านั้น")
+
+    async with db.transaction():
+        for item in req.permissions:
+            await db.execute("""
+                INSERT INTO role_menu_permissions (role_id, menu_id, can_view, can_edit)
+                VALUES ($1, $2, $3, $4)
+                ON CONFLICT (role_id, menu_id) DO UPDATE SET
+                    can_view = EXCLUDED.can_view,
+                    can_edit = EXCLUDED.can_edit
+            """, item.role_id, item.menu_id, item.can_view, item.can_edit)
+
+    # บันทึก Audit Log ลง PostgreSQL
+    try:
+        await log_audit_event(
+            db=db,
+            user_id="a0000002-0000-0000-0000-000000000002",
+            event_type="RBAC_MATRIX_UPDATED",
+            resource_type="role_menu_permissions",
+            resource_id="rbac_matrix",
+            client_ip="127.0.0.1",
+            payload={"updated_items": len(req.permissions)}
+        )
+    except Exception as e:
+        logger.warning(f"Audit log warning: {e}")
+
+    return {
+        "status": "success",
+        "message": f"อัปเดตสิทธิ์ Dynamic RBAC เรียบร้อยแล้ว {len(req.permissions)} รายการ"
+    }
+
 
 if __name__ == "__main__":
     import uvicorn

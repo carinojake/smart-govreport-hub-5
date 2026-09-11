@@ -951,11 +951,16 @@
     }
 
     function switchTab(tabId) {
+      if (window.RBACManager && !window.RBACManager.canView(tabId)) {
+        alert(`⚠️ สงวนสิทธิ์การเข้าถึงโมดูลนี้ (Access Denied)\n\nบทบาทปัจจุบันของท่านยังไม่ได้รับสิทธิ์เปิดใช้งานโมดูล: ${tabId}\nระบบนำท่านกลับมายังหน้าสมุดบันทึก OJT ครับ`);
+        tabId = 'ojt-log';
+      }
+
       if (tabId === 'executive-overview') {
         const session = (typeof getActiveSession === 'function') ? getActiveSession() : null;
         if (session && session.role === 'trainee') {
           alert('🚫 สิทธิ์ไม่เพียงพอ: หน้ารวมผู้บริหาร (Executive Dashboard) สงวนสิทธิ์เฉพาะผู้ควบคุมงาน อาจารย์นิเทศก์ และเจ้าหน้าที่เท่านั้น');
-          switchTab('dashboard');
+          switchTab('ojt-log');
           return;
         }
       }

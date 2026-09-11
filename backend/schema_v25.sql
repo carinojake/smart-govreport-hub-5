@@ -209,3 +209,99 @@ VALUES
     'ไม่มี'
 )
 ON CONFLICT (username) DO NOTHING;
+
+-- ==============================================================================
+-- 11. Dynamic Role-Based Access Control (RBAC Matrix)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS roles (
+    role_id VARCHAR(50) PRIMARY KEY,
+    role_name VARCHAR(100) NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS menus (
+    menu_id VARCHAR(50) PRIMARY KEY,
+    module_key VARCHAR(50) NOT NULL UNIQUE,
+    menu_label VARCHAR(100) NOT NULL,
+    menu_category VARCHAR(50) DEFAULT 'sidebar',
+    menu_icon VARCHAR(50),
+    sort_order INTEGER DEFAULT 0,
+    is_active INTEGER DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS role_menu_permissions (
+    role_id VARCHAR(50) NOT NULL,
+    menu_id VARCHAR(50) NOT NULL,
+    can_view INTEGER DEFAULT 1,
+    can_edit INTEGER DEFAULT 0,
+    PRIMARY KEY (role_id, menu_id),
+    FOREIGN KEY (role_id) REFERENCES roles(role_id) ON DELETE CASCADE,
+    FOREIGN KEY (menu_id) REFERENCES menus(menu_id) ON DELETE CASCADE
+);
+
+-- Seed Roles
+INSERT INTO roles (role_id, role_name) VALUES
+('staff', 'ผู้ดูแลระบบ / เจ้าหน้าที่ (Admin Staff)'),
+('supervisor', 'ผู้ควบคุมงาน / พี่เลี้ยง (Supervisor)'),
+('advisor', 'อาจารย์นิเทศก์ / ที่ปรึกษา (Advisor)'),
+('trainee', 'ผู้ฝึกปฏิบัติงาน (Trainee)')
+ON CONFLICT (role_id) DO NOTHING;
+
+-- Seed 10 Menus
+INSERT INTO menus (menu_id, module_key, menu_label, menu_category, menu_icon, sort_order) VALUES
+('m_dash', 'dashboard', 'แดชบอร์ดภาพรวมรายงาน', 'sidebar', 'fa-solid fa-chart-pie', 1),
+('m_log', 'ojt-log', 'สมุดบันทึกการฝึกภาคปฏิบัติ', 'sidebar', 'fa-solid fa-book-bookmark', 2),
+('m_proj', 'project-summary', 'รายงานบริหารโครงการ', 'sidebar', 'fa-solid fa-diagram-project', 3),
+('m_memo', 'official-memo', 'บันทึกข้อความราชการ', 'sidebar', 'fa-solid fa-stamp', 4),
+('m_exec', 'executive-overview', 'Executive Dashboard', 'sidebar', 'fa-solid fa-users-viewfinder', 5),
+('m_port', 'portfolio-report', 'รายงานสมรรถนะ Portfolio', 'sidebar', 'fa-solid fa-award', 6),
+('m_audit', 'audit-console', 'Audit Log Console', 'sidebar', 'fa-solid fa-terminal', 7),
+('m_kb', 'knowledge-base', 'คลังสืบค้นงานรุ่นพี่', 'sidebar', 'fa-solid fa-book-open-reader', 8),
+('m_photo', 'photo-gallery', 'คลังภาพหลักฐาน', 'sidebar', 'fa-solid fa-images', 9),
+('m_polish', 'ai-polish', 'AI Polish ขัดเกลาภาษาราชการ', 'widget', 'fa-solid fa-wand-magic-sparkles', 10)
+ON CONFLICT (menu_id) DO NOTHING;
+
+-- Seed Default Role Permissions
+INSERT INTO role_menu_permissions (role_id, menu_id, can_view, can_edit) VALUES
+('staff', 'm_dash', 1, 1),
+('staff', 'm_log', 1, 1),
+('staff', 'm_proj', 1, 1),
+('staff', 'm_memo', 1, 1),
+('staff', 'm_exec', 1, 1),
+('staff', 'm_port', 1, 1),
+('staff', 'm_audit', 1, 1),
+('staff', 'm_kb', 1, 1),
+('staff', 'm_photo', 1, 1),
+('staff', 'm_polish', 1, 1),
+('supervisor', 'm_dash', 1, 1),
+('supervisor', 'm_log', 1, 1),
+('supervisor', 'm_proj', 1, 1),
+('supervisor', 'm_memo', 1, 1),
+('supervisor', 'm_exec', 1, 1),
+('supervisor', 'm_port', 1, 1),
+('supervisor', 'm_audit', 1, 0),
+('supervisor', 'm_kb', 1, 1),
+('supervisor', 'm_photo', 1, 1),
+('supervisor', 'm_polish', 1, 1),
+('advisor', 'm_dash', 1, 0),
+('advisor', 'm_log', 1, 1),
+('advisor', 'm_proj', 1, 1),
+('advisor', 'm_memo', 1, 1),
+('advisor', 'm_exec', 1, 1),
+('advisor', 'm_port', 1, 1),
+('advisor', 'm_audit', 1, 0),
+('advisor', 'm_kb', 1, 1),
+('advisor', 'm_photo', 1, 1),
+('advisor', 'm_polish', 1, 1),
+('trainee', 'm_dash', 0, 0),
+('trainee', 'm_log', 1, 1),
+('trainee', 'm_proj', 1, 1),
+('trainee', 'm_memo', 1, 1),
+('trainee', 'm_exec', 0, 0),
+('trainee', 'm_port', 1, 0),
+('trainee', 'm_audit', 0, 0),
+('trainee', 'm_kb', 1, 1),
+('trainee', 'm_photo', 1, 1),
+('trainee', 'm_polish', 1, 1)
+ON CONFLICT (role_id, menu_id) DO NOTHING;
+

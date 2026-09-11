@@ -7,7 +7,8 @@
  */
 
 (function () {
-  const AUDIT_API_BASE = 'http://127.0.0.1:8086/api';
+  const auditHost = (typeof window !== 'undefined' && window.location && window.location.hostname) ? window.location.hostname : '127.0.0.1';
+  const AUDIT_API_BASE = `http://${auditHost}:8086/api`;
 
   let currentAuditLogsCache = [];
   let currentAuditPage = 0;

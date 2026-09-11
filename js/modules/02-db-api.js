@@ -4,8 +4,9 @@
  * ออกแบบโดย: เซียน SA (5.2) & โค้ดเดอร์หลังบ้าน (5.5)
  */
 
+const defaultHost = (typeof window !== 'undefined' && window.location && window.location.hostname) ? window.location.hostname : '127.0.0.1';
 export const DB_CONFIG = {
-  apiBase: 'http://127.0.0.1:8086/api',
+  apiBase: `http://${defaultHost}:8086/api`,
   pollIntervalMs: 5000,
   defaultUserId: 'a0000001-0000-0000-0000-000000000001',
   defaultSupervisorId: 'a0000002-0000-0000-0000-000000000002'

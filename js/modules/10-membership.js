@@ -1336,11 +1336,16 @@
         }
       }
 
-      // If a trainee is somehow viewing the Executive Dashboard tab, redirect to trainee dashboard
+      // Dynamic RBAC Loading
+      if (window.RBACManager) {
+        RBACManager.loadPermissions(session.role);
+      }
+
+      // If a trainee is somehow viewing the Executive Dashboard tab, redirect to ojt-log
       if (!canAccessExecutive) {
         const execView = document.getElementById('view-executive-overview');
         if (execView && !execView.classList.contains('hidden')) {
-          switchTab('dashboard');
+          switchTab('ojt-log');
         }
       }
 

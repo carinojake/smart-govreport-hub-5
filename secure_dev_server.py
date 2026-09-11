@@ -37,7 +37,7 @@ class SecureGovHTTPHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Referrer-Policy", "strict-origin-when-cross-origin")
         self.send_header(
             "Content-Security-Policy",
-            "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval';"
+            "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; connect-src 'self' http://localhost:8086 http://127.0.0.1:8086 ws: wss: https:;"
         )
         super().end_headers()
 

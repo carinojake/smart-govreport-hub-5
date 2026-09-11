@@ -55,6 +55,16 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // Hook ระบบ Auto-Save เข้าสู่ Docker PostgreSQL
   setupPostgresAutoSync();
+
+  // ตั้งค่าการวางหน้า PDF เริ่มต้น (Landscape/Portrait) ตามที่บันทึกไว้
+  if (typeof window.applyPdfOrientationStyle === 'function') {
+    const savedOrient = localStorage.getItem('ojt_pdf_orientation') || 'landscape';
+    if (typeof window.setPdfOrientation === 'function') {
+      window.setPdfOrientation(savedOrient);
+    } else {
+      window.applyPdfOrientationStyle();
+    }
+  }
 });
 
 /**

@@ -11,6 +11,87 @@ function escapeHtml(str) {
 window.escapeHtml = escapeHtml;
 
     // =========================================================================
+    // PDF ORIENTATION CONTROL: LANDSCAPE (แนวนอน) VS PORTRAIT (แนวตั้ง) VS MIXED
+    // =========================================================================
+    let currentPdfOrientation = localStorage.getItem('ojt_pdf_orientation') || 'landscape';
+    window.currentPdfOrientation = currentPdfOrientation;
+
+    function applyPdfOrientationStyle() {
+      const styleTag = document.getElementById('dynamic-print-orientation');
+      const body = document.getElementById('main-body') || document.body;
+      if (!styleTag) return;
+
+      if (currentPdfOrientation === 'landscape') {
+        styleTag.innerHTML = `
+          @media print {
+            @page {
+              size: A4 landscape !important;
+              margin: 6mm 8mm 6mm 8mm !important;
+            }
+          }
+        `;
+        body.classList.add('pdf-landscape');
+      } else if (currentPdfOrientation === 'portrait') {
+        styleTag.innerHTML = `
+          @media print {
+            @page {
+              size: A4 portrait !important;
+              margin: 6mm 8mm 6mm 8mm !important;
+            }
+          }
+        `;
+        body.classList.remove('pdf-landscape');
+      } else if (currentPdfOrientation === 'mixed') {
+        styleTag.innerHTML = `
+          @media print {
+            @page {
+              size: A4 portrait !important;
+              margin: 6mm 8mm 6mm 8mm !important;
+            }
+            @page a4-landscape {
+              size: A4 landscape !important;
+              margin: 6mm 8mm 6mm 8mm !important;
+            }
+            .a4-paper.landscape {
+              page: a4-landscape !important;
+            }
+          }
+        `;
+        body.classList.remove('pdf-landscape');
+      }
+    }
+    window.applyPdfOrientationStyle = applyPdfOrientationStyle;
+
+    function setPdfOrientation(mode) {
+      currentPdfOrientation = mode;
+      window.currentPdfOrientation = mode;
+      localStorage.setItem('ojt_pdf_orientation', mode);
+
+      const btnLandscape = document.getElementById('btn-orient-landscape');
+      const btnPortrait = document.getElementById('btn-orient-portrait');
+      const btnMixed = document.getElementById('btn-orient-mixed');
+
+      const activeClass = 'px-2.5 py-1 text-xs font-bold rounded-lg bg-govNavy text-white shadow-xs transition flex items-center space-x-1';
+      const inactiveClass = 'px-2.5 py-1 text-xs font-bold rounded-lg text-slate-700 hover:bg-purple-100 transition flex items-center space-x-1';
+
+      if (btnLandscape) btnLandscape.className = (mode === 'landscape' ? activeClass : inactiveClass);
+      if (btnPortrait) btnPortrait.className = (mode === 'portrait' ? activeClass : inactiveClass);
+      if (btnMixed) btnMixed.className = (mode === 'mixed' ? activeClass : inactiveClass);
+
+      applyPdfOrientationStyle();
+      renderOjtPages();
+    }
+    window.setPdfOrientation = setPdfOrientation;
+
+    function printOjtReport() {
+      applyPdfOrientationStyle();
+      setTimeout(() => {
+        window.print();
+      }, 80);
+    }
+    window.printOjtReport = printOjtReport;
+
+    // =========================================================================
     // OJT EDITION SWITCHER: BRIEF (ตารางทางการ A4) VS FULL (ฉบับเต็ม + รูปภาพ)
     // =========================================================================
     let currentOjtEdition = 'brief'; // 'brief' or 'full'
@@ -132,6 +213,8 @@ window.escapeHtml = escapeHtml;
       const pageNum = pageNumOverride || (isMultiWeek ? (weekNum + 1) : (currentOjtViewMode === 'cover-and-week' ? 2 : 1));
       const totalPageLabel = isMultiWeek ? totalPages : (currentOjtViewMode === 'cover-and-week' ? 2 : 1);
 
+      const isLandscape = (currentPdfOrientation === 'landscape' || currentPdfOrientation === 'mixed');
+
       // วันมาตรฐาน 5 วันทำการ (จันทร์ - ศุกร์)
       // กรณีสัปดาห์ที่ 1 เริ่ม อังคาร 1 ก.ย. 69 ตัดแถวว่างวันจันทร์ออกเพื่อความสะอาดตาและประหยัดพื้นที่ 1 หน้ากระดาษ
       let standardDays = [
@@ -162,14 +245,14 @@ window.escapeHtml = escapeHtml;
           usedEntryIds.add(entry.id);
           const h = parseFloat(entry.hours) || 0;
           return `
-            <tr id="ojt-row-${entry.id}" class="hover:bg-blue-50/40 transition group print:hover:bg-transparent">
-              <td class="border border-slate-700 p-1.5 print:p-1 text-left font-medium text-[12.5px] print:text-[10pt] leading-snug align-top">
+            <tr id="ojt-row-${entry.id}" class="hover:bg-blue-50/40 transition group print:hover:bg-transparent ${isLandscape ? 'min-h-[46px]' : 'min-h-[42px]'}">
+              <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-1.5 print:p-1'} text-left font-medium ${isLandscape ? 'text-[13px] print:text-[10pt]' : 'text-[12.5px] print:text-[9.5pt]'} leading-snug align-top">
                 <div class="font-semibold text-slate-900">${escapeHtml(entry.date)}</div>
               </td>
-              <td class="border border-slate-700 p-1.5 print:p-1 text-center font-bold text-slate-900 text-[13px] print:text-[10.5pt] align-middle">
+              <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-1.5 print:p-1'} text-center font-bold text-slate-900 ${isLandscape ? 'text-[14px] print:text-[10.5pt]' : 'text-[13px] print:text-[10pt]'} align-middle">
                 ${h.toFixed(1)}
               </td>
-              <td class="border border-slate-700 p-1.5 print:p-1 text-left text-[12.5px] print:text-[10pt] leading-snug align-top">
+              <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-1.5 print:p-1'} text-left ${isLandscape ? 'text-[13px] print:text-[10pt]' : 'text-[12px] print:text-[9.5pt]'} leading-snug align-top">
                 <div class="text-slate-800">
                   <span>${escapeHtml(entry.task)}</span>
                   <button onclick="openEvidenceModal('${entry.id}')" class="ml-1 inline-flex items-center space-x-1 px-1.5 py-0.2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-[9px] font-semibold border border-blue-200 no-print transition align-middle flex-shrink-0" title="คลิกดูขั้นตอน SOP และหลักฐานฉบับเต็ม">
@@ -178,10 +261,10 @@ window.escapeHtml = escapeHtml;
                   </button>
                 </div>
               </td>
-              <td class="border border-slate-700 p-1.5 print:p-1 text-left text-[12.5px] print:text-[10pt] leading-snug text-slate-800 align-top">
+              <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-1.5 print:p-1'} text-left ${isLandscape ? 'text-[13px] print:text-[10pt]' : 'text-[12px] print:text-[9.5pt]'} leading-snug text-slate-800 align-top">
                 ${escapeHtml(entry.skill)}
               </td>
-              <td class="border border-slate-700 p-1.5 print:p-1 text-left text-[12px] print:text-[9.5pt] leading-snug text-slate-700 align-top">
+              <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-1.5 print:p-1'} text-left ${isLandscape ? 'text-[12.5px] print:text-[9.5pt]' : 'text-[11.5px] print:text-[9pt]'} leading-snug text-slate-700 align-top">
                 ${escapeHtml(entry.blocker || '-')}
               </td>
               <td class="border border-slate-700 p-1 text-center no-print align-middle">
@@ -204,10 +287,10 @@ window.escapeHtml = escapeHtml;
             </tr>
           `;
         } else {
-          // แถวว่างตามแบบฟอร์มกระดาษจริง
+          // แถวว่างตามแบบฟอร์มกระดาษจริง (ปรับความสูงให้สวยงาม ไม่หดกุด)
           return `
-            <tr class="h-9 print:h-8">
-              <td class="border border-slate-700 p-1.5 print:p-1 text-left font-medium text-[12px] print:text-[10pt] text-slate-600 align-middle">
+            <tr class="${isLandscape ? 'h-11 print:h-10' : 'h-14 print:h-12'}">
+              <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-2 print:p-1'} text-left font-medium text-[12px] print:text-[10pt] text-slate-600 align-middle">
                 ${std.label}...../...../.....
               </td>
               <td class="border border-slate-700 p-1.5 print:p-1 text-center text-[12px] print:text-[10pt] align-middle text-slate-400"></td>
@@ -221,12 +304,12 @@ window.escapeHtml = escapeHtml;
       }).join('');
 
       return `
-        <div id="ojt-weekly-page-${weekNum}" class="a4-paper font-sarabun text-slate-900 leading-normal page-break shadow-md mb-8">
+        <div id="ojt-weekly-page-${weekNum}" class="a4-paper font-sarabun text-slate-900 leading-normal page-break shadow-md mb-8 ${isLandscape ? 'landscape' : ''}">
           
           <!-- Header (แบบฟอร์มราชการกึ่งกลางตรงตามต้นฉบับจริง) -->
           <div class="text-center pt-1 pb-2 print:pt-0 print:pb-1 relative">
-            <h2 class="text-lg print:text-base font-bold tracking-normal text-black">แบบบันทึกการปฏิบัติงานประจำสัปดาห์</h2>
-            <div class="text-base print:text-sm font-bold text-black mt-0.5">
+            <h2 class="${isLandscape ? 'text-xl print:text-lg' : 'text-lg print:text-base'} font-bold tracking-normal text-black">แบบบันทึกการปฏิบัติงานประจำสัปดาห์</h2>
+            <div class="${isLandscape ? 'text-base print:text-sm' : 'text-base print:text-sm'} font-bold text-black mt-0.5">
               สัปดาห์ที่<span class="inline-block border-b border-dotted border-black min-w-[3rem] text-center font-bold px-2 mx-1">${toThaiNum(weekNum)}</span>
             </div>
             
@@ -242,7 +325,40 @@ window.escapeHtml = escapeHtml;
             </div>
           </div>
 
-          <!-- Section: ข้อมูลผู้ฝึกภาคปฏิบัติ (3 บรรทัด เส้นประ จุดไข่ปลา ตามต้นฉบับเป๊ะ) -->
+          ${isLandscape ? `
+          <!-- Section: ข้อมูลผู้ฝึกภาคปฏิบัติ (Landscape 2 Columns จัดเต็มพื้นที่) -->
+          <div class="text-[13px] print:text-[10.5pt] leading-snug text-black mb-2.5 print:mb-2 space-y-1">
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex items-baseline min-w-0">
+                <span class="font-normal whitespace-nowrap">ข้าพเจ้า (นาย/นางสาว)</span>
+                <span class="border-b border-dotted border-black flex-1 ml-2 px-2 font-medium text-slate-900 truncate">
+                  ${formatTraineeNameWithTitle(maskText(profileData.traineeName))}
+                </span>
+              </div>
+              <div class="flex items-baseline min-w-0">
+                <span class="font-normal whitespace-nowrap">ชื่อหน่วยงาน</span>
+                <span class="border-b border-dotted border-black flex-1 ml-2 px-2 font-medium text-slate-900 truncate">
+                  ${profileData.orgName}
+                </span>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex items-baseline min-w-0">
+                <span class="font-normal whitespace-nowrap">ผู้ควบคุมการฝึกงาน</span>
+                <span class="border-b border-dotted border-black flex-1 ml-2 px-2 font-medium text-slate-900 truncate">
+                  ${profileData.supervisorName}
+                </span>
+              </div>
+              <div class="flex items-baseline min-w-0">
+                <span class="font-normal whitespace-nowrap">ตำแหน่ง</span>
+                <span class="border-b border-dotted border-black flex-1 ml-2 px-2 font-medium text-slate-900 truncate">
+                  ${profileData.supervisorPos}
+                </span>
+              </div>
+            </div>
+          </div>
+          ` : `
+          <!-- Section: ข้อมูลผู้ฝึกภาคปฏิบัติ (Portrait 3 Lines ตามมาตรฐาน) -->
           <div class="text-[13px] print:text-[11px] leading-snug text-black mb-2 print:mb-1.5 space-y-0.5">
             <div class="flex items-baseline">
               <span class="font-normal whitespace-nowrap">ข้าพเจ้า (นาย/นางสาว)</span>
@@ -271,17 +387,18 @@ window.escapeHtml = escapeHtml;
               </div>
             </div>
           </div>
+          `}
 
-          <!-- Official Logbook Table (ตรงตามแบบฟอร์มกระดาษราชการ 1:1) -->
+          <!-- Official Logbook Table (สัดส่วนคอลัมน์กว้างสวยงาม) -->
           <div class="w-full">
-            <table class="w-full border-collapse border border-slate-700 text-[13px] print:text-[10.5pt] mb-2 print:mb-1">
+            <table class="w-full border-collapse border border-slate-700 ${isLandscape ? 'text-[13px] print:text-[10pt]' : 'text-[12.5px] print:text-[9.5pt]'} mb-2 print:mb-1">
               <thead>
                 <tr class="bg-white text-center font-bold text-black">
-                  <th class="border border-slate-700 p-1.5 print:p-1 w-[14%] print:w-[14%] font-bold text-center">วัน/เดือน/ปี</th>
-                  <th class="border border-slate-700 p-1.5 print:p-1 w-[8%] print:w-[8%] font-bold text-center leading-tight">จำนวน<br>ชั่วโมง</th>
-                  <th class="border border-slate-700 p-1.5 print:p-1 w-[38%] print:w-[41%] font-bold text-center">งานที่ปฏิบัติโดยย่อ</th>
-                  <th class="border border-slate-700 p-1.5 print:p-1 w-[22%] print:w-[23%] font-bold text-center leading-tight">ความรู้/ทักษะ<br>ที่ได้รับ</th>
-                  <th class="border border-slate-700 p-1.5 print:p-1 w-[13%] print:w-[14%] font-bold text-center leading-tight">ปัญหา/<br>อุปสรรค</th>
+                  <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[13%] print:w-[13%]' : 'p-1.5 print:p-1 w-[14%] print:w-[14%]'} font-bold text-center">วัน/เดือน/ปี</th>
+                  <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[7%] print:w-[7%]' : 'p-1.5 print:p-1 w-[8%] print:w-[8%]'} font-bold text-center leading-tight">จำนวน<br>ชั่วโมง</th>
+                  <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[42%] print:w-[42%]' : 'p-1.5 print:p-1 w-[40%] print:w-[41%]'} font-bold text-center">งานที่ปฏิบัติโดยย่อ</th>
+                  <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[23%] print:w-[23%]' : 'p-1.5 print:p-1 w-[23%] print:w-[23%]'} font-bold text-center leading-tight">ความรู้/ทักษะ<br>ที่ได้รับ</th>
+                  <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[15%] print:w-[15%]' : 'p-1.5 print:p-1 w-[15%] print:w-[14%]'} font-bold text-center leading-tight">ปัญหา/<br>อุปสรรค</th>
                   <th class="border border-slate-700 p-1 w-[5%] no-print text-center font-normal text-slate-500">จัดการ</th>
                 </tr>
               </thead>
@@ -291,14 +408,14 @@ window.escapeHtml = escapeHtml;
               <tfoot>
                 <!-- Integrated Footer Matching Official Paper Form (Symmetric Dual Digital / Manual Signatures) -->
                 <tr>
-                  <td class="border border-slate-700 p-2 print:p-1 font-bold text-black text-center text-[12px] print:text-[10pt] leading-snug align-middle">
+                  <td class="border border-slate-700 ${isLandscape ? 'p-2.5 print:p-1.5' : 'p-2 print:p-1'} font-bold text-black text-center text-[12px] print:text-[10pt] leading-snug align-middle">
                     จำนวนชั่วโมงรวมใน<br>รายงานฉบับนี้
                   </td>
-                  <td class="border border-slate-700 p-1.5 print:p-1 text-center font-black text-black text-[15px] print:text-[12pt] align-middle">
+                  <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1' : 'p-1.5 print:p-1'} text-center font-black text-black ${isLandscape ? 'text-[16px] print:text-[12pt]' : 'text-[15px] print:text-[12pt]'} align-middle">
                     ${toThaiNum(weekHours.toFixed(1))}
                   </td>
                   <!-- Signature Trainee Block -->
-                  <td class="border border-slate-700 p-2.5 print:p-1.5 text-center align-top text-[12px] print:text-[10pt] leading-snug">
+                  <td class="border border-slate-700 ${isLandscape ? 'p-3 print:p-2' : 'p-2.5 print:p-1.5'} text-center align-top text-[12px] print:text-[10pt] leading-snug">
                     <p class="mb-1 font-medium text-black">ขอรับรองว่ารายงานฉบับนี้เป็นความจริงทุกประการ</p>
                     ${securityState.traineeSignatures && securityState.traineeSignatures[weekNum] ? `
                       <div class="my-0.5">
@@ -325,7 +442,7 @@ window.escapeHtml = escapeHtml;
                     `}
                   </td>
                   <!-- Signature Supervisor Block (Colspan 2) -->
-                  <td class="border border-slate-700 p-2.5 print:p-1.5 text-center align-top text-[12px] print:text-[10pt] leading-snug" colspan="2">
+                  <td class="border border-slate-700 ${isLandscape ? 'p-3 print:p-2' : 'p-2.5 print:p-1.5'} text-center align-top text-[12px] print:text-[10pt] leading-snug" colspan="2">
                     <p class="mb-1 font-medium text-black">ขอรับรองว่ารายงานฉบับนี้เป็นความจริงทุกประการ</p>
                     ${securityState.signatures && securityState.signatures[weekNum] ? `
                       <div class="my-0.5">
