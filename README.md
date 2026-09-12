@@ -16,7 +16,7 @@
 
 ---
 
-## 🌟 ฟีเจอร์เด่นในรุ่น 2.5 (Key Features)
+## 🌟 ฟีเจอร์เด่นในรุ่น 5 (Key Features)
 
 1. **Dynamic RBAC Permission Matrix (PostgreSQL-backed):**
    - จัดการสิทธิ์การเข้าถึงเมนูและโมดูลงาน (View / Edit) ได้แบบ Real-time ราย 4 บทบาทหลัก:
