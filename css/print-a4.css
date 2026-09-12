@@ -6,12 +6,12 @@
 @media print {
   @page {
     size: A4 portrait;
-    margin: 10mm 12mm 10mm 12mm; /* ปรับขอบให้พอดีแบบฟอร์มราชการ ไม่เว้นกว้างเกินไป */
+    margin: 12mm 15mm; /* ปรับขอบกระดาษ 12mm 15mm สวยงามตามระเบียบสารบรรณ */
   }
   
   @page a4-landscape {
     size: A4 landscape;
-    margin: 10mm 12mm 10mm 12mm;
+    margin: 12mm 15mm;
   }
 
   body.pdf-landscape {
@@ -99,6 +99,46 @@
     table-layout: fixed !important;
   }
 
+  /* ล็อคสัดส่วนคอลัมน์ตาราง OJT ให้แม่นยำ 100% ตามมาตรฐานราชการ (12% | 6% | 38% | 23% | 21%) */
+  [id^="ojt-weekly-page-"] table th:nth-child(1),
+  [id^="ojt-weekly-page-"] table td:nth-child(1) {
+    width: 12% !important;
+    max-width: 12% !important;
+  }
+
+  [id^="ojt-weekly-page-"] table th:nth-child(2),
+  [id^="ojt-weekly-page-"] table td:nth-child(2) {
+    width: 6% !important;
+    max-width: 6% !important;
+  }
+
+  [id^="ojt-weekly-page-"] table th:nth-child(3),
+  [id^="ojt-weekly-page-"] table td:nth-child(3) {
+    width: 38% !important;
+    max-width: 38% !important;
+  }
+
+  [id^="ojt-weekly-page-"] table th:nth-child(4),
+  [id^="ojt-weekly-page-"] table td:nth-child(4) {
+    width: 23% !important;
+    max-width: 23% !important;
+  }
+
+  [id^="ojt-weekly-page-"] table th:nth-child(5),
+  [id^="ojt-weekly-page-"] table td:nth-child(5) {
+    width: 21% !important;
+    max-width: 21% !important;
+  }
+
+  /* ซ่อนคอลัมน์ปุ่มจัดการในโหมดพิมพ์เสมอ */
+  [id^="ojt-weekly-page-"] table th:nth-child(6),
+  [id^="ojt-weekly-page-"] table td:nth-child(6) {
+    display: none !important;
+    width: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+
   tr, td, th {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
@@ -129,7 +169,7 @@
     text-align: center !important;
   }
 
-  /* ป้องกันช่องลงนามท้ายตารางหลุดไปหน้า 2 และไม่ปั๊มซ้ำ */
+  /* แก้ปัญหา Overlap Bug ใน Chrome: บังคับ tfoot เป็น table-row-group และห้ามแบ่งหน้าภายใน */
   tfoot, .sign-section, [id^="ojt-weekly-page-"] tfoot {
     display: table-row-group !important;
     break-inside: avoid !important;

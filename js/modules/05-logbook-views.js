@@ -84,7 +84,7 @@ window.setCondensedEntryCache = setCondensedEntryCache;
           @media print {
             @page {
               size: A4 landscape !important;
-              margin: 10mm 12mm 10mm 12mm !important;
+              margin: 12mm 15mm !important;
             }
           }
         `;
@@ -94,7 +94,7 @@ window.setCondensedEntryCache = setCondensedEntryCache;
           @media print {
             @page {
               size: A4 portrait !important;
-              margin: 10mm 12mm 10mm 12mm !important;
+              margin: 12mm 15mm !important;
             }
           }
         `;
@@ -104,11 +104,11 @@ window.setCondensedEntryCache = setCondensedEntryCache;
           @media print {
             @page {
               size: A4 portrait !important;
-              margin: 10mm 12mm 10mm 12mm !important;
+              margin: 12mm 15mm !important;
             }
             @page a4-landscape {
               size: A4 landscape !important;
-              margin: 10mm 12mm 10mm 12mm !important;
+              margin: 12mm 15mm !important;
             }
             .a4-paper.landscape {
               page: a4-landscape !important;
