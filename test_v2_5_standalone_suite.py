@@ -101,14 +101,34 @@ def run_suite():
         "js/modules/12-audit-console.js",
         "js/modules/13-knowledge-photo-hub.js",
         "js/modules/14-rbac-manager.js",
+        "js/modules/15-pwa-manager.js",
         "css/main.css",
-        "css/print-a4.css"
+        "css/print-a4.css",
+        "manifest.json",
+        "sw.js",
+        "static/icons/icon-192.png",
+        "static/icons/icon-512.png",
+        "static/icons/icon-maskable-192.png",
+        "static/icons/icon-maskable-512.png",
+        "static/icons/apple-touch-icon.png",
+        "static/icons/icon.svg"
     ]
     base_dir = os.path.dirname(os.path.abspath(__file__))
     for m in modules:
         full_p = os.path.join(base_dir, m)
         exists = os.path.exists(full_p) and os.path.getsize(full_p) > 0
         check(f"Modular asset exists and non-empty: {m}", exists)
+
+    # 5. Test PWA Manifest Integrity
+    manifest_p = os.path.join(base_dir, "manifest.json")
+    try:
+        with open(manifest_p, "r", encoding="utf-8") as mf:
+            mdata = json.load(mf)
+            check("PWA Manifest has display: standalone", mdata.get("display") == "standalone")
+            check("PWA Manifest has theme_color #1B365D", mdata.get("theme_color") == "#1B365D")
+            check("PWA Manifest has at least 4 icons configured", len(mdata.get("icons", [])) >= 4)
+    except Exception as e:
+        check(f"PWA Manifest integrity: {e}", False)
 
     # 6. Test 1_CLICK_START.command
     cmd_file = os.path.join(base_dir, "1_CLICK_START.command")

@@ -2,8 +2,20 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart GovReport Hub 5- ระบบบริหารจัดการและรายงานผลการปฏิบัติงานอัจฉริยะ 5 (PostgreSQL 5432 + Modular) (รุ่นที่ 1 - OJT Report System 5)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Smart GovReport Hub 2.5 - ระบบบริหารจัดการและรายงานผลการปฏิบัติงานอัจฉริยะ (ศทส. สป.ยธ.)</title>
+  
+  <!-- PWA & Mobile Web App Capabilities -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1B365D">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GovReport">
+  <link rel="apple-touch-icon" href="static/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="static/icons/icon-192.png">
+  <link rel="icon" type="image/x-icon" href="static/icons/favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="static/icons/icon.svg">
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com">
     
@@ -265,6 +277,18 @@
             <i class="fa-solid fa-magnifying-glass"></i>
           </button>
 
+          <!-- PWA Network Connectivity Status Badge (Online / Offline) -->
+          <div id="pwa-network-badge" class="flex items-center space-x-1.5 px-2 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/40 text-[11px] text-emerald-300 font-medium shadow-xs cursor-pointer" title="สถานะเครือข่าย">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span class="text-[10px] font-bold text-white hidden md:inline">Online</span>
+          </div>
+
+          <!-- PWA Install App Button (Auto-shows when browser is ready) -->
+          <button id="btn-pwa-install" class="hidden items-center space-x-1.5 px-2.5 py-1 rounded-full bg-govGold hover:bg-amber-400 text-slate-900 font-bold text-xs shadow-md transition-all cursor-pointer flex-shrink-0" title="ติดตั้ง Smart GovReport Hub ลงเครื่อง Mac / PC / มือถือ">
+            <i class="fa-solid fa-cloud-arrow-down"></i>
+            <span class="hidden sm:inline">ติดตั้งแอป</span>
+          </button>
+
           <!-- PostgreSQL 5432 Live Status Pill (Compact & Clean: 🟢 PG:5432 (4)) -->
           <div id="pg-docker-pill" onclick="openApiSyncModal()" class="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-950/70 border border-emerald-500/40 text-[11px] text-emerald-300 font-medium shadow-sm backdrop-blur-md whitespace-nowrap flex-shrink-0 transition-all hover:bg-emerald-900/60 cursor-pointer" title="Docker PostgreSQL 5432 เชื่อมต่อสมบูรณ์ (คลิกเพื่อดูรายละเอียด Container)">
             <span class="relative flex h-2 w-2 flex-shrink-0">
@@ -331,6 +355,23 @@
               <button onclick="toggleSystemHubDropdown(); window.print();" class="w-full p-2 hover:bg-yellow-50 text-slate-700 rounded-xl text-xs font-semibold flex items-center space-x-2 transition text-left">
                 <i class="fa-solid fa-print text-yellow-600 w-4 text-center"></i>
                 <span>พิมพ์เอกสาร / ส่งออก PDF</span>
+              </button>
+
+              <div class="border-t border-slate-100 my-1"></div>
+
+              <!-- PWA Install & Offline Status in System Hub -->
+              <button id="hub-pwa-install-btn" class="w-full p-2 hover:bg-amber-50 text-slate-700 rounded-xl text-xs font-semibold flex items-center justify-between transition text-left cursor-pointer">
+                <span class="flex items-center space-x-2">
+                  <i class="fa-solid fa-mobile-screen-button text-amber-500 w-4 text-center"></i>
+                  <span>ติดตั้งแอปลงเครื่อง (PWA)</span>
+                </span>
+                <span class="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded font-bold">พกพา</span>
+              </button>
+
+              <!-- Clear PWA Cache & Force Reload -->
+              <button onclick="toggleSystemHubDropdown(); if (window.pwaManager) window.pwaManager.clearCacheAndReload();" class="w-full p-2 hover:bg-rose-50 text-slate-700 rounded-xl text-xs font-semibold flex items-center space-x-2 transition text-left cursor-pointer">
+                <i class="fa-solid fa-arrows-rotate text-rose-500 w-4 text-center"></i>
+                <span>ล้างแคช PWA & อัปเดตสด</span>
               </button>
             </div>
           </div>
@@ -5819,6 +5860,45 @@ function doGet(e) {
     </div>
   </div>
 
+  <!-- PWA iOS & Safari Install Guide Modal -->
+  <div id="pwa-install-guide-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 border border-slate-200 text-slate-800 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-2xl bg-govNavy text-govGold flex items-center justify-center text-lg shadow-sm">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-govNavy">ติดตั้งแอปลงเครื่อง (PWA)</h3>
+            <p class="text-xs text-slate-500">ใช้งานแบบแอปพกพา ไร้กรอบเบราว์เซอร์</p>
+          </div>
+        </div>
+        <button onclick="if(window.pwaManager) window.pwaManager.closeInstallGuideModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-sm cursor-pointer">&times;</button>
+      </div>
+      <div class="space-y-3 text-xs text-slate-600">
+        <div class="p-3 bg-blue-50/70 border border-blue-100 rounded-2xl flex items-start space-x-3">
+          <span class="w-6 h-6 rounded-full bg-govNavy text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">1</span>
+          <div>
+            <p class="font-bold text-govNavy">บน Safari (iPhone / iPad / Mac):</p>
+            <p class="mt-0.5">กดปุ่ม <span class="font-semibold text-blue-700">แชร์ (Share Icon <i class="fa-solid fa-arrow-up-from-bracket"></i>)</span> ในแถบเครื่องมือของเบราว์เซอร์</p>
+          </div>
+        </div>
+        <div class="p-3 bg-blue-50/70 border border-blue-100 rounded-2xl flex items-start space-x-3">
+          <span class="w-6 h-6 rounded-full bg-govNavy text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">2</span>
+          <div>
+            <p class="font-bold text-govNavy">เลือกเพิ่มลงเครื่อง:</p>
+            <p class="mt-0.5">กด <span class="font-semibold text-blue-700">"เพิ่มไปยังหน้าจอโฮม" (Add to Home Screen)</span> หรือ <span class="font-semibold text-blue-700">"Add to Dock"</span> บน Mac</p>
+          </div>
+        </div>
+      </div>
+      <div class="pt-2 flex justify-end">
+        <button onclick="if(window.pwaManager) window.pwaManager.closeInstallGuideModal()" class="px-5 py-2 rounded-xl bg-govNavy text-white text-xs font-semibold hover:bg-govNavyLight transition cursor-pointer">
+          เข้าใจแล้ว
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modular JavaScript Architecture (Smart GovReport Hub 2.5) -->
   <script src="js/voice-input.js"></script>
   <script src="js/modules/01-core-state.js"></script>
@@ -5833,6 +5913,7 @@ function doGet(e) {
   <script src="js/modules/12-audit-console.js"></script>
   <script src="js/modules/13-knowledge-photo-hub.js"></script>
   <script src="js/modules/14-rbac-manager.js"></script>
+  <script type="module" src="js/modules/15-pwa-manager.js"></script>
   <script type="module" src="js/app.js"></script>
 
   <script>

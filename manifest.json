@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json.schemastore.org/web-manifest.json",
+  "id": "smart-govreport-hub-25",
+  "name": "Smart GovReport Hub 2.5 - ระบบบริหารและรายงานผลการปฏิบัติงานราชการ",
+  "short_name": "GovReport",
+  "description": "ระบบบันทึก Logbook รายงานผลการฝึกงาน OJT 90 ชม. และบริหารจัดการงานราชการอัจฉริยะ (ศทส. สป.ยธ.)",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
+  "theme_color": "#1B365D",
+  "background_color": "#F8FAFC",
+  "lang": "th",
+  "dir": "ltr",
+  "categories": ["productivity", "government", "utilities", "business"],
+  "icons": [
+    {
+      "src": "static/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "static/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "static/icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "static/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "static/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "บันทึก OJT ประจำวัน",
+      "short_name": "บันทึก OJT",
+      "description": "เปิดหน้าบันทึก Logbook ประจำวันทันที",
+      "url": "./index.html#logbook",
+      "icons": [
+        {
+          "src": "static/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "พิมพ์รายงาน A4 ทางการ",
+      "short_name": "พิมพ์ A4",
+      "description": "ดูและพิมพ์รายงานผลการปฏิบัติงานราชการ A4",
+      "url": "./index.html#print-a4",
+      "icons": [
+        {
+          "src": "static/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "ศูนย์ควบคุมระบบ (System Hub)",
+      "short_name": "System Hub",
+      "description": "ดูสถิติ สถานะการซิงค์ และสำรองข้อมูล",
+      "url": "./index.html#system-hub",
+      "icons": [
+        {
+          "src": "static/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

@@ -31,15 +31,25 @@ class SecureGovHTTPHandler(http.server.SimpleHTTPRequestHandler):
         super().__init__(*args, directory=PROJECT_DIR, **kwargs)
 
     def end_headers(self):
-        # ฝัง Security Headers มาตรฐานความปลอดภัยภาครัฐ
+        # ฝัง Security Headers มาตรฐานความปลอดภัยภาครัฐ และรองรับ PWA
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("X-Frame-Options", "SAMEORIGIN")
         self.send_header("Referrer-Policy", "strict-origin-when-cross-origin")
         self.send_header(
             "Content-Security-Policy",
-            "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; connect-src 'self' http://localhost:8086 http://127.0.0.1:8086 ws: wss: https:;"
+            "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; connect-src 'self' http://localhost:8086 http://127.0.0.1:8086 ws: wss: https:; worker-src 'self' blob:;"
         )
+        if hasattr(self, 'path') and self.path.split("?")[0].endswith("sw.js"):
+            self.send_header("Service-Worker-Allowed", "/")
+            self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
         super().end_headers()
+
+    def guess_type(self, path):
+        if path.endswith("manifest.json") or path.endswith(".webmanifest"):
+            return "application/manifest+json"
+        if path.endswith(".svg"):
+            return "image/svg+xml"
+        return super().guess_type(path)
 
     def _proxy_to_backend(self, method):
         import urllib.request

@@ -73,3 +73,24 @@ body {
     padding: 1.25rem;
   }
 }
+
+/* PWA Standalone & Safe Area Optimizations */
+@supports (padding-top: env(safe-area-inset-top)) {
+  header.sticky {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+.is-pwa-standalone {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.is-pwa-standalone input,
+.is-pwa-standalone textarea,
+.is-pwa-standalone select,
+.is-pwa-standalone [contenteditable="true"] {
+  user-select: text;
+  -webkit-user-select: text;
+}

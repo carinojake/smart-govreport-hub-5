@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGovGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1B365D" />
+      <stop offset="100%" stop-color="#0F2038" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F2D07C" />
+      <stop offset="100%" stop-color="#C5A059" />
+    </linearGradient>
+  </defs>
+  <!-- Background Shield/Rounded Rect -->
+  <rect width="512" height="512" rx="115" fill="url(#bgGovGrad)" />
+  <circle cx="256" cy="256" r="210" fill="none" stroke="url(#goldGrad)" stroke-width="8" opacity="0.4" />
+  
+  <!-- Scales of Justice Emblem -->
+  <!-- Central Pillar -->
+  <path d="M256 100 L256 390" stroke="url(#goldGrad)" stroke-width="18" stroke-linecap="round" />
+  <circle cx="256" cy="90" r="22" fill="url(#goldGrad)" />
+  <path d="M190 390 L322 390" stroke="url(#goldGrad)" stroke-width="20" stroke-linecap="round" />
+  
+  <!-- Balance Beam -->
+  <path d="M130 160 Q256 145 382 160" fill="none" stroke="url(#goldGrad)" stroke-width="16" stroke-linecap="round" />
+  <circle cx="130" cy="160" r="12" fill="url(#goldGrad)" />
+  <circle cx="382" cy="160" r="12" fill="url(#goldGrad)" />
+  
+  <!-- Left Scale Pan -->
+  <path d="M130 160 L80 260 L180 260 Z" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linejoin="round" opacity="0.9" />
+  <path d="M70 260 Q130 295 190 260 Z" fill="url(#goldGrad)" />
+  
+  <!-- Right Scale Pan -->
+  <path d="M382 160 L332 260 L432 260 Z" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linejoin="round" opacity="0.9" />
+  <path d="M322 260 Q382 295 442 260 Z" fill="url(#goldGrad)" />
+  
+  <!-- Modern Spark / Tech Dot -->
+  <circle cx="256" cy="205" r="10" fill="#FFFFFF" />
+  <text x="256" y="445" font-family="'Prompt', 'Sarabun', sans-serif" font-size="34" font-weight="bold" fill="#FFFFFF" text-anchor="middle" letter-spacing="3">GOVREPORT</text>
+</svg>
