@@ -229,6 +229,45 @@
     line-height: 1.25 !important;
   }
 
+  /* ตารางสรุปชั่วโมงสะสม 3 แถวใน tfoot (จำนวนชั่วโมงรวมในฉบับนี้ / ฉบับก่อน / ทั้งหมด) */
+  [id^="ojt-weekly-page-"] tfoot td > table {
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
+    margin: 0 !important;
+  }
+  [id^="ojt-weekly-page-"] tfoot td > table td {
+    border: none !important;
+    padding: 3px 4px !important;
+    font-size: 8.5pt !important;
+    line-height: 1.15 !important;
+  }
+  [id^="ojt-weekly-page-"] tfoot td > table tr:not(:last-child) td {
+    border-bottom: 1px solid #000000 !important;
+  }
+  [id^="ojt-weekly-page-"] tfoot td > table td:last-child {
+    border-left: 1px solid #000000 !important;
+    width: 38px !important;
+    text-align: center !important;
+  }
+
+  /* แบบฟอร์มหน้าปกราชการ (ตรงตาม PDF หน้า 1 เป๊ะ 100%) */
+  #cover-official-paper-view {
+    padding: 10mm 12mm !important;
+    font-size: 11pt !important;
+    line-height: 1.6 !important;
+    color: #000000 !important;
+  }
+  #cover-official-paper-view h1 {
+    font-size: 20pt !important;
+    margin-bottom: 8mm !important;
+    margin-top: 4mm !important;
+    font-weight: bold !important;
+  }
+  #cover-official-paper-view .border-dotted {
+    border-bottom: 1px dotted #000000 !important;
+  }
+
   [id^="ojt-weekly-page-"] tfoot img {
     max-height: 28px !important;
     height: 28px !important;

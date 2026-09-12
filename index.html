@@ -1364,6 +1364,26 @@
 
             </div>
 
+            <!-- Form Layout Selector: Official Paper Mode (PDF 6 หน้าเป๊ะ) vs Smart Digital Mode -->
+            <div class="flex items-center p-1 bg-emerald-50 border border-emerald-300 rounded-xl space-x-1" title="เลือกรูปแบบฟอร์ม: แบบฟอร์มกระดาษราชการ (ตรงตาม PDF 6 หน้าเป๊ะ) หรือ แบบฟอร์มดิจิทัลสมาร์ท">
+              <button onclick="setOjtFormLayout('official_paper')" id="btn-layout-official" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-govNavy text-white shadow-xs transition flex items-center space-x-1" title="โหมดทางการ: ตรงตามสมุดบันทึกการฝึกภาคปฏิบัติ.pdf 6 หน้าเป๊ะ 100% (ชั่วโมงสะสม 3 ช่อง)">
+                <i class="fa-solid fa-file-pdf text-amber-300"></i>
+                <span>🏛️ แบบฟอร์มราชการ (ตรง PDF 6 หน้า)</span>
+              </button>
+              <button onclick="setOjtFormLayout('smart_digital')" id="btn-layout-smart" class="px-2.5 py-1 text-xs font-bold rounded-lg text-slate-700 hover:bg-emerald-100 transition flex items-center space-x-1" title="โหมดดิจิทัล: มีตารางสรุป 4-5 สัปดาห์ และสถิติภาพรวม">
+                <i class="fa-solid fa-laptop-code text-emerald-600"></i>
+                <span>💻 แบบดิจิทัลสมาร์ท</span>
+              </button>
+            </div>
+
+            <!-- Gemini A4 AI Condenser: สลับโหมดย่อ A4 พอดี 1 หน้า vs ดูฉบับเต็ม -->
+            <div class="flex items-center p-1 bg-purple-50 border border-purple-200 rounded-xl space-x-1" title="ย่อข้อความให้กระชับสละสลวย รับประกันพิมพ์ 1 สัปดาห์พอดี 1 หน้า A4">
+              <button onclick="toggleAllWeeksCondensed()" id="btn-toggle-all-condensed" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-purple-700 text-white hover:bg-purple-800 shadow-2xs transition flex items-center space-x-1.5" title="คลิกเพื่อสลับระหว่าง ย่อ A4 พอดี 1 หน้า กับ ดูข้อความฉบับเต็ม">
+                <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
+                <span id="label-all-condensed">✨ Gemini ปรับ A4 (5 วัน)</span>
+              </button>
+            </div>
+
             <!-- Edition Selector: Brief vs Full with Photos -->
             <div class="flex items-center p-1 bg-amber-50 border border-amber-200 rounded-xl space-x-1">
               <button onclick="setOjtEdition('brief')" id="ojt-edition-brief" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-govNavy text-white shadow-xs transition flex items-center space-x-1" title="ฉบับย่อ: ตารางทางการ A4 1 หน้าต่อสัปดาห์">
@@ -1466,177 +1486,265 @@
             <span class="text-[8px] font-bold text-govNavy mt-0.5">ฉบับเต็ม</span>
           </div>
 
-          <!-- Official Emblem & Header -->
-          <div class="text-center pt-1 pb-3 border-b-2 border-slate-900">
-            <div class="w-10 h-10 mx-auto mb-1 text-govNavy flex items-center justify-center text-2xl bg-slate-100 rounded-full border border-slate-300">
-              <i class="fa-solid fa-book-bookmark"></i>
+          <!-- VIEW A: แบบฟอร์มราชการดั้งเดิม (ตรงตาม PDF หน้า 1 เป๊ะ 100%) -->
+          <div id="cover-official-paper-view" class="py-6 px-4 sm:px-8 space-y-6">
+            <div class="text-center pt-8 pb-8">
+              <h1 class="text-2xl sm:text-3xl font-bold tracking-wide text-black mb-2">สมุดบันทึกการฝึกภาคปฏิบัติ</h1>
             </div>
-            <h2 class="text-xl font-bold tracking-wide text-slate-900">สมุดบันทึกการฝึกภาคปฏิบัติ</h2>
-            <p class="text-sm font-semibold text-govNavy mt-0.5">ระบบบริหารจัดการและรายงานผลการปฏิบัติงานอัจฉริยะ 5 (PostgreSQL 5432 + Modular)</p>
-            <p class="text-[11px] text-slate-600">(รุ่นที่ 1 - OJT Report System 5) • โครงการส่งเสริมและเตรียมความพร้อมสำหรับการจ้างงานคนพิการในหน่วยงานภาครัฐ 90 ชั่วโมง</p>
+
+            <!-- หมวดข้อมูลหน่วยงาน -->
+            <div class="space-y-3 text-[15px] print:text-[12pt] leading-relaxed text-black">
+              <div class="font-bold text-base print:text-[13pt] mb-1">ข้อมูลหน่วยงาน</div>
+              
+              <div class="flex items-baseline">
+                <span class="whitespace-nowrap font-normal">ชื่อหน่วยงาน</span>
+                <span class="border-b border-dotted border-black flex-1 ml-2 px-2 font-medium text-slate-900" id="official-cover-org-name">สำนักงานปลัดกระทรวงยุติธรรม ศูนย์เทคโนโลยีสารสนเทศและการสื่อสาร</span>
+              </div>
+
+              <div class="font-normal pt-1">ที่อยู่</div>
+              
+              <div class="flex flex-wrap items-baseline gap-y-2">
+                <span class="whitespace-nowrap">เลขที่</span>
+                <span class="border-b border-dotted border-black min-w-[4rem] px-2 text-center font-medium" id="official-cover-org-no">120</span>
+                <span class="whitespace-nowrap ml-2">ถนน</span>
+                <span class="border-b border-dotted border-black min-w-[8rem] px-2 text-center font-medium" id="official-cover-org-road">แจ้งวัฒนะ</span>
+                <span class="whitespace-nowrap ml-2">ตำบล/แขวง</span>
+                <span class="border-b border-dotted border-black min-w-[8rem] px-2 text-center font-medium" id="official-cover-org-subdistrict">ทุ่งสองห้อง</span>
+                <span class="whitespace-nowrap ml-2">อำเภอ/เขต</span>
+                <span class="border-b border-dotted border-black flex-1 min-w-[8rem] px-2 text-center font-medium" id="official-cover-org-district">หลักสี่</span>
+              </div>
+
+              <div class="flex flex-wrap items-baseline gap-y-2">
+                <span class="whitespace-nowrap">จังหวัด</span>
+                <span class="border-b border-dotted border-black min-w-[12rem] px-2 text-center font-medium" id="official-cover-org-province">กรุงเทพมหานคร</span>
+                <span class="whitespace-nowrap ml-4">รหัสไปรษณีย์</span>
+                <span class="border-b border-dotted border-black min-w-[8rem] px-2 text-center font-medium" id="official-cover-org-zip">10210</span>
+              </div>
+
+              <div class="flex flex-wrap items-baseline gap-y-2 pt-1">
+                <span class="whitespace-nowrap">โทรศัพท์</span>
+                <span class="border-b border-dotted border-black flex-1 min-w-[10rem] px-2 font-medium" id="official-cover-org-phone">0 2141 9999</span>
+                <span class="whitespace-nowrap ml-4">โทรสาร</span>
+                <span class="border-b border-dotted border-black flex-1 min-w-[10rem] px-2 font-medium" id="official-cover-org-fax">0 2143 8888</span>
+              </div>
+
+              <div class="flex items-baseline pt-1">
+                <span class="whitespace-nowrap">ผู้ควบคุมการฝึกงาน</span>
+                <span class="border-b border-dotted border-black flex-1 ml-2 px-2 font-medium text-slate-900" id="official-cover-supervisor-name">นางสาวสรินยา สุวรรณวณิช</span>
+              </div>
+            </div>
+
+            <!-- หมวดข้อมูลผู้ฝึกภาคปฏิบัติ -->
+            <div class="space-y-3 text-[15px] print:text-[12pt] leading-relaxed text-black pt-4">
+              <div class="font-bold text-base print:text-[13pt] mb-1">ข้อมูลผู้ฝึกภาคปฏิบัติ</div>
+
+              <div class="flex flex-wrap items-baseline gap-y-2">
+                <span class="whitespace-nowrap">ชื่อ – นามสกุล</span>
+                <span class="border-b border-dotted border-black flex-1 min-w-[14rem] px-2 font-medium text-slate-900" id="official-cover-trainee-name">นายเจค (นิติพัฒน์ คุ้มวงษ์)</span>
+                <span class="whitespace-nowrap ml-4">ชื่อเล่น</span>
+                <span class="border-b border-dotted border-black min-w-[8rem] px-2 text-center font-medium" id="official-cover-trainee-nick">เจค</span>
+              </div>
+
+              <div class="flex items-baseline pt-1">
+                <span class="whitespace-nowrap">ประเภทความพิการ</span>
+                <span class="border-b border-dotted border-black flex-1 ml-2 px-2 font-medium text-slate-900" id="official-cover-trainee-disability">ทางการเคลื่อนไหวหรือทางร่างกาย</span>
+              </div>
+
+              <div class="flex flex-wrap items-baseline gap-y-2 pt-1">
+                <span class="whitespace-nowrap">เบอร์โทรศัพท์</span>
+                <span class="border-b border-dotted border-black flex-1 min-w-[10rem] px-2 font-medium" id="official-cover-trainee-phone">081-234-5678</span>
+                <span class="whitespace-nowrap ml-4">E-mail</span>
+                <span class="border-b border-dotted border-black flex-1 min-w-[12rem] px-2 font-medium" id="official-cover-trainee-email">carinojake@gmail.com</span>
+              </div>
+
+              <div class="flex flex-wrap items-baseline gap-y-2 pt-3">
+                <span class="whitespace-nowrap">เริ่มฝึกงานตั้งแต่วันที่</span>
+                <span class="border-b border-dotted border-black min-w-[9rem] px-2 text-center font-bold text-black" id="official-cover-start-date">1 กันยายน 2569</span>
+                <span class="whitespace-nowrap ml-2">สิ้นสุดการฝึกงานวันที่</span>
+                <span class="border-b border-dotted border-black min-w-[9rem] px-2 text-center font-bold text-black" id="official-cover-end-date">30 กันยายน 2569</span>
+              </div>
+            </div>
+
+            <!-- Official Footer Note -->
+            <div class="pt-8 text-center text-xs text-slate-400 no-print">
+              <span>(แบบฟอร์มนี้ถอดแบบตามต้นฉบับ สมุดบันทึกการฝึกภาคปฏิบัติ.pdf หน้า 1 ถูกต้องตรงกัน 100%)</span>
+            </div>
           </div>
 
-          <!-- Content Body -->
-          <div class="py-3 space-y-2.5">
-            
-            <!-- Section 1: ข้อมูลหน่วยงาน -->
-            <div class="p-2.5 bg-slate-50/70 rounded-xl border border-slate-300 space-y-1.5 text-xs">
-              <div class="flex items-center space-x-2 border-b border-slate-300 pb-1 mb-1">
-                <i class="fa-solid fa-building text-govNavy text-xs"></i>
-                <h3 class="font-bold text-xs text-govNavy">1. ข้อมูลหน่วยงานฝึกปฏิบัติงาน</h3>
+          <!-- VIEW B: แบบฟอร์มดิจิทัลสมาร์ท (มีตารางสรุป 4 สัปดาห์ & ลายเซ็นเดิม) -->
+          <div id="cover-smart-digital-view" class="hidden">
+            <!-- Official Emblem & Header -->
+            <div class="text-center pt-1 pb-3 border-b-2 border-slate-900">
+              <div class="w-10 h-10 mx-auto mb-1 text-govNavy flex items-center justify-center text-2xl bg-slate-100 rounded-full border border-slate-300">
+                <i class="fa-solid fa-book-bookmark"></i>
               </div>
+              <h2 class="text-xl font-bold tracking-wide text-slate-900">สมุดบันทึกการฝึกภาคปฏิบัติ</h2>
+              <p class="text-sm font-semibold text-govNavy mt-0.5">ระบบบริหารจัดการและรายงานผลการปฏิบัติงานอัจฉริยะ 5 (PostgreSQL 5432 + Modular)</p>
+              <p class="text-[11px] text-slate-600">(รุ่นที่ 1 - OJT Report System 5) • โครงการส่งเสริมและเตรียมความพร้อมสำหรับการจ้างงานคนพิการในหน่วยงานภาครัฐ 90 ชั่วโมง</p>
+            </div>
+
+            <!-- Content Body -->
+            <div class="py-3 space-y-2.5">
               
-              <div class="space-y-1 pl-1">
-                <p>
-                  <span class="font-bold text-slate-800">ชื่อหน่วยงาน :</span>
-                  <span id="doc-org-name" class="font-semibold text-slate-900 ml-1 border-b border-dotted border-slate-500 pb-0.5">สำนักงานปลัดกระทรวงยุติธรรม ศูนย์เทคโนโลยีสารสนเทศและการสื่อสาร</span>
-                </p>
-                <p>
-                  <span class="font-bold text-slate-800">ที่อยู่ / สถานที่ตั้ง :</span>
-                  <span id="doc-org-addr" class="font-medium text-slate-800 ml-1 border-b border-dotted border-slate-500 pb-0.5">อาคารรัฐประศาสนภักดี ศูนย์ราชการเฉลิมพระเกียรติฯ ถ.แจ้งวัฒนะ กทม. 10210</span>
-                </p>
-                <div class="grid grid-cols-2 gap-2">
-                  <p>
-                    <span class="font-bold text-slate-800">โทรศัพท์ :</span>
-                    <span id="doc-org-phone" class="font-medium text-slate-800 ml-1 border-b border-dotted border-slate-500 pb-0.5">0 2141 9999</span>
-                  </p>
-                  <p>
-                    <span class="font-bold text-slate-800">โทรสาร :</span>
-                    <span id="doc-org-fax" class="font-medium text-slate-800 ml-1 border-b border-dotted border-slate-500 pb-0.5">0 2143 8888</span>
-                  </p>
+              <!-- Section 1: ข้อมูลหน่วยงาน -->
+              <div class="p-2.5 bg-slate-50/70 rounded-xl border border-slate-300 space-y-1.5 text-xs">
+                <div class="flex items-center space-x-2 border-b border-slate-300 pb-1 mb-1">
+                  <i class="fa-solid fa-building text-govNavy text-xs"></i>
+                  <h3 class="font-bold text-xs text-govNavy">1. ข้อมูลหน่วยงานฝึกปฏิบัติงาน</h3>
                 </div>
-                <div class="grid grid-cols-2 gap-2">
+                
+                <div class="space-y-1 pl-1">
                   <p>
-                    <span class="font-bold text-slate-800">ผู้ควบคุมการฝึกงาน :</span>
-                    <span id="doc-supervisor-name" class="font-semibold text-slate-900 ml-1 border-b border-dotted border-slate-500 pb-0.5">นางสาวสรินยา สุวรรณวณิช</span>
+                    <span class="font-bold text-slate-800">ชื่อหน่วยงาน :</span>
+                    <span id="doc-org-name" class="font-semibold text-slate-900 ml-1 border-b border-dotted border-slate-500 pb-0.5">สำนักงานปลัดกระทรวงยุติธรรม ศูนย์เทคโนโลยีสารสนเทศและการสื่อสาร</span>
                   </p>
                   <p>
-                    <span class="font-bold text-slate-800">ตำแหน่ง :</span>
-                    <span id="doc-supervisor-pos-cover" class="font-medium text-slate-800 ml-1 border-b border-dotted border-slate-500 pb-0.5">ผู้อำนวยการกลุ่มงานสารสนเทศและพัฒนาระบบ</span>
+                    <span class="font-bold text-slate-800">ที่อยู่ / สถานที่ตั้ง :</span>
+                    <span id="doc-org-addr" class="font-medium text-slate-800 ml-1 border-b border-dotted border-slate-500 pb-0.5">อาคารรัฐประศาสนภักดี ศูนย์ราชการเฉลิมพระเกียรติฯ ถ.แจ้งวัฒนะ กทม. 10210</span>
                   </p>
+                  <div class="grid grid-cols-2 gap-2">
+                    <p>
+                      <span class="font-bold text-slate-800">โทรศัพท์ :</span>
+                      <span id="doc-org-phone" class="font-medium text-slate-800 ml-1 border-b border-dotted border-slate-500 pb-0.5">0 2141 9999</span>
+                    </p>
+                    <p>
+                      <span class="font-bold text-slate-800">โทรสาร :</span>
+                      <span id="doc-org-fax" class="font-medium text-slate-800 ml-1 border-b border-dotted border-slate-500 pb-0.5">0 2143 8888</span>
+                    </p>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <p>
+                      <span class="font-bold text-slate-800">ผู้ควบคุมการฝึกงาน :</span>
+                      <span id="doc-supervisor-name" class="font-semibold text-slate-900 ml-1 border-b border-dotted border-slate-500 pb-0.5">นางสาวสรินยา สุวรรณวณิช</span>
+                    </p>
+                    <p>
+                      <span class="font-bold text-slate-800">ตำแหน่ง :</span>
+                      <span id="doc-supervisor-pos-cover" class="font-medium text-slate-800 ml-1 border-b border-dotted border-slate-500 pb-0.5">ผู้อำนวยการกลุ่มงานสารสนเทศและพัฒนาระบบ</span>
+                    </p>
+                  </div>
                 </div>
               </div>
+
+              <!-- Section 2: ข้อมูลผู้ฝึกภาคปฏิบัติ -->
+              <div class="p-2.5 bg-blue-50/40 rounded-xl border border-blue-200 space-y-1.5 text-xs">
+                <div class="flex items-center space-x-2 border-b border-blue-200 pb-1 mb-1">
+                  <i class="fa-solid fa-user-tie text-govTeal text-xs"></i>
+                  <h3 class="font-bold text-xs text-govNavy">2. ข้อมูลผู้ฝึกภาคปฏิบัติ</h3>
+                </div>
+
+                <div class="space-y-1 pl-1">
+                  <div class="grid grid-cols-2 gap-2">
+                    <p>
+                      <span class="font-bold text-slate-800">ชื่อ – นามสกุล :</span>
+                      <span id="doc-trainee-name" class="font-semibold text-slate-900 ml-1 border-b border-dotted border-slate-500 pb-0.5">นายเจค (นิติพัฒน์ คุ้มวงษ์)</span>
+                    </p>
+                    <p>
+                      <span class="font-bold text-slate-800">ชื่อเล่น :</span>
+                      <span id="doc-trainee-nick" class="font-medium text-slate-800 ml-1 border-b border-dotted border-slate-500 pb-0.5">เจค</span>
+                    </p>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <p>
+                      <span class="font-bold text-slate-800">ประเภทความพิการ :</span>
+                      <span id="doc-trainee-disability" class="font-medium text-slate-800 ml-1 border-b border-dotted border-slate-500 pb-0.5">ทางการเคลื่อนไหวหรือทางร่างกาย</span>
+                    </p>
+                    <p>
+                      <span class="font-bold text-slate-800">เบอร์โทรศัพท์ :</span>
+                      <span id="doc-trainee-phone" class="font-medium text-slate-800 ml-1 border-b border-dotted border-slate-500 pb-0.5">081-234-5678</span>
+                    </p>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <p>
+                      <span class="font-bold text-slate-800">E-mail :</span>
+                      <span id="doc-trainee-email" class="font-medium text-slate-800 ml-1 border-b border-dotted border-slate-500 pb-0.5">carinojake@gmail.com</span>
+                    </p>
+                    <p class="font-bold text-emerald-800 text-[11px]">
+                      <i class="fa-solid fa-calendar-check text-govTeal mr-1"></i> รวมปฏิบัติงานจริง 4 สัปดาห์ (90.0 ชม. ครบถ้วน)
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section 3: สรุปภาพรวมการฝึกภาคปฏิบัติ 4 สัปดาห์ -->
+              <div class="p-2.5 bg-white rounded-xl border border-slate-300 space-y-1 text-xs">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-1 mb-1">
+                  <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-chart-pie text-govGold text-xs"></i>
+                    <h3 class="font-bold text-xs text-slate-800">3. สรุปภาพรวมการฝึกภาคปฏิบัติ 4 สัปดาห์ (OJT Curriculum Structure)</h3>
+                  </div>
+                  <button onclick="openProfileEditModal()" class="text-[10px] text-govNavy hover:text-blue-800 hover:underline font-medium no-print flex items-center space-x-1 bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded border border-slate-200 transition" title="แก้ไขช่วงวันที่และโครงสร้าง 4 สัปดาห์">
+                    <i class="fa-solid fa-pen-to-square text-[9px]"></i>
+                    <span>แก้ไขกำหนดการ/ขอบเขตงาน</span>
+                  </button>
+                </div>
+
+                <table class="w-full border-collapse border border-slate-300 text-[11px]">
+                  <thead>
+                    <tr class="bg-slate-100 text-center font-bold">
+                      <th class="border border-slate-300 p-1 w-20">สัปดาห์</th>
+                      <th class="border border-slate-300 p-1 w-24">ช่วงวันที่</th>
+                      <th class="border border-slate-300 p-1">ขอบเขตงานและสมรรถนะหลัก</th>
+                      <th class="border border-slate-300 p-1 w-20">จำนวนชั่วโมง</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="border border-slate-300 p-1 text-center font-semibold">สัปดาห์ที่ 1</td>
+                      <td id="doc-curriculum-w1-dates" class="border border-slate-300 p-1 text-center text-slate-600">1 - 4 ก.ย. 69</td>
+                      <td id="doc-curriculum-w1-title" class="border border-slate-300 p-1">งานสารบรรณ ระเบียบราชการ และระบบ e-Saraban ภาครัฐ</td>
+                      <td id="doc-curriculum-w1-hours" class="border border-slate-300 p-1 text-center font-bold text-govNavy">22.5 ชม.</td>
+                    </tr>
+                    <tr>
+                      <td class="border border-slate-300 p-1 text-center font-semibold">สัปดาห์ที่ 2</td>
+                      <td id="doc-curriculum-w2-dates" class="border border-slate-300 p-1 text-center text-slate-600">7 - 11 ก.ย. 69</td>
+                      <td id="doc-curriculum-w2-title" class="border border-slate-300 p-1">การบริหารจัดการฐานข้อมูล Data Cleaning & Excel ขั้นสูง</td>
+                      <td id="doc-curriculum-w2-hours" class="border border-slate-300 p-1 text-center font-bold text-govNavy">22.5 ชม.</td>
+                    </tr>
+                    <tr>
+                      <td class="border border-slate-300 p-1 text-center font-semibold">สัปดาห์ที่ 3</td>
+                      <td id="doc-curriculum-w3-dates" class="border border-slate-300 p-1 text-center text-slate-600">14 - 18 ก.ย. 69</td>
+                      <td id="doc-curriculum-w3-title" class="border border-slate-300 p-1">การพัฒนา Dashboard, การประเมิน WCAG 2.1 AA & PDPA</td>
+                      <td id="doc-curriculum-w3-hours" class="border border-slate-300 p-1 text-center font-bold text-govNavy">22.5 ชม.</td>
+                    </tr>
+                    <tr>
+                      <td class="border border-slate-300 p-1 text-center font-semibold">สัปดาห์ที่ 4</td>
+                      <td id="doc-curriculum-w4-dates" class="border border-slate-300 p-1 text-center text-slate-600">21 - 25 ก.ย. 69</td>
+                      <td id="doc-curriculum-w4-title" class="border border-slate-300 p-1">การวิเคราะห์ข้อมูลผู้เรียน, Agile Project Canvas & Portfolio</td>
+                      <td id="doc-curriculum-w4-hours" class="border border-slate-300 p-1 text-center font-bold text-govNavy">22.5 ชม.</td>
+                    </tr>
+                    <tr id="doc-curriculum-w5-row">
+                      <td class="border border-slate-300 p-1 text-center font-semibold">สัปดาห์ที่ 5</td>
+                      <td id="doc-curriculum-w5-dates" class="border border-slate-300 p-1 text-center text-slate-600">28 - 30 ก.ย. 69</td>
+                      <td id="doc-curriculum-w5-title" class="border border-slate-300 p-1">สรุปผลสัมฤทธิ์ OJT ส่งมอบคู่มือระบบ และประเมินผลสมรรถนะ</td>
+                      <td id="doc-curriculum-w5-hours" class="border border-slate-300 p-1 text-center font-bold text-govNavy">13.5 ชม.</td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr class="bg-slate-100 font-bold">
+                      <td class="border border-slate-300 p-1 text-center" colspan="3">รวมระยะเวลาการฝึกปฏิบัติงานทั้งสิ้น</td>
+                      <td id="doc-curriculum-total-hours" class="border border-slate-300 p-1 text-center text-govTeal text-xs">103.5 ชม.</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+
+              <!-- Signatures Section on Cover Page -->
+              <div class="grid grid-cols-2 gap-4 pt-3 border-t border-slate-300 text-xs">
+                <div class="text-center space-y-0.5">
+                  <p class="mb-5 font-medium">ลงชื่อ..........................................................ผู้ฝึกภาคปฏิบัติ</p>
+                  <p class="font-bold text-slate-900">( <span id="cover-sig-trainee">นายเจค (นิติพัฒน์ คุ้มวงษ์)</span> )</p>
+                  <p class="text-slate-600 text-[10px]">วันที่ <span id="doc-cover-sig-date-trainee">30 กันยายน 2569</span></p>
+                </div>
+
+                <div class="text-center space-y-0.5">
+                  <p class="mb-5 font-medium">ลงชื่อ..........................................................ผู้ควบคุมการฝึกงาน</p>
+                  <p class="font-bold text-slate-900">( <span id="cover-sig-supervisor">นางสาวสรินยา สุวรรณวณิช</span> )</p>
+                  <p class="text-slate-600 text-[10px]">ตำแหน่ง <span id="cover-sig-pos">ผู้อำนวยการกลุ่มงานสารสนเทศและพัฒนาระบบ</span></p>
+                  <p class="text-slate-600 text-[10px]">วันที่ <span id="doc-cover-sig-date-sup">30 กันยายน 2569</span></p>
+                </div>
+              </div>
+
             </div>
-
-            <!-- Section 2: ข้อมูลผู้ฝึกภาคปฏิบัติ -->
-            <div class="p-2.5 bg-blue-50/40 rounded-xl border border-blue-200 space-y-1.5 text-xs">
-              <div class="flex items-center space-x-2 border-b border-blue-200 pb-1 mb-1">
-                <i class="fa-solid fa-user-tie text-govTeal text-xs"></i>
-                <h3 class="font-bold text-xs text-govNavy">2. ข้อมูลผู้ฝึกภาคปฏิบัติ</h3>
-              </div>
-
-              <div class="space-y-1 pl-1">
-                <div class="grid grid-cols-2 gap-2">
-                  <p>
-                    <span class="font-bold text-slate-800">ชื่อ – นามสกุล :</span>
-                    <span id="doc-trainee-name" class="font-semibold text-slate-900 ml-1 border-b border-dotted border-slate-500 pb-0.5">นายเจค (นิติพัฒน์ คุ้มวงษ์)</span>
-                  </p>
-                  <p>
-                    <span class="font-bold text-slate-800">ชื่อเล่น :</span>
-                    <span id="doc-trainee-nick" class="font-medium text-slate-800 ml-1 border-b border-dotted border-slate-500 pb-0.5">เจค</span>
-                  </p>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                  <p>
-                    <span class="font-bold text-slate-800">ประเภทความพิการ :</span>
-                    <span id="doc-trainee-disability" class="font-medium text-slate-800 ml-1 border-b border-dotted border-slate-500 pb-0.5">ทางการเคลื่อนไหวหรือทางร่างกาย</span>
-                  </p>
-                  <p>
-                    <span class="font-bold text-slate-800">เบอร์โทรศัพท์ :</span>
-                    <span id="doc-trainee-phone" class="font-medium text-slate-800 ml-1 border-b border-dotted border-slate-500 pb-0.5">081-234-5678</span>
-                  </p>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                  <p>
-                    <span class="font-bold text-slate-800">E-mail :</span>
-                    <span id="doc-trainee-email" class="font-medium text-slate-800 ml-1 border-b border-dotted border-slate-500 pb-0.5">carinojake@gmail.com</span>
-                  </p>
-                  <p class="font-bold text-emerald-800 text-[11px]">
-                    <i class="fa-solid fa-calendar-check text-govTeal mr-1"></i> รวมปฏิบัติงานจริง 4 สัปดาห์ (90.0 ชม. ครบถ้วน)
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Section 3: สรุปภาพรวมการฝึกภาคปฏิบัติ 4 สัปดาห์ -->
-            <div class="p-2.5 bg-white rounded-xl border border-slate-300 space-y-1 text-xs">
-              <div class="flex items-center justify-between border-b border-slate-200 pb-1 mb-1">
-                <div class="flex items-center space-x-2">
-                  <i class="fa-solid fa-chart-pie text-govGold text-xs"></i>
-                  <h3 class="font-bold text-xs text-slate-800">3. สรุปภาพรวมการฝึกภาคปฏิบัติ 4 สัปดาห์ (OJT Curriculum Structure)</h3>
-                </div>
-                <button onclick="openProfileEditModal()" class="text-[10px] text-govNavy hover:text-blue-800 hover:underline font-medium no-print flex items-center space-x-1 bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded border border-slate-200 transition" title="แก้ไขช่วงวันที่และโครงสร้าง 4 สัปดาห์">
-                  <i class="fa-solid fa-pen-to-square text-[9px]"></i>
-                  <span>แก้ไขกำหนดการ/ขอบเขตงาน</span>
-                </button>
-              </div>
-
-              <table class="w-full border-collapse border border-slate-300 text-[11px]">
-                <thead>
-                  <tr class="bg-slate-100 text-center font-bold">
-                    <th class="border border-slate-300 p-1 w-20">สัปดาห์</th>
-                    <th class="border border-slate-300 p-1 w-24">ช่วงวันที่</th>
-                    <th class="border border-slate-300 p-1">ขอบเขตงานและสมรรถนะหลัก</th>
-                    <th class="border border-slate-300 p-1 w-20">จำนวนชั่วโมง</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="border border-slate-300 p-1 text-center font-semibold">สัปดาห์ที่ 1</td>
-                    <td id="doc-curriculum-w1-dates" class="border border-slate-300 p-1 text-center text-slate-600">1 - 4 ก.ย. 69</td>
-                    <td id="doc-curriculum-w1-title" class="border border-slate-300 p-1">งานสารบรรณ ระเบียบราชการ และระบบ e-Saraban ภาครัฐ</td>
-                    <td id="doc-curriculum-w1-hours" class="border border-slate-300 p-1 text-center font-bold text-govNavy">22.5 ชม.</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-slate-300 p-1 text-center font-semibold">สัปดาห์ที่ 2</td>
-                    <td id="doc-curriculum-w2-dates" class="border border-slate-300 p-1 text-center text-slate-600">7 - 11 ก.ย. 69</td>
-                    <td id="doc-curriculum-w2-title" class="border border-slate-300 p-1">การบริหารจัดการฐานข้อมูล Data Cleaning & Excel ขั้นสูง</td>
-                    <td id="doc-curriculum-w2-hours" class="border border-slate-300 p-1 text-center font-bold text-govNavy">22.5 ชม.</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-slate-300 p-1 text-center font-semibold">สัปดาห์ที่ 3</td>
-                    <td id="doc-curriculum-w3-dates" class="border border-slate-300 p-1 text-center text-slate-600">14 - 18 ก.ย. 69</td>
-                    <td id="doc-curriculum-w3-title" class="border border-slate-300 p-1">การพัฒนา Dashboard, การประเมิน WCAG 2.1 AA & PDPA</td>
-                    <td id="doc-curriculum-w3-hours" class="border border-slate-300 p-1 text-center font-bold text-govNavy">22.5 ชม.</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-slate-300 p-1 text-center font-semibold">สัปดาห์ที่ 4</td>
-                    <td id="doc-curriculum-w4-dates" class="border border-slate-300 p-1 text-center text-slate-600">21 - 25 ก.ย. 69</td>
-                    <td id="doc-curriculum-w4-title" class="border border-slate-300 p-1">การวิเคราะห์ข้อมูลผู้เรียน, Agile Project Canvas & Portfolio</td>
-                    <td id="doc-curriculum-w4-hours" class="border border-slate-300 p-1 text-center font-bold text-govNavy">22.5 ชม.</td>
-                  </tr>
-                  <tr id="doc-curriculum-w5-row">
-                    <td class="border border-slate-300 p-1 text-center font-semibold">สัปดาห์ที่ 5</td>
-                    <td id="doc-curriculum-w5-dates" class="border border-slate-300 p-1 text-center text-slate-600">28 - 30 ก.ย. 69</td>
-                    <td id="doc-curriculum-w5-title" class="border border-slate-300 p-1">สรุปผลสัมฤทธิ์ OJT ส่งมอบคู่มือระบบ และประเมินผลสมรรถนะ</td>
-                    <td id="doc-curriculum-w5-hours" class="border border-slate-300 p-1 text-center font-bold text-govNavy">13.5 ชม.</td>
-                  </tr>
-                </tbody>
-                <tfoot>
-                  <tr class="bg-slate-100 font-bold">
-                    <td class="border border-slate-300 p-1 text-center" colspan="3">รวมระยะเวลาการฝึกปฏิบัติงานทั้งสิ้น</td>
-                    <td id="doc-curriculum-total-hours" class="border border-slate-300 p-1 text-center text-govTeal text-xs">103.5 ชม.</td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-
-            <!-- Signatures Section on Cover Page -->
-            <div class="grid grid-cols-2 gap-4 pt-3 border-t border-slate-300 text-xs">
-              <div class="text-center space-y-0.5">
-                <p class="mb-5 font-medium">ลงชื่อ..........................................................ผู้ฝึกภาคปฏิบัติ</p>
-                <p class="font-bold text-slate-900">( <span id="cover-sig-trainee">นายเจค (นิติพัฒน์ คุ้มวงษ์)</span> )</p>
-                <p class="text-slate-600 text-[10px]">วันที่ <span id="doc-cover-sig-date-trainee">30 กันยายน 2569</span></p>
-              </div>
-
-              <div class="text-center space-y-0.5">
-                <p class="mb-5 font-medium">ลงชื่อ..........................................................ผู้ควบคุมการฝึกงาน</p>
-                <p class="font-bold text-slate-900">( <span id="cover-sig-supervisor">นางสาวสรินยา สุวรรณวณิช</span> )</p>
-                <p class="text-slate-600 text-[10px]">ตำแหน่ง <span id="cover-sig-pos">ผู้อำนวยการกลุ่มงานสารสนเทศและพัฒนาระบบ</span></p>
-                <p class="text-slate-600 text-[10px]">วันที่ <span id="doc-cover-sig-date-sup">30 กันยายน 2569</span></p>
-              </div>
-            </div>
-
           </div>
 
           <!-- Document Footer -->

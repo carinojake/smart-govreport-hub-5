@@ -14,6 +14,29 @@ window.escapeHtml = escapeHtml;
 // A4 AI CONDENSER PRESETS & CACHING (การันตี 1 สัปดาห์ 5 วัน 1 หน้า A4)
 // =========================================================================
 const DEFAULT_CONDENSED_PRESETS = {
+  // สัปดาห์ที่ 1
+  "1-1": {
+    task: "ปฐมนิเทศหน่วยงาน ศึกษาระเบียบโครงสร้างราชการ และระเบียบสำนักนายกรัฐมนตรีว่าด้วยงานสารบรรณ พ.ศ. 2526",
+    skill: "เข้าใจโครงสร้างสายการบังคับบัญชา และระเบียบงานสารบรรณสำนักนายกฯ",
+    blocker: "ไม่มี"
+  },
+  "1-2": {
+    task: "ให้บริการและสนับสนุนทางเทคนิคเบื้องต้น (IT Support) ประสานงานแก้ไขปัญหาอุปกรณ์สารสนเทศ และงานบริหารทั่วไป กลุ่ม บท.ศท.",
+    skill: "การให้บริการสนับสนุนทางเทคนิคเบื้องต้น (IT Support) และการประสานงานแก้ไขปัญหาอุปกรณ์สารสนเทศ",
+    blocker: "ไม่มี"
+  },
+  "1-3": {
+    task: "สำรวจและตรวจสอบสถานะ Anti-Virus เครื่องลูกข่าย จัดระเบียบฐานข้อมูลทะเบียนคุมความมั่นคงปลอดภัยไซเบอร์",
+    skill: "มาตรฐานความปลอดภัยไซเบอร์ภาครัฐ และการจัดการข้อมูลด้วย Excel (VLOOKUP, XLOOKUP)",
+    blocker: "ไม่มี (Clean ข้อมูลและตรวจสอบความถูกต้องครบถ้วน)"
+  },
+  "1-4": {
+    task: "รีโมต AnyDesk ติดตั้งไดรเวอร์เครื่องพิมพ์ Epson L3250 ให้แก่ สยจ.ตาก พร้อมทดสอบระบบพิมพ์งานราชการ",
+    skill: "บริการเทคนิคทางไกล (Remote Helpdesk) และการติดตั้งไดรเวอร์ตามมาตรฐาน SOP-ศท-๐๖",
+    blocker: "เครื่องพิมพ์ขาดไดรเวอร์ รีโมตติดตั้งตรงรุ่นสำเร็จเรียบร้อย"
+  },
+
+  // สัปดาห์ที่ 2
   "2-1": {
     task: "ให้บริการสนับสนุนทางเทคนิค Helpdesk รีโมต AnyDesk รวม 3 เคส (ต่ออายุ License ThaiWPS และติดตั้งชุดแบบอักษรราชการ TH Sarabun IT๙) ให้แก่ศูนย์บริการร่วมฯ และ กองยุทธศาสตร์และแผนงาน",
     skill: "การบริหารสิทธิ์ซอฟต์แวร์สำนักงาน, ติดตั้งฟอนต์ราชการ และการแก้ปัญหาระยะไกลตาม SLA",
@@ -35,23 +58,111 @@ const DEFAULT_CONDENSED_PRESETS = {
     blocker: "ไม่มี (ลดเวลาสรุปผลจาก 2 ชม. เหลือ 5 นาที)"
   },
   "2-5": {
-    task: "ประชุมติดตามความก้าวหน้าโครงการประจำสัปดาห์ (Weekly Stand-up) และรับมอบหมายภารกิจสัปดาห์ที่ 3",
-    skill: "การสื่อสารรายงานผลงาน (Agile Stand-up) และการวางแผนงานประจำสัปดาห์",
+    task: "ติดตั้ง Microsoft Power BI Desktop และ Microsoft 365 รวมถึงแก้ไขปัญหาการพิมพ์ WPS Office ให้แก่ สยจ.เพชรบุรี และ กาฬสินธุ์",
+    skill: "การติดตั้งโปรแกรม BI, แก้ไขปัญหาโปรแกรมสำนักงาน (WPS Office) และการสนับสนุนทางไกลผ่าน AnyDesk",
+    blocker: "ไม่มี (แก้ไขปัญหาและติดตั้งสำเร็จลุล่วงตามเกณฑ์ SLA)"
+  },
+
+  // สัปดาห์ที่ 3
+  "3-1": {
+    task: "ออกแบบโครงสร้างฐานข้อมูลคลังผลงานดิจิทัล (Digital Portfolio Schema) ตามกรอบสมรรถนะ ก.พ.ร.",
+    skill: "การจัดหมวดหมู่สมรรถนะ และการออกแบบ Entity Relationship Diagram",
     blocker: "ไม่มี"
+  },
+  "3-2": {
+    task: "วิเคราะห์ความสอดคล้องระเบียบ พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA) และจัดทำแบบยินยอม (Consent Form)",
+    skill: "การจัดทำ Consent Form, Privacy Notice และการทำ Data Masking",
+    blocker: "ไม่มี"
+  },
+  "3-3": {
+    task: "พัฒนาหน้าจอ Dashboard Layout และส่วนแสดงผลสถิติด้วย Chart.js และ Tailwind CSS",
+    skill: "การแสดงผลข้อมูลแบบโต้ตอบ (Interactive Data Visualization) และ Responsive Design",
+    blocker: "ไม่มี"
+  },
+  "3-4": {
+    task: "ทดสอบการเข้าถึงของระบบตามมาตรฐาน WCAG 2.1 AA (Contrast Ratio และ Screen Reader)",
+    skill: "การทดสอบ Accessibility, ตรวจสอบคอนทราสต์ และการใช้ Screen Reader (NVDA)",
+    blocker: "ปรับขนาดฟอนต์และอัตราส่วนคอนทราสต์ให้ผ่านมาตรฐาน 100%"
+  },
+  "3-5": {
+    task: "ทดสอบระบบร่วมกับผู้ใช้งาน (UAT) บันทึกข้อเสนอแนะ และปรับปรุงประสิทธิภาพระบบ",
+    skill: "กระบวนการ User Acceptance Testing (UAT) และการจัดการข้อคิดเห็นผู้ใช้",
+    blocker: "ไม่มี (ความพึงพอใจสูงกว่า 95%)"
+  },
+
+  // สัปดาห์ที่ 4
+  "4-1": {
+    task: "วิเคราะห์ข้อมูลสารสนเทศโครงการด้วย PivotTable และ Slicer จัดกลุ่มตัวชี้วัดความสำเร็จ",
+    skill: "การคำนวณ Score Gain, Performance Level และการสร้าง Slicer วิเคราะห์ผลสัมฤทธิ์",
+    blocker: "Clean ข้อมูลซ้ำซ้อนสำเร็จเรียบร้อย"
+  },
+  "4-2": {
+    task: "ออกแบบและสร้างแดชบอร์ดสรุปสถิติสำหรับผู้บริหาร (Executive Dashboard) แบบเรียลไทม์",
+    skill: "การเชื่อมโยงกราฟสรุปตัวชี้วัด และการออกแบบ Data Visualization เชิงนโยบาย",
+    blocker: "ไม่มี"
+  },
+  "4-3": {
+    task: "วางแผนโครงการและแตกงานย่อยด้วย Project Canvas 9 ช่อง และกำหนดบทบาทตาม RACI Matrix",
+    skill: "การบริหารงานภาครัฐแบบ Outcome-Based และ Agile Governance",
+    blocker: "ไม่มี"
+  },
+  "4-4": {
+    task: "ทดสอบความพร้อมของระบบคลังผลงานตามมาตรฐาน WCAG 2.1 AA และมาตรการ PDPA ก่อนส่งมอบ",
+    skill: "การตรวจสอบความปลอดภัยสารสนเทศ และการเข้ารหัสข้อมูล Local-First",
+    blocker: "ปรับแต่งระบบขยายฟอนต์ 3 ระดับสำเร็จสมบูรณ์"
+  },
+  "4-5": {
+    task: "จัดทำรูปเล่มรายงานสมบูรณ์ครบถ้วน 90 ชั่วโมง และนำเสนอผลงาน Portfolio ต่อคณะกรรมการ",
+    skill: "การสื่อสารเชิงวิชาชีพและการนำเสนอผลสัมฤทธิ์การฝึกงานภาครัฐ",
+    blocker: "ไม่มี (สำเร็จครบ 90.0 ชั่วโมงตามเกณฑ์)"
+  },
+
+  // สัปดาห์ที่ 5
+  "5-1": {
+    task: "นำเสนอรายงานผลสัมฤทธิ์การปฏิบัติงาน OJT 90 ชม. และสาธิตระบบสารสนเทศต้นแบบแก่ผู้บริหาร",
+    skill: "การนำเสนอผลงานและสาธิตระบบ (System Demo) แก่ผู้บริหารระดับสูง",
+    blocker: "ไม่มี"
+  },
+  "5-2": {
+    task: "จัดทำคู่มือการใช้งานระบบ (User Manual) และส่งมอบ Source Code พร้อมเอกสารสถาปัตยกรรม",
+    skill: "การจัดทำ Technical Documentation และ Version Control Handover",
+    blocker: "ไม่มี"
+  },
+  "5-3": {
+    task: "ปิดโครงการฝึกภาคปฏิบัติ ประเมินผลสมรรถนะร่วมกับผู้ควบคุมงาน และลงนามรับรองสำเร็จการฝึกงาน",
+    skill: "การประเมินผลสมรรถนะและการลงนามปิดโครงการฝึกปฏิบัติงานภาครัฐ",
+    blocker: "ไม่มี (สำเร็จครบถ้วนสมบูรณ์ 100%)"
   }
 };
 
-let condensedState = JSON.parse(localStorage.getItem('ojt_condensed_state') || '{"2": true}');
+let condensedState = JSON.parse(localStorage.getItem('ojt_condensed_state') || '{"1": true, "2": true, "3": true, "4": true, "5": true}');
 let condensedCache = JSON.parse(localStorage.getItem('ojt_condensed_cache') || '{}');
 
 function isWeekCondensed(weekNum) {
-  return condensedState[weekNum] === undefined ? (weekNum === 2) : !!condensedState[weekNum];
+  if (condensedState[weekNum] !== undefined) {
+    return !!condensedState[weekNum];
+  }
+  return true; // ค่าเริ่มต้นย่อ A4 พอดี 1 หน้าเพื่อการพิมพ์ที่สมบูรณ์แบบ
 }
 window.isWeekCondensed = isWeekCondensed;
 
 function getCondensedEntry(entryId) {
   if (condensedCache[entryId]) return condensedCache[entryId];
   if (DEFAULT_CONDENSED_PRESETS[entryId]) return DEFAULT_CONDENSED_PRESETS[entryId];
+  
+  // Smart fallback สำหรับรายการที่ผู้ใช้เพิ่มขึ้นมาเอง
+  if (window.liveOjtData) {
+    for (let w in window.liveOjtData) {
+      const found = window.liveOjtData[w].find(r => r.id === entryId);
+      if (found) {
+        return {
+          task: found.task && found.task.length > 120 ? found.task.substring(0, 117) + '...' : (found.task || ''),
+          skill: found.skill && found.skill.length > 90 ? found.skill.substring(0, 87) + '...' : (found.skill || ''),
+          blocker: found.blocker ? (found.blocker.length > 80 ? found.blocker.substring(0, 77) + '...' : found.blocker) : 'ไม่มี'
+        };
+      }
+    }
+  }
   return null;
 }
 window.getCondensedEntry = getCondensedEntry;
@@ -60,8 +171,36 @@ function toggleWeekCondensed(weekNum) {
   condensedState[weekNum] = !isWeekCondensed(weekNum);
   localStorage.setItem('ojt_condensed_state', JSON.stringify(condensedState));
   renderOjtPages();
+  updateCondensedButtonUI();
 }
 window.toggleWeekCondensed = toggleWeekCondensed;
+
+function toggleAllWeeksCondensed() {
+  const anyUncondensed = [1, 2, 3, 4, 5].some(w => !isWeekCondensed(w));
+  const targetState = anyUncondensed;
+  [1, 2, 3, 4, 5].forEach(w => {
+    condensedState[w] = targetState;
+  });
+  localStorage.setItem('ojt_condensed_state', JSON.stringify(condensedState));
+  renderOjtPages();
+  updateCondensedButtonUI();
+}
+window.toggleAllWeeksCondensed = toggleAllWeeksCondensed;
+
+function updateCondensedButtonUI() {
+  const btn = document.getElementById('btn-toggle-all-condensed');
+  const label = document.getElementById('label-all-condensed');
+  if (!btn || !label) return;
+  const allCondensed = [1, 2, 3, 4, 5].every(w => isWeekCondensed(w));
+  if (allCondensed) {
+    label.innerText = '✨ ย่อ A4 ครบ 5 สัปดาห์ (คลิกสลับเป็นฉบับเต็ม)';
+    btn.className = 'px-2.5 py-1 text-xs font-bold rounded-lg bg-purple-700 text-white hover:bg-purple-800 shadow-2xs transition flex items-center space-x-1.5';
+  } else {
+    label.innerText = '📄 แสดงฉบับเต็ม (คลิกย่อ A4 พอดี 1 หน้า)';
+    btn.className = 'px-2.5 py-1 text-xs font-bold rounded-lg bg-slate-100 text-slate-700 hover:bg-purple-100 border border-slate-300 shadow-2xs transition flex items-center space-x-1.5';
+  }
+}
+window.updateCondensedButtonUI = updateCondensedButtonUI;
 
 function setCondensedEntryCache(entryId, data) {
   condensedCache[entryId] = data;
@@ -150,6 +289,39 @@ window.setCondensedEntryCache = setCondensedEntryCache;
     window.printOjtReport = printOjtReport;
 
     // =========================================================================
+    // OJT FORM LAYOUT: OFFICIAL PAPER (ตรงตาม PDF 6 หน้าเป๊ะ) VS SMART DIGITAL
+    // =========================================================================
+    let currentFormLayout = localStorage.getItem('ojt_form_layout') || 'official_paper';
+    window.currentFormLayout = currentFormLayout;
+
+    function setOjtFormLayout(layout) {
+      currentFormLayout = layout;
+      window.currentFormLayout = layout;
+      localStorage.setItem('ojt_form_layout', layout);
+
+      const btnOfficial = document.getElementById('btn-layout-official');
+      const btnSmart = document.getElementById('btn-layout-smart');
+
+      const officialActive = 'px-2.5 py-1 text-xs font-bold rounded-lg bg-govNavy text-white shadow-xs transition flex items-center space-x-1';
+      const officialInactive = 'px-2.5 py-1 text-xs font-bold rounded-lg text-slate-700 hover:bg-emerald-100 transition flex items-center space-x-1';
+      const smartActive = 'px-2.5 py-1 text-xs font-bold rounded-lg bg-govNavy text-white shadow-xs transition flex items-center space-x-1';
+      const smartInactive = 'px-2.5 py-1 text-xs font-bold rounded-lg text-slate-700 hover:bg-emerald-100 transition flex items-center space-x-1';
+
+      if (btnOfficial && btnSmart) {
+        if (layout === 'official_paper') {
+          btnOfficial.className = officialActive;
+          btnSmart.className = smartInactive;
+        } else {
+          btnOfficial.className = officialInactive;
+          btnSmart.className = smartActive;
+        }
+      }
+
+      renderOjtPages();
+    }
+    window.setOjtFormLayout = setOjtFormLayout;
+
+    // =========================================================================
     // OJT EDITION SWITCHER: BRIEF (ตารางทางการ A4) VS FULL (ฉบับเต็ม + รูปภาพ)
     // =========================================================================
     let currentOjtEdition = 'brief'; // 'brief' or 'full'
@@ -174,12 +346,28 @@ window.setCondensedEntryCache = setCondensedEntryCache;
 
       renderOjtPages();
     }
+    window.setOjtEdition = setOjtEdition;
 
     function renderOjtPages() {
       const coverPage = document.getElementById('ojt-cover-page');
+      const coverOfficial = document.getElementById('cover-official-paper-view');
+      const coverSmart = document.getElementById('cover-smart-digital-view');
       const weeklyContainer = document.getElementById('ojt-weekly-container');
       const weekSelect = document.getElementById('ojt-week-select');
       const selectedWeek = parseInt(weekSelect ? weekSelect.value : 4) || 4;
+
+      // ซิงค์การแสดงผลหน้าปกระหว่าง แบบฟอร์มราชการ (PDF หน้า 1) กับ ดิจิทัลสมาร์ท
+      if (coverOfficial && coverSmart) {
+        if (currentFormLayout === 'official_paper') {
+          coverOfficial.classList.remove('hidden');
+          coverSmart.classList.add('hidden');
+        } else {
+          coverOfficial.classList.add('hidden');
+          coverSmart.classList.remove('hidden');
+        }
+      }
+
+      updateCondensedButtonUI();
 
       if (!weeklyContainer) return;
 
@@ -235,8 +423,9 @@ window.setCondensedEntryCache = setCondensedEntryCache;
 
       updateDashboardKPI();
     }
+    window.renderOjtPages = renderOjtPages;
 
-        // ฟังก์ชันดึงหมายเลขวันจากข้อความวันที่ (รองรับทั้งเลขอารบิกและเลขไทย เพื่อเรียงวันที่ 1, 2, 3...)
+    // ฟังก์ชันดึงหมายเลขวันจากข้อความวันที่ (รองรับทั้งเลขอารบิกและเลขไทย เพื่อเรียงวันที่ 1, 2, 3...)
     function extractDayNumber(dateStr) {
       if (!dateStr) return 999;
       const arabicStr = String(dateStr).replace(/[๐-๙]/g, d => "๐๑๒๓๔๕๖๗๘๙".indexOf(d));
@@ -274,7 +463,6 @@ window.setCondensedEntryCache = setCondensedEntryCache;
       const isLandscape = (currentPdfOrientation === 'landscape' || currentPdfOrientation === 'mixed');
 
       // วันมาตรฐาน 5 วันทำการ (จันทร์ - ศุกร์)
-      // กรณีสัปดาห์ที่ 1 เริ่ม อังคาร 1 ก.ย. 69 ตัดแถวว่างวันจันทร์ออกเพื่อความสะอาดตาและประหยัดพื้นที่ 1 หน้ากระดาษ
       let standardDays = [
         { label: 'จันทร์', prefix: 'จันทร์' },
         { label: 'อังคาร', prefix: 'อังคาร' },
@@ -283,10 +471,13 @@ window.setCondensedEntryCache = setCondensedEntryCache;
         { label: 'ศุกร์', prefix: 'ศุกร์' }
       ];
 
-      if (weekNum === 1 && !data.some(r => (r.date || '').includes('จันทร์'))) {
-        standardDays = standardDays.filter(d => d.label !== 'จันทร์');
-      } else if (weekNum === 5 && !data.some(r => (r.date || '').includes('พฤหัสบดี') || (r.date || '').includes('ศุกร์'))) {
-        standardDays = standardDays.filter(d => ['จันทร์', 'อังคาร', 'พุธ'].includes(d.label));
+      // ในโหมดดิจิทัลสมาร์ท สามารถซ่อนวันว่างได้ แต่ในโหมดราชการ (official_paper) จะแสดงครบ 5 วันทำการตามแบบฟอร์ม PDF
+      if (currentFormLayout === 'smart_digital') {
+        if (weekNum === 1 && !data.some(r => (r.date || '').includes('จันทร์'))) {
+          standardDays = standardDays.filter(d => d.label !== 'จันทร์');
+        } else if (weekNum === 5 && !data.some(r => (r.date || '').includes('พฤหัสบดี') || (r.date || '').includes('ศุกร์'))) {
+          standardDays = standardDays.filter(d => ['จันทร์', 'อังคาร', 'พุธ'].includes(d.label));
+        }
       }
 
       // แมปข้อมูลตามวันในสัปดาห์
@@ -314,7 +505,7 @@ window.setCondensedEntryCache = setCondensedEntryCache;
                 <div class="font-semibold text-slate-900">${escapeHtml(entry.date)}</div>
               </td>
               <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-1.5 print:p-1'} text-center font-bold text-slate-900 ${isLandscape ? 'text-[14px] print:text-[10.5pt]' : 'text-[13px] print:text-[10pt]'} align-middle">
-                ${h.toFixed(1)}
+                ${toThaiNum(h.toFixed(1))}
               </td>
               <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-1.5 print:p-1'} text-left ${isLandscape ? 'text-[13px] print:text-[10pt]' : 'text-[12px] print:text-[9.5pt]'} leading-snug align-top">
                 <div class="text-slate-800">
@@ -358,7 +549,7 @@ window.setCondensedEntryCache = setCondensedEntryCache;
         } else {
           // แถวว่างตามแบบฟอร์มกระดาษจริง (ปรับความสูงให้สวยงาม ไม่หดกุด)
           return `
-            <tr class="${isLandscape ? 'h-11 print:h-12' : 'h-14 print:h-18'}">
+            <tr class="${isLandscape ? 'h-11 print:h-12' : 'h-13 print:h-14'}">
               <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5' : 'p-2 print:p-1.5'} text-left font-medium text-[12px] print:text-[10pt] text-slate-600 align-middle">
                 ${std.label}...../...../.....
               </td>
@@ -411,10 +602,9 @@ window.setCondensedEntryCache = setCondensedEntryCache;
             </div>
           </div>
 
-          ${isLandscape ? `
-          <!-- Section: ข้อมูลผู้ฝึกภาคปฏิบัติ (Landscape 2 Columns จัดเต็มพื้นที่) -->
-          <div class="text-[13px] print:text-[10.5pt] leading-snug text-black mb-2.5 print:mb-2 space-y-1">
-            <div class="grid grid-cols-2 gap-4">
+          <!-- Section: ข้อมูลผู้ฝึกภาคปฏิบัติ (ตามมาตรฐานกระดาษราชการ) -->
+          <div class="text-[13px] print:text-[10pt] leading-snug text-black mb-2 print:mb-1.5 space-y-1">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
               <div class="flex items-baseline min-w-0">
                 <span class="font-normal whitespace-nowrap">ข้าพเจ้า (นาย/นางสาว)</span>
                 <span class="border-b border-dotted border-black flex-1 ml-2 px-2 font-medium text-slate-900 truncate">
@@ -428,7 +618,7 @@ window.setCondensedEntryCache = setCondensedEntryCache;
                 </span>
               </div>
             </div>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
               <div class="flex items-baseline min-w-0">
                 <span class="font-normal whitespace-nowrap">ผู้ควบคุมการฝึกงาน</span>
                 <span class="border-b border-dotted border-black flex-1 ml-2 px-2 font-medium text-slate-900 truncate">
@@ -443,41 +633,10 @@ window.setCondensedEntryCache = setCondensedEntryCache;
               </div>
             </div>
           </div>
-          ` : `
-          <!-- Section: ข้อมูลผู้ฝึกภาคปฏิบัติ (Portrait 3 Lines ตามมาตรฐาน) -->
-          <div class="text-[13px] print:text-[11px] leading-snug text-black mb-2 print:mb-1.5 space-y-0.5">
-            <div class="flex items-baseline">
-              <span class="font-normal whitespace-nowrap">ข้าพเจ้า (นาย/นางสาว)</span>
-              <span class="border-b border-dotted border-black flex-1 ml-2 px-2 font-medium text-slate-900 break-words">
-                ${formatTraineeNameWithTitle(maskText(profileData.traineeName))}
-              </span>
-            </div>
-            <div class="flex items-baseline">
-              <span class="font-normal whitespace-nowrap">ชื่อหน่วยงาน</span>
-              <span class="border-b border-dotted border-black flex-1 ml-2 px-2 font-medium text-slate-900 break-words">
-                ${profileData.orgName}
-              </span>
-            </div>
-            <div class="flex items-baseline justify-between gap-4">
-              <div class="flex items-baseline flex-1 min-w-0">
-                <span class="font-normal whitespace-nowrap">ผู้ควบคุมการฝึกงาน</span>
-                <span class="border-b border-dotted border-black flex-1 ml-2 px-2 font-medium text-slate-900 break-words">
-                  ${profileData.supervisorName}
-                </span>
-              </div>
-              <div class="flex items-baseline flex-1 min-w-0">
-                <span class="font-normal whitespace-nowrap">ตำแหน่ง</span>
-                <span class="border-b border-dotted border-black flex-1 ml-2 px-2 font-medium text-slate-900 break-words">
-                  ${profileData.supervisorPos}
-                </span>
-              </div>
-            </div>
-          </div>
-          `}
 
           <!-- Official Logbook Table (สัดส่วนคอลัมน์กว้างสวยงาม 12% | 6% | 38% | 23% | 21%) -->
           <div class="w-full">
-            <table class="w-full border-collapse border border-slate-700 ${isLandscape ? 'text-[13px] print:text-[10pt]' : 'text-[12.5px] print:text-[9.5pt]'} mb-2 print:mb-1">
+            <table class="w-full border-collapse border border-slate-700 ${isLandscape ? 'text-[13px] print:text-[10pt]' : 'text-[12px] print:text-[9.5pt]'} mb-2 print:mb-1">
               <thead>
                 <tr class="bg-white text-center font-bold text-black">
                   <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[12%] print:w-[12%]' : 'p-1.5 print:p-1 w-[12%] print:w-[12%]'} font-bold text-center">วัน/เดือน/ปี</th>
@@ -494,51 +653,64 @@ window.setCondensedEntryCache = setCondensedEntryCache;
               <tfoot>
                 <!-- Integrated Footer Matching Official Paper Form (Symmetric Dual Digital / Manual Signatures) -->
                 <tr>
-                  <td class="border border-slate-700 ${isLandscape ? 'p-2.5 print:p-1.5' : 'p-2 print:p-1'} font-bold text-black text-center text-[12px] print:text-[10pt] leading-snug align-middle">
-                    จำนวนชั่วโมงรวมใน<br>รายงานฉบับนี้
+                  <!-- Col 1-2: 3-Row Cumulative Hours Matching Official PDF Template -->
+                  <td colspan="2" class="p-0 border border-slate-700 align-top">
+                    <table class="w-full h-full text-[10.5px] print:text-[8.5pt] border-collapse">
+                      <tr class="border-b border-slate-700">
+                        <td class="p-1 print:p-0.5 font-medium text-black leading-tight text-left">จำนวนชั่วโมงรวมใน<br>รายงานฉบับนี้</td>
+                        <td class="p-1 print:p-0.5 text-center font-bold text-black border-l border-slate-700 w-11 text-[12px] print:text-[9.5pt] align-middle">${toThaiNum(weekHours.toFixed(1))}</td>
+                      </tr>
+                      <tr class="border-b border-slate-700">
+                        <td class="p-1 print:p-0.5 font-medium text-black leading-tight text-left">จำนวนชั่วโมงรวมใน<br>รายงานฉบับก่อน</td>
+                        <td class="p-1 print:p-0.5 text-center font-bold text-black border-l border-slate-700 w-11 text-[12px] print:text-[9.5pt] align-middle">${toThaiNum(prevHours.toFixed(1))}</td>
+                      </tr>
+                      <tr>
+                        <td class="p-1 print:p-0.5 font-bold text-black leading-tight text-left">จำนวนชั่วโมงรวม<br>ทั้งหมด</td>
+                        <td class="p-1 print:p-0.5 text-center font-black text-govNavy border-l border-slate-700 w-11 text-[13px] print:text-[10pt] align-middle">${toThaiNum(grandTotal.toFixed(1))}</td>
+                      </tr>
+                    </table>
                   </td>
-                  <td class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1' : 'p-1.5 print:p-1'} text-center font-black text-black ${isLandscape ? 'text-[16px] print:text-[12pt]' : 'text-[15px] print:text-[12pt]'} align-middle">
-                    ${toThaiNum(weekHours.toFixed(1))}
-                  </td>
-                  <!-- Signature Trainee Block -->
-                  <td class="border border-slate-700 ${isLandscape ? 'p-3 print:p-2' : 'p-2.5 print:p-1.5'} text-center align-top text-[12px] print:text-[10pt] leading-snug">
+
+                  <!-- Col 3: Signature Trainee Block -->
+                  <td class="border border-slate-700 ${isLandscape ? 'p-2.5 print:p-1.5' : 'p-2 print:p-1'} text-center align-top text-[11.5px] print:text-[9.5pt] leading-snug">
                     <p class="mb-1 font-medium text-black">ขอรับรองว่ารายงานฉบับนี้เป็นความจริงทุกประการ</p>
                     ${securityState.traineeSignatures && securityState.traineeSignatures[weekNum] ? `
                       <div class="my-0.5">
                         <img src="${securityState.traineeSignatures[weekNum].image}" class="h-8 mx-auto object-contain -mb-1">
-                        <div class="w-44 mx-auto border-b border-black"></div>
+                        <div class="w-40 mx-auto border-b border-black"></div>
                       </div>
                       <p class="text-black font-medium mt-0.5">( <span class="font-bold">${formatTraineeNameWithTitle(maskText(profileData.traineeName))}</span> )</p>
                       <p class="font-bold text-black mt-0.5">คนพิการ</p>
-                      <p class="text-black mt-0.5 text-[11px] print:text-[9.5pt]">วัน <span class="font-bold px-1">${securityState.traineeSignatures[weekNum].dateOnly || '...................'}</span></p>
+                      <p class="text-black mt-0.5 text-[10.5px] print:text-[9pt]">วัน <span class="font-bold px-1">${securityState.traineeSignatures[weekNum].dateOnly || '...................'}</span></p>
                       <div class="mt-1 p-1 bg-blue-50 border border-blue-200 rounded text-[9px] text-blue-800 leading-tight no-print">
                         <i class="fa-solid fa-signature mr-1 text-blue-600"></i>
                         <span>ลงนามสด: ${securityState.traineeSignatures[weekNum].timestamp}</span>
                         <button type="button" onclick="unlockWeekSignature(${weekNum}, 'trainee')" class="block mx-auto mt-0.5 text-[8px] text-red-600 underline hover:text-red-800">ยกเลิกลายเซ็น</button>
                       </div>
                     ` : `
-                      <div class="w-44 mx-auto border-b border-dotted border-black mb-1 h-7 print:h-6"></div>
+                      <div class="w-40 mx-auto border-b border-dotted border-black mb-1 h-6 print:h-5"></div>
                       <p class="text-black font-medium">( <span class="font-bold">${formatTraineeNameWithTitle(maskText(profileData.traineeName))}</span> )</p>
                       <p class="font-bold text-black mt-0.5">คนพิการ</p>
-                      <p class="text-black mt-0.5 text-[11px] print:text-[9.5pt]">วัน<span class="inline-block border-b border-dotted border-black w-6 mx-0.5"></span>เดือน<span class="inline-block border-b border-dotted border-black w-16 mx-0.5"></span>พ.ศ. <span class="inline-block border-b border-dotted border-black w-10 mx-0.5"></span></p>
-                      <button type="button" onclick="openSignatureModal(${weekNum}, 'trainee')" class="no-print mt-1.5 px-2.5 py-1 bg-blue-700 hover:bg-blue-800 text-white rounded text-[10px] font-bold shadow-xs flex items-center space-x-1 mx-auto transition" title="คลิกลงนามดิจิทัลบนหน้าจอ หรือเว้นว่างเพื่อเซ็นสดด้วยปากกาบนกระดาษ">
+                      <p class="text-black mt-0.5 text-[10.5px] print:text-[9pt]">วัน<span class="inline-block border-b border-dotted border-black w-6 mx-0.5"></span>เดือน<span class="inline-block border-b border-dotted border-black w-14 mx-0.5"></span>พ.ศ. <span class="inline-block border-b border-dotted border-black w-10 mx-0.5"></span></p>
+                      <button type="button" onclick="openSignatureModal(${weekNum}, 'trainee')" class="no-print mt-1 px-2 py-0.5 bg-blue-700 hover:bg-blue-800 text-white rounded text-[10px] font-bold shadow-xs flex items-center space-x-1 mx-auto transition" title="คลิกลงนามดิจิทัลบนหน้าจอ หรือเว้นว่างเพื่อเซ็นสดด้วยปากกาบนกระดาษ">
                         <i class="fa-solid fa-pen-nib text-amber-300"></i>
                         <span>ลงนามดิจิทัล (คนพิการ)</span>
                       </button>
                     `}
                   </td>
-                  <!-- Signature Supervisor Block (Colspan 2) -->
-                  <td class="border border-slate-700 ${isLandscape ? 'p-3 print:p-2' : 'p-2.5 print:p-1.5'} text-center align-top text-[12px] print:text-[10pt] leading-snug" colspan="2">
+
+                  <!-- Col 4-5: Signature Supervisor Block (Colspan 2) -->
+                  <td class="border border-slate-700 ${isLandscape ? 'p-2.5 print:p-1.5' : 'p-2 print:p-1'} text-center align-top text-[11.5px] print:text-[9.5pt] leading-snug" colspan="2">
                     <p class="mb-1 font-medium text-black">ขอรับรองว่ารายงานฉบับนี้เป็นความจริงทุกประการ</p>
                     ${securityState.signatures && securityState.signatures[weekNum] ? `
                       <div class="my-0.5">
                         <img src="${securityState.signatures[weekNum].image}" class="h-8 mx-auto object-contain -mb-1">
-                        <div class="w-44 mx-auto border-b border-black"></div>
+                        <div class="w-40 mx-auto border-b border-black"></div>
                       </div>
                       <p class="text-black font-medium mt-0.5">( <span class="font-bold">${maskText(profileData.supervisorName)}</span> )</p>
                       <p class="font-bold text-black mt-0.5">ผู้ควบคุมงาน</p>
-                      <p class="text-black text-[11px] print:text-[9.5pt] mt-0.5">ตำแหน่ง <span class="border-b border-dotted border-black px-1 font-medium">${profileData.supervisorPos || 'ผู้ควบคุมงาน'}</span></p>
-                      <p class="text-black text-[11px] print:text-[9.5pt] mt-0.5">วัน <span class="font-bold px-1">${securityState.signatures[weekNum].dateOnly || '...................'}</span></p>
+                      <p class="text-black text-[10.5px] print:text-[9pt] mt-0.5">ตำแหน่ง <span class="border-b border-dotted border-black px-1 font-medium">${profileData.supervisorPos || 'ผู้ควบคุมงาน'}</span></p>
+                      <p class="text-black text-[10.5px] print:text-[9pt] mt-0.5">วัน <span class="font-bold px-1">${securityState.signatures[weekNum].dateOnly || '...................'}</span></p>
                       <div class="mt-1 p-1 bg-emerald-50 border border-emerald-300 rounded text-[9px] text-emerald-800 leading-tight no-print">
                         <i class="fa-solid fa-shield-check mr-1 text-emerald-600"></i>
                         <span>อนุมัติ & ล็อค: ${securityState.signatures[weekNum].timestamp}</span>
@@ -547,13 +719,13 @@ window.setCondensedEntryCache = setCondensedEntryCache;
                         ` : ''}
                       </div>
                     ` : `
-                      <div class="w-44 mx-auto border-b border-dotted border-black mb-1 h-7 print:h-6"></div>
+                      <div class="w-40 mx-auto border-b border-dotted border-black mb-1 h-6 print:h-5"></div>
                       <p class="text-black font-medium">( <span class="font-bold">${maskText(profileData.supervisorName) || '.............................................'}</span> )</p>
                       <p class="font-bold text-black mt-0.5">ผู้ควบคุมงาน</p>
-                      <p class="text-black text-[11px] print:text-[9.5pt] mt-0.5">ตำแหน่ง <span class="border-b border-dotted border-black min-w-[6rem] inline-block font-medium">${profileData.supervisorPos || '...............................'}</span></p>
-                      <p class="text-black text-[11px] print:text-[9.5pt] mt-0.5">วัน<span class="inline-block border-b border-dotted border-black w-6 mx-0.5"></span>เดือน<span class="inline-block border-b border-dotted border-black w-14 mx-0.5"></span>พ.ศ. <span class="inline-block border-b border-dotted border-black w-10 mx-0.5"></span></p>
+                      <p class="text-black text-[10.5px] print:text-[9pt] mt-0.5">ตำแหน่ง <span class="border-b border-dotted border-black min-w-[6rem] inline-block font-medium">${profileData.supervisorPos || '...............................'}</span></p>
+                      <p class="text-black text-[10.5px] print:text-[9pt] mt-0.5">วัน<span class="inline-block border-b border-dotted border-black w-6 mx-0.5"></span>เดือน<span class="inline-block border-b border-dotted border-black w-14 mx-0.5"></span>พ.ศ. <span class="inline-block border-b border-dotted border-black w-10 mx-0.5"></span></p>
                       ${!isTrainee ? `
-                        <button type="button" onclick="openSignatureModal(${weekNum}, 'supervisor')" class="no-print mt-1.5 px-2.5 py-1 bg-govNavy hover:bg-govNavyLight text-white rounded text-[10px] font-bold shadow-xs flex items-center space-x-1 mx-auto transition" title="คลิกลงนามดิจิทัลบนหน้าจอ หรือเว้นว่างเพื่อเซ็นสดด้วยปากกาบนกระดาษ">
+                        <button type="button" onclick="openSignatureModal(${weekNum}, 'supervisor')" class="no-print mt-1 px-2 py-0.5 bg-govNavy hover:bg-govNavyLight text-white rounded text-[10px] font-bold shadow-xs flex items-center space-x-1 mx-auto transition" title="คลิกลงนามดิจิทัลบนหน้าจอ หรือเว้นว่างเพื่อเซ็นสดด้วยปากกาบนกระดาษ">
                           <i class="fa-solid fa-signature text-govGold"></i>
                           <span>ลงนามดิจิทัล (ผู้ควบคุมงาน)</span>
                         </button>
