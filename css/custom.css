@@ -53,22 +53,23 @@ body {
   color: #fbbf24 !important;
 }
 
-/* A4 Screen Preview Paper */
+/* Modern Screen View: Full Comfortable Responsive Card (No 58% Dead Space) */
 .a4-paper {
   background: white;
-  width: 210mm;
-  min-height: 297mm;
-  padding: 15mm 15mm 15mm 15mm;
+  width: 100%;
+  max-width: 1120px;
+  min-height: auto;
+  padding: 2rem 2.25rem;
   margin: 0 auto 2rem auto;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
   position: relative;
 }
 
 @media (max-width: 900px) {
   .a4-paper {
-    width: 100%;
-    min-height: auto;
-    padding: 1rem;
+    padding: 1.25rem;
   }
 }

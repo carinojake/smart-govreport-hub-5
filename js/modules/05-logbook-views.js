@@ -636,7 +636,7 @@ window.setCondensedEntryCache = setCondensedEntryCache;
 
           <!-- Official Logbook Table (สัดส่วนคอลัมน์กว้างสวยงาม 12% | 6% | 38% | 23% | 21%) -->
           <div class="w-full">
-            <table class="w-full border-collapse border border-slate-700 ${isLandscape ? 'text-[13px] print:text-[10pt]' : 'text-[12px] print:text-[9.5pt]'} mb-2 print:mb-1">
+            <table class="official-table w-full border-collapse border border-slate-700 ${isLandscape ? 'text-[13.5px] print:text-[10pt]' : 'text-[13px] print:text-[9.5pt]'} mb-2 print:mb-1">
               <thead>
                 <tr class="bg-white text-center font-bold text-black">
                   <th class="border border-slate-700 ${isLandscape ? 'p-2 print:p-1.5 w-[12%] print:w-[12%]' : 'p-1.5 print:p-1 w-[12%] print:w-[12%]'} font-bold text-center">วัน/เดือน/ปี</th>

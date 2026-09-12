@@ -7,22 +7,23 @@
       font-family: 'Sarabun', sans-serif;
     }
     
-    /* Paper Simulation for A4 Report */
+    /* Separation of Concerns: Screen Web Application View (Full Comfort, Zero Dead Space) */
     .a4-paper {
-      width: 210mm;
-      min-height: 297mm;
-      padding: 20mm 15mm 20mm 20mm;
-      margin: 0 auto;
+      width: 100%;
+      max-width: 1120px;
+      min-height: auto;
+      padding: 2rem 2.25rem;
+      margin: 0 auto 2rem auto;
       background: #ffffff;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      border-radius: 1rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
       box-sizing: border-box;
       position: relative;
     }
 
     @media (max-width: 900px) {
       .a4-paper {
-        width: 100%;
-        min-height: auto;
         padding: 1.25rem;
       }
     }

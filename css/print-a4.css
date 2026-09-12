@@ -3,48 +3,50 @@
    การันตี 1 สัปดาห์ 1 หน้า A4 ลายเซ็นไม่ตกไปอยู่หน้า 2 เสมอ 100%
    ========================================================================== */
 
+@page {
+  size: A4 portrait;
+  margin: 10mm 12mm 10mm 12mm; /* ระยะขอบมาตรฐาน ปลอดภัย ไม่ถูกเครื่องพิมพ์ตัดขอบ */
+}
+
+@page a4-landscape {
+  size: A4 landscape;
+  margin: 10mm 12mm 10mm 12mm;
+}
+
+body.pdf-landscape {
+  page: a4-landscape !important;
+}
+
+.a4-paper.landscape {
+  page: a4-landscape !important;
+}
+
+*, *::before, *::after {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
 @media print {
-  @page {
-    size: A4 portrait;
-    margin: 12mm 15mm; /* ปรับขอบกระดาษ 12mm 15mm สวยงามตามระเบียบสารบรรณ */
-  }
-  
-  @page a4-landscape {
-    size: A4 landscape;
-    margin: 12mm 15mm;
-  }
-
-  body.pdf-landscape {
-    page: a4-landscape !important;
-  }
-
-  .a4-paper.landscape {
-    page: a4-landscape !important;
-  }
-  
-  *, *::before, *::after {
-    box-shadow: none !important;
-    text-shadow: none !important;
-  }
-
+  /* 1. บังคับคอนเทนเนอร์เต็ม 100% และรีเซ็ตพื้นหลัง */
   html, body {
     width: 100% !important;
+    height: auto !important;
     margin: 0 !important;
     padding: 0 !important;
     background: #ffffff !important;
     background-color: #ffffff !important;
-    font-family: 'Sarabun', 'TH Sarabun New', 'Prompt', sans-serif !important;
-    font-size: 10pt !important;
+    font-family: 'TH Sarabun New', 'Sarabun', sans-serif !important;
+    font-size: 10.5pt !important;
     color: #000000 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
-  /* ซ่อน Navigation, Modals, Backdrops, Buttons ในโหมดพิมพ์ */
-  aside, nav, header, footer, .no-print,
+  /* 2. ซ่อนองค์ประกอบ UI และส่วนนำทางทั้งหมดเด็ดขาด */
+  header, nav, aside, footer, .no-print, button:not(.allow-print), 
+  #system-hub-dropdown, #a11y-dropdown, .floating-actions,
   #app-sidebar, #app-header, #sup-trainee-selector-bar, #ojt-master-action-toolbar,
-  [id$="-modal"], [class*="backdrop-blur"], [class*="fixed inset-0"],
-  button:not(.allow-print) {
+  [id$="-modal"], [class*="backdrop-blur"], [class*="fixed inset-0"] {
     display: none !important;
   }
 
@@ -74,8 +76,10 @@
     padding: 0 !important;
   }
 
-  /* บังคับคอนเทนเนอร์และตารางกางเต็มหน้ากระดาษ 100% */
-  #print-area, .print-page, .a4-paper, [id^="ojt-weekly-page-"] {
+  /* 3. คอนเทนเนอร์แผ่นพิมพ์ */
+  .print-page, #print-area, .a4-paper, [id^="ojt-weekly-page-"], #ojt-cover-page {
+    display: block !important;
+    position: static !important;
     width: 100% !important;
     max-width: 100% !important;
     min-height: auto !important;
@@ -124,56 +128,98 @@
     margin-top: 3.5mm !important;
   }
 
-  table {
-    border-collapse: collapse !important;
+  /* 4. สถาปัตยกรรมตาราง 100% แก้ปัญหา Overlap & Shrink */
+  table, table.official-table {
     width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 auto !important;
     table-layout: fixed !important;
+    border-collapse: collapse !important;
+    page-break-inside: auto !important;
+    margin: 0 auto 1.5mm auto !important;
   }
 
-  /* ล็อคสัดส่วนคอลัมน์ตาราง OJT ให้แม่นยำ 100% ตามมาตรฐานราชการ (12% | 6% | 38% | 23% | 21%) */
-  [id^="ojt-weekly-page-"] table th:nth-child(1),
-  [id^="ojt-weekly-page-"] table tbody td:nth-child(1) {
+  /* แก้ไขบั๊ก Chrome Overlap โดยเปลี่ยน tfoot เป็น table-row-group */
+  table tfoot, table.official-table tfoot,
+  .sign-section, [id^="ojt-weekly-page-"] tfoot {
+    display: table-row-group !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  table tr, table.official-table tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  table th, table.official-table th,
+  table td, table.official-table td,
+  [id^="ojt-weekly-page-"] th, [id^="ojt-weekly-page-"] tbody td {
+    border: 1px solid #000000 !important;
+    padding: 4px 5px !important;
+    font-size: 9.5pt !important;
+    line-height: 1.25 !important;
+    vertical-align: top !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    text-align: left !important;
+  }
+
+  table th, table.official-table th, [id^="ojt-weekly-page-"] th {
+    background-color: #f1f5f9 !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    padding: 3px 4px !important;
+    font-size: 9.5pt !important;
+  }
+
+  /* ล็อคสัดส่วนคอลัมน์มาตรฐานราชการ 100% (12% | 6% | 38% | 23% | 21%) */
+  table.official-table th:nth-child(1), table.official-table tbody td:nth-child(1),
+  [id^="ojt-weekly-page-"] table th:nth-child(1), [id^="ojt-weekly-page-"] table tbody td:nth-child(1) {
     width: 12% !important;
     max-width: 12% !important;
     min-width: 12% !important;
     box-sizing: border-box !important;
+    text-align: center !important;
   }
 
-  [id^="ojt-weekly-page-"] table th:nth-child(2),
-  [id^="ojt-weekly-page-"] table tbody td:nth-child(2) {
+  table.official-table th:nth-child(2), table.official-table tbody td:nth-child(2),
+  [id^="ojt-weekly-page-"] table th:nth-child(2), [id^="ojt-weekly-page-"] table tbody td:nth-child(2) {
     width: 6% !important;
     max-width: 6% !important;
     min-width: 6% !important;
     box-sizing: border-box !important;
+    text-align: center !important;
   }
 
-  [id^="ojt-weekly-page-"] table th:nth-child(3),
-  [id^="ojt-weekly-page-"] table tbody td:nth-child(3) {
+  table.official-table th:nth-child(3), table.official-table tbody td:nth-child(3),
+  [id^="ojt-weekly-page-"] table th:nth-child(3), [id^="ojt-weekly-page-"] table tbody td:nth-child(3) {
     width: 38% !important;
     max-width: 38% !important;
     min-width: 38% !important;
     box-sizing: border-box !important;
+    text-align: left !important;
   }
 
-  [id^="ojt-weekly-page-"] table th:nth-child(4),
-  [id^="ojt-weekly-page-"] table tbody td:nth-child(4) {
+  table.official-table th:nth-child(4), table.official-table tbody td:nth-child(4),
+  [id^="ojt-weekly-page-"] table th:nth-child(4), [id^="ojt-weekly-page-"] table tbody td:nth-child(4) {
     width: 23% !important;
     max-width: 23% !important;
     min-width: 23% !important;
     box-sizing: border-box !important;
+    text-align: left !important;
   }
 
-  [id^="ojt-weekly-page-"] table th:nth-child(5),
-  [id^="ojt-weekly-page-"] table tbody td:nth-child(5) {
+  table.official-table th:nth-child(5), table.official-table tbody td:nth-child(5),
+  [id^="ojt-weekly-page-"] table th:nth-child(5), [id^="ojt-weekly-page-"] table tbody td:nth-child(5) {
     width: 21% !important;
     max-width: 21% !important;
     min-width: 21% !important;
     box-sizing: border-box !important;
+    text-align: left !important;
   }
 
   /* ใน tfoot เซลล์แรกผสาน 2 คอลัมน์ (colspan 2 = 12% + 6% = 18%) ล็อคความกว้างป้องกันบีบตัวอักษรแนวตั้ง */
+  table.official-table tfoot > tr > td:first-child,
+  table.official-table tfoot td.footer-hours-cell,
   [id^="ojt-weekly-page-"] table tfoot > tr > td:first-child,
   [id^="ojt-weekly-page-"] table tfoot td.footer-hours-cell {
     width: 18% !important;
@@ -184,38 +230,22 @@
   }
 
   /* ซ่อนคอลัมน์ปุ่มจัดการในโหมดพิมพ์เสมอ */
-  [id^="ojt-weekly-page-"] table th:nth-child(6),
-  [id^="ojt-weekly-page-"] table td:nth-child(6) {
+  table.official-table th:nth-child(6), table.official-table td:nth-child(6),
+  [id^="ojt-weekly-page-"] table th:nth-child(6), [id^="ojt-weekly-page-"] table td:nth-child(6) {
     display: none !important;
     width: 0 !important;
     padding: 0 !important;
     border: none !important;
   }
 
-  tr, td, th {
+  /* 5. กล่องลายเซ็นคู่ */
+  .signature-grid {
+    display: flex !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    margin-top: 14px !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
-  }
-
-  /* กำหนดขนาดตัวอักษรในเซลล์ให้อ่านสบายตาและคมชัด (9.5pt พอดี 1 หน้า A4 เสมอ) */
-  table th, table td, [id^="ojt-weekly-page-"] th, [id^="ojt-weekly-page-"] tbody td {
-    border: 1px solid #000000 !important;
-    padding: 3.5px 5px !important;
-    font-size: 9.5pt !important;
-    line-height: 1.25 !important;
-    vertical-align: top !important;
-    word-break: break-word !important;
-    overflow-wrap: break-word !important;
-    line-break: loose !important;
-    text-align: left !important;
-  }
-
-  table th, [id^="ojt-weekly-page-"] th {
-    background-color: #f1f5f9 !important;
-    font-weight: bold !important;
-    text-align: center !important;
-    padding: 3px 4px !important;
-    font-size: 9.5pt !important;
   }
 
   .text-center, td.text-center, th.text-center {
