@@ -7,7 +7,7 @@
  * 3. จัดการการอัปเดตแคชอัตโนมัติ (Stale-While-Revalidate & Cache-First)
  */
 
-const CACHE_NAME = 'govreport-cache-v2.5.0';
+const CACHE_NAME = 'govreport-cache-v5.0.0';
 
 // ทรัพยากรหลักที่ต้อง Pre-cache สำหรับการเปิดใช้งานแบบออฟไลน์
 const PRECACHE_ASSETS = [

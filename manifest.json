@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/web-manifest.json",
-  "id": "smart-govreport-hub-25",
-  "name": "Smart GovReport Hub 2.5 - ระบบบริหารและรายงานผลการปฏิบัติงานราชการ",
+  "id": "smart-govreport-hub-5",
+  "name": "Smart GovReport Hub 5 - ระบบบริหารและรายงานผลการปฏิบัติงานราชการ",
   "short_name": "GovReport",
   "description": "ระบบบันทึก Logbook รายงานผลการฝึกงาน OJT 90 ชม. และบริหารจัดการงานราชการอัจฉริยะ (ศทส. สป.ยธ.)",
   "start_url": "./index.html",
