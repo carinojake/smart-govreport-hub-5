@@ -654,19 +654,28 @@ window.setCondensedEntryCache = setCondensedEntryCache;
                 <!-- Integrated Footer Matching Official Paper Form (Symmetric Dual Digital / Manual Signatures) -->
                 <tr>
                   <!-- Col 1-2: 3-Row Cumulative Hours Matching Official PDF Template -->
-                  <td colspan="2" class="p-0 border border-slate-700 align-top">
-                    <table class="w-full h-full text-[10.5px] print:text-[8.5pt] border-collapse">
+                  <td colspan="2" class="p-0 border border-slate-700 align-top footer-hours-cell">
+                    <table class="w-full h-full text-[10.5px] print:text-[8pt] border-collapse" style="table-layout: fixed;">
                       <tr class="border-b border-slate-700">
-                        <td class="p-1 print:p-0.5 font-medium text-black leading-tight text-left">จำนวนชั่วโมงรวมใน<br>รายงานฉบับนี้</td>
-                        <td class="p-1 print:p-0.5 text-center font-bold text-black border-l border-slate-700 w-11 text-[12px] print:text-[9.5pt] align-middle">${toThaiNum(weekHours.toFixed(1))}</td>
+                        <td class="p-1 print:p-0.5 font-medium text-black leading-tight text-left">
+                          <span class="whitespace-nowrap inline-block">จำนวนชั่วโมงรวมใน</span><br>
+                          <span class="whitespace-nowrap inline-block">รายงานฉบับนี้</span>
+                        </td>
+                        <td class="p-1 print:p-0.5 text-center font-bold text-black border-l border-slate-700 w-10 text-[12px] print:text-[9pt] align-middle">${toThaiNum(weekHours.toFixed(1))}</td>
                       </tr>
                       <tr class="border-b border-slate-700">
-                        <td class="p-1 print:p-0.5 font-medium text-black leading-tight text-left">จำนวนชั่วโมงรวมใน<br>รายงานฉบับก่อน</td>
-                        <td class="p-1 print:p-0.5 text-center font-bold text-black border-l border-slate-700 w-11 text-[12px] print:text-[9.5pt] align-middle">${toThaiNum(prevHours.toFixed(1))}</td>
+                        <td class="p-1 print:p-0.5 font-medium text-black leading-tight text-left">
+                          <span class="whitespace-nowrap inline-block">จำนวนชั่วโมงรวมใน</span><br>
+                          <span class="whitespace-nowrap inline-block">รายงานฉบับก่อน</span>
+                        </td>
+                        <td class="p-1 print:p-0.5 text-center font-bold text-black border-l border-slate-700 w-10 text-[12px] print:text-[9pt] align-middle">${toThaiNum(prevHours.toFixed(1))}</td>
                       </tr>
                       <tr>
-                        <td class="p-1 print:p-0.5 font-bold text-black leading-tight text-left">จำนวนชั่วโมงรวม<br>ทั้งหมด</td>
-                        <td class="p-1 print:p-0.5 text-center font-black text-govNavy border-l border-slate-700 w-11 text-[13px] print:text-[10pt] align-middle">${toThaiNum(grandTotal.toFixed(1))}</td>
+                        <td class="p-1 print:p-0.5 font-bold text-black leading-tight text-left">
+                          <span class="whitespace-nowrap inline-block">จำนวนชั่วโมงรวม</span><br>
+                          <span class="whitespace-nowrap inline-block">ทั้งหมด</span>
+                        </td>
+                        <td class="p-1 print:p-0.5 text-center font-black text-govNavy border-l border-slate-700 w-10 text-[13px] print:text-[9.5pt] align-middle">${toThaiNum(grandTotal.toFixed(1))}</td>
                       </tr>
                     </table>
                   </td>
