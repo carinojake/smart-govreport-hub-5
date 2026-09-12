@@ -651,99 +651,52 @@ window.setCondensedEntryCache = setCondensedEntryCache;
                 ${rowsHTML}
               </tbody>
               <tfoot>
-                <!-- Integrated Footer Matching Official Paper Form (Symmetric Dual Digital / Manual Signatures) -->
-                <tr>
-                  <!-- Col 1-2: 3-Row Cumulative Hours Matching Official PDF Template -->
-                  <td colspan="2" class="p-0 border border-slate-700 align-top footer-hours-cell">
-                    <table class="w-full h-full text-[10.5px] print:text-[8pt] border-collapse" style="table-layout: fixed;">
-                      <tr class="border-b border-slate-700">
-                        <td class="p-1 print:p-0.5 font-medium text-black leading-tight text-left">
-                          <span class="whitespace-nowrap inline-block">จำนวนชั่วโมงรวมใน</span><br>
-                          <span class="whitespace-nowrap inline-block">รายงานฉบับนี้</span>
-                        </td>
-                        <td class="p-1 print:p-0.5 text-center font-bold text-black border-l border-slate-700 w-10 text-[12px] print:text-[9pt] align-middle">${toThaiNum(weekHours.toFixed(1))}</td>
-                      </tr>
-                      <tr class="border-b border-slate-700">
-                        <td class="p-1 print:p-0.5 font-medium text-black leading-tight text-left">
-                          <span class="whitespace-nowrap inline-block">จำนวนชั่วโมงรวมใน</span><br>
-                          <span class="whitespace-nowrap inline-block">รายงานฉบับก่อน</span>
-                        </td>
-                        <td class="p-1 print:p-0.5 text-center font-bold text-black border-l border-slate-700 w-10 text-[12px] print:text-[9pt] align-middle">${toThaiNum(prevHours.toFixed(1))}</td>
-                      </tr>
-                      <tr>
-                        <td class="p-1 print:p-0.5 font-bold text-black leading-tight text-left">
-                          <span class="whitespace-nowrap inline-block">จำนวนชั่วโมงรวม</span><br>
-                          <span class="whitespace-nowrap inline-block">ทั้งหมด</span>
-                        </td>
-                        <td class="p-1 print:p-0.5 text-center font-black text-govNavy border-l border-slate-700 w-10 text-[13px] print:text-[9.5pt] align-middle">${toThaiNum(grandTotal.toFixed(1))}</td>
-                      </tr>
-                    </table>
+                <!-- Row 1: Cumulative Hours for this Report -->
+                <tr class="bg-white">
+                  <td colspan="2" class="border border-slate-700 p-1 text-center align-middle font-medium text-black leading-snug">
+                    <div>จำนวนชั่วโมงรวม</div>
+                    <div>ในรายงานฉบับนี้</div>
                   </td>
-
-                  <!-- Col 3: Signature Trainee Block -->
-                  <td class="border border-slate-700 ${isLandscape ? 'p-2.5 print:p-1.5' : 'p-2 print:p-1'} text-center align-top text-[11.5px] print:text-[9.5pt] leading-snug">
-                    <p class="mb-1 font-medium text-black">ขอรับรองว่ารายงานฉบับนี้เป็นความจริงทุกประการ</p>
-                    ${securityState.traineeSignatures && securityState.traineeSignatures[weekNum] ? `
-                      <div class="my-0.5">
-                        <img src="${securityState.traineeSignatures[weekNum].image}" class="h-8 mx-auto object-contain -mb-1">
-                        <div class="w-40 mx-auto border-b border-black"></div>
-                      </div>
-                      <p class="text-black font-medium mt-0.5">( <span class="font-bold">${formatTraineeNameWithTitle(maskText(profileData.traineeName))}</span> )</p>
-                      <p class="font-bold text-black mt-0.5">คนพิการ</p>
-                      <p class="text-black mt-0.5 text-[10.5px] print:text-[9pt]">วัน <span class="font-bold px-1">${securityState.traineeSignatures[weekNum].dateOnly || '...................'}</span></p>
-                      <div class="mt-1 p-1 bg-blue-50 border border-blue-200 rounded text-[9px] text-blue-800 leading-tight no-print">
-                        <i class="fa-solid fa-signature mr-1 text-blue-600"></i>
-                        <span>ลงนามสด: ${securityState.traineeSignatures[weekNum].timestamp}</span>
-                        <button type="button" onclick="unlockWeekSignature(${weekNum}, 'trainee')" class="block mx-auto mt-0.5 text-[8px] text-red-600 underline hover:text-red-800">ยกเลิกลายเซ็น</button>
-                      </div>
-                    ` : `
-                      <div class="w-40 mx-auto border-b border-dotted border-black mb-1 h-6 print:h-5"></div>
-                      <p class="text-black font-medium">( <span class="font-bold">${formatTraineeNameWithTitle(maskText(profileData.traineeName))}</span> )</p>
-                      <p class="font-bold text-black mt-0.5">คนพิการ</p>
-                      <p class="text-black mt-0.5 text-[10.5px] print:text-[9pt]">วัน<span class="inline-block border-b border-dotted border-black w-6 mx-0.5"></span>เดือน<span class="inline-block border-b border-dotted border-black w-14 mx-0.5"></span>พ.ศ. <span class="inline-block border-b border-dotted border-black w-10 mx-0.5"></span></p>
-                      <button type="button" onclick="openSignatureModal(${weekNum}, 'trainee')" class="no-print mt-1 px-2 py-0.5 bg-blue-700 hover:bg-blue-800 text-white rounded text-[10px] font-bold shadow-xs flex items-center space-x-1 mx-auto transition" title="คลิกลงนามดิจิทัลบนหน้าจอ หรือเว้นว่างเพื่อเซ็นสดด้วยปากกาบนกระดาษ">
-                        <i class="fa-solid fa-pen-nib text-amber-300"></i>
-                        <span>ลงนามดิจิทัล (คนพิการ)</span>
-                      </button>
-                    `}
+                  <td colspan="3" class="border border-slate-700 px-4 py-1 text-left align-middle font-normal text-black">
+                    <span class="inline-flex items-center text-[12px] print:text-[9.5pt]">
+                      <span class="tracking-widest text-slate-500 font-light">................</span>
+                      <span class="font-bold text-black px-2 text-[13px] print:text-[10pt]">${toThaiNum(weekHours.toFixed(1))}</span>
+                      <span class="tracking-widest text-slate-500 font-light">................</span>
+                      <span class="ml-1.5 font-medium text-black">ชั่วโมง</span>
+                    </span>
                   </td>
-
-                  <!-- Col 4-5: Signature Supervisor Block (Colspan 2) -->
-                  <td class="border border-slate-700 ${isLandscape ? 'p-2.5 print:p-1.5' : 'p-2 print:p-1'} text-center align-top text-[11.5px] print:text-[9.5pt] leading-snug" colspan="2">
-                    <p class="mb-1 font-medium text-black">ขอรับรองว่ารายงานฉบับนี้เป็นความจริงทุกประการ</p>
-                    ${securityState.signatures && securityState.signatures[weekNum] ? `
-                      <div class="my-0.5">
-                        <img src="${securityState.signatures[weekNum].image}" class="h-8 mx-auto object-contain -mb-1">
-                        <div class="w-40 mx-auto border-b border-black"></div>
-                      </div>
-                      <p class="text-black font-medium mt-0.5">( <span class="font-bold">${maskText(profileData.supervisorName)}</span> )</p>
-                      <p class="font-bold text-black mt-0.5">ผู้ควบคุมงาน</p>
-                      <p class="text-black text-[10.5px] print:text-[9pt] mt-0.5">ตำแหน่ง <span class="border-b border-dotted border-black px-1 font-medium">${profileData.supervisorPos || 'ผู้ควบคุมงาน'}</span></p>
-                      <p class="text-black text-[10.5px] print:text-[9pt] mt-0.5">วัน <span class="font-bold px-1">${securityState.signatures[weekNum].dateOnly || '...................'}</span></p>
-                      <div class="mt-1 p-1 bg-emerald-50 border border-emerald-300 rounded text-[9px] text-emerald-800 leading-tight no-print">
-                        <i class="fa-solid fa-shield-check mr-1 text-emerald-600"></i>
-                        <span>อนุมัติ & ล็อค: ${securityState.signatures[weekNum].timestamp}</span>
-                        ${!isTrainee ? `
-                          <button type="button" onclick="unlockWeekSignature(${weekNum}, 'supervisor')" class="block mx-auto mt-0.5 text-[8px] text-red-600 underline hover:text-red-800">ปลดล็อค</button>
-                        ` : ''}
-                      </div>
-                    ` : `
-                      <div class="w-40 mx-auto border-b border-dotted border-black mb-1 h-6 print:h-5"></div>
-                      <p class="text-black font-medium">( <span class="font-bold">${maskText(profileData.supervisorName) || '.............................................'}</span> )</p>
-                      <p class="font-bold text-black mt-0.5">ผู้ควบคุมงาน</p>
-                      <p class="text-black text-[10.5px] print:text-[9pt] mt-0.5">ตำแหน่ง <span class="border-b border-dotted border-black min-w-[6rem] inline-block font-medium">${profileData.supervisorPos || '...............................'}</span></p>
-                      <p class="text-black text-[10.5px] print:text-[9pt] mt-0.5">วัน<span class="inline-block border-b border-dotted border-black w-6 mx-0.5"></span>เดือน<span class="inline-block border-b border-dotted border-black w-14 mx-0.5"></span>พ.ศ. <span class="inline-block border-b border-dotted border-black w-10 mx-0.5"></span></p>
-                      ${!isTrainee ? `
-                        <button type="button" onclick="openSignatureModal(${weekNum}, 'supervisor')" class="no-print mt-1 px-2 py-0.5 bg-govNavy hover:bg-govNavyLight text-white rounded text-[10px] font-bold shadow-xs flex items-center space-x-1 mx-auto transition" title="คลิกลงนามดิจิทัลบนหน้าจอ หรือเว้นว่างเพื่อเซ็นสดด้วยปากกาบนกระดาษ">
-                          <i class="fa-solid fa-signature text-govGold"></i>
-                          <span>ลงนามดิจิทัล (ผู้ควบคุมงาน)</span>
-                        </button>
-                      ` : `
-                        <div class="no-print mt-1 text-[10px] text-amber-600 font-medium">
-                          <i class="fa-solid fa-clock-rotate-left mr-0.5"></i> รอผู้ควบคุมงานลงนาม
-                        </div>
-                      `}
-                    `}
+                  <td class="border border-slate-700 p-1 no-print bg-slate-50"></td>
+                </tr>
+                <!-- Row 2: Cumulative Hours for Previous Report -->
+                <tr class="bg-white">
+                  <td colspan="2" class="border border-slate-700 p-1 text-center align-middle font-medium text-black leading-snug">
+                    <div>จำนวนชั่วโมงรวม</div>
+                    <div>ในรายงานฉบับ</div>
+                    <div>ก่อน</div>
+                  </td>
+                  <td colspan="3" class="border border-slate-700 px-4 py-1 text-left align-middle font-normal text-black">
+                    <span class="inline-flex items-center text-[12px] print:text-[9.5pt]">
+                      <span class="tracking-widest text-slate-500 font-light">................</span>
+                      <span class="font-bold text-black px-2 text-[13px] print:text-[10pt]">${toThaiNum(prevHours.toFixed(1))}</span>
+                      <span class="tracking-widest text-slate-500 font-light">................</span>
+                      <span class="ml-1.5 font-medium text-black">ชั่วโมง</span>
+                    </span>
+                  </td>
+                  <td class="border border-slate-700 p-1 no-print bg-slate-50"></td>
+                </tr>
+                <!-- Row 3: Total Cumulative Hours -->
+                <tr class="bg-white">
+                  <td colspan="2" class="border border-slate-700 p-1 text-center align-middle font-bold text-black leading-snug">
+                    <div>จำนวนชั่วโมงรวม</div>
+                    <div>ทั้งหมด</div>
+                  </td>
+                  <td colspan="3" class="border border-slate-700 px-4 py-1 text-left align-middle font-normal text-black">
+                    <span class="inline-flex items-center text-[12px] print:text-[9.5pt]">
+                      <span class="tracking-widest text-slate-500 font-light">................</span>
+                      <span class="font-bold text-black px-2 text-[13px] print:text-[10pt]">${toThaiNum(grandTotal.toFixed(1))}</span>
+                      <span class="tracking-widest text-slate-500 font-light">................</span>
+                      <span class="ml-1.5 font-bold text-black">ชั่วโมง</span>
+                    </span>
                   </td>
                   <td class="border border-slate-700 p-1 no-print bg-slate-50"></td>
                 </tr>
@@ -751,9 +704,82 @@ window.setCondensedEntryCache = setCondensedEntryCache;
             </table>
           </div>
 
+          <!-- Dual Signature Section Matching Authentic Official Government Form -->
+          <div class="grid grid-cols-2 gap-4 text-center signature-grid mt-3 print:mt-2 pt-0.5 text-[12px] print:text-[9.5pt] leading-normal">
+            <!-- Trainee Signature Block (Left) -->
+            <div class="text-center">
+              <p class="font-normal text-black mb-1.5 print:mb-1">ขอรับรองว่ารายงานฉบับนี้เป็นความจริงทุกประการ</p>
+              ${securityState.traineeSignatures && securityState.traineeSignatures[weekNum] ? `
+                <div class="my-0.5">
+                  <img src="${securityState.traineeSignatures[weekNum].image}" class="h-8 mx-auto object-contain -mb-1">
+                  <div class="w-48 mx-auto border-b border-black"></div>
+                </div>
+                <p class="text-black font-normal mt-0.5">ลงชื่อ <span class="font-bold px-1">${formatTraineeNameWithTitle(maskText(profileData.traineeName))}</span></p>
+                <p class="text-black font-normal mt-0.5">( <span class="font-bold">${formatTraineeNameWithTitle(maskText(profileData.traineeName))}</span> )</p>
+                <p class="font-normal text-black mt-0.5">ผู้ฝึกภาคปฏิบัติ (คนพิการ)</p>
+                <p class="text-black mt-0.5">วันที่ <span class="font-bold px-1">${(securityState.traineeSignatures[weekNum].dateOnly || '...................').replace(/วัน\s*/, '')}</span></p>
+                <div class="mt-1 p-1 bg-blue-50 border border-blue-200 rounded text-[9px] text-blue-800 leading-tight no-print inline-block">
+                  <i class="fa-solid fa-signature mr-1 text-blue-600"></i>
+                  <span>ลงนามสด: ${securityState.traineeSignatures[weekNum].timestamp}</span>
+                  <button type="button" onclick="unlockWeekSignature(${weekNum}, 'trainee')" class="ml-2 text-[8px] text-red-600 underline hover:text-red-800">ยกเลิก</button>
+                </div>
+              ` : `
+                <div class="space-y-1 print:space-y-0.5">
+                  <p class="text-black">ลงชื่อ ................................................................</p>
+                  <p class="text-black">( .................................................................... )</p>
+                  <p class="font-normal text-black">ผู้ฝึกภาคปฏิบัติ (คนพิการ)</p>
+                  <p class="text-black">วันที่ ......... เดือน ....................................... พ.ศ. ...............</p>
+                </div>
+                <button type="button" onclick="openSignatureModal(${weekNum}, 'trainee')" class="no-print mt-1.5 px-2.5 py-1 bg-blue-700 hover:bg-blue-800 text-white rounded text-[10px] font-bold shadow-xs inline-flex items-center space-x-1 mx-auto transition" title="คลิกลงนามดิจิทัลบนหน้าจอ หรือเว้นว่างเพื่อเซ็นสดด้วยปากกาบนกระดาษ">
+                  <i class="fa-solid fa-pen-nib text-amber-300"></i>
+                  <span>ลงนามดิจิทัล (คนพิการ)</span>
+                </button>
+              `}
+            </div>
+
+            <!-- Supervisor Signature Block (Right) -->
+            <div class="text-center">
+              <p class="font-normal text-black mb-1.5 print:mb-1">ขอรับรองว่ารายงานฉบับนี้เป็นความจริงทุกประการ</p>
+              ${securityState.signatures && securityState.signatures[weekNum] ? `
+                <div class="my-0.5">
+                  <img src="${securityState.signatures[weekNum].image}" class="h-8 mx-auto object-contain -mb-1">
+                  <div class="w-48 mx-auto border-b border-black"></div>
+                </div>
+                <p class="text-black font-normal mt-0.5">ลงชื่อ <span class="font-bold px-1">${maskText(profileData.supervisorName)}</span></p>
+                <p class="text-black font-normal mt-0.5">( <span class="font-bold">${maskText(profileData.supervisorName)}</span> )</p>
+                <p class="font-normal text-black mt-0.5">ผู้ควบคุมงาน</p>
+                <p class="text-black mt-0.5">วันที่ <span class="font-bold px-1">${(securityState.signatures[weekNum].dateOnly || '...................').replace(/วัน\s*/, '')}</span></p>
+                <div class="mt-1 p-1 bg-emerald-50 border border-emerald-300 rounded text-[9px] text-emerald-800 leading-tight no-print inline-block">
+                  <i class="fa-solid fa-shield-check mr-1 text-emerald-600"></i>
+                  <span>อนุมัติ & ล็อค: ${securityState.signatures[weekNum].timestamp}</span>
+                  ${!isTrainee ? `
+                    <button type="button" onclick="unlockWeekSignature(${weekNum}, 'supervisor')" class="ml-2 text-[8px] text-red-600 underline hover:text-red-800">ปลดล็อค</button>
+                  ` : ''}
+                </div>
+              ` : `
+                <div class="space-y-1 print:space-y-0.5">
+                  <p class="text-black">ลงชื่อ ................................................................</p>
+                  <p class="text-black">( .................................................................... )</p>
+                  <p class="font-normal text-black">ผู้ควบคุมงาน</p>
+                  <p class="text-black">วันที่ ......... เดือน ....................................... พ.ศ. ...............</p>
+                </div>
+                ${!isTrainee ? `
+                  <button type="button" onclick="openSignatureModal(${weekNum}, 'supervisor')" class="no-print mt-1.5 px-2.5 py-1 bg-govNavy hover:bg-govNavyLight text-white rounded text-[10px] font-bold shadow-xs inline-flex items-center space-x-1 mx-auto transition" title="คลิกลงนามดิจิทัลบนหน้าจอ หรือเว้นว่างเพื่อเซ็นสดด้วยปากกาบนกระดาษ">
+                    <i class="fa-solid fa-signature text-govGold"></i>
+                    <span>ลงนามดิจิทัล (ผู้ควบคุมงาน)</span>
+                  </button>
+                ` : `
+                  <div class="no-print mt-1.5 text-[10px] text-amber-600 font-medium">
+                    <i class="fa-solid fa-clock-rotate-left mr-0.5"></i> รอผู้ควบคุมงานลงนาม
+                  </div>
+                `}
+              `}
+            </div>
+          </div>
+
           <!-- Document Footer -->
-          <div class="mt-1 pt-1 border-t border-slate-300 text-[10px] print:text-[9px] text-slate-500 flex justify-between">
-            <span>เอกสารอ้างอิง: Smart GovReport Hub 5 (โครงการส่งเสริมและเตรียมความพร้อมสำหรับการจ้างงานคนพิการในหน่วยงานภาครัฐ 90 ชั่วโมง) • แบบบันทึกประจำสัปดาห์</span>
+          <div class="mt-2.5 pt-1 border-t border-slate-300 text-[10px] print:text-[8pt] text-slate-500 flex justify-between">
+            <span>เอกสารอ้างอิง: แบบบันทึกการปฏิบัติงานประจำสัปดาห์ โครงการเตรียมความพร้อมสำหรับการจ้างงานคนพิการในหน่วยงานภาครัฐ ๙๐ ชั่วโมง</span>
             <span>หน้า ${toThaiNum(pageNum)} จาก ${toThaiNum(totalPageLabel)}</span>
           </div>
         </div>

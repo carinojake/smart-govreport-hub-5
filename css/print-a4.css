@@ -154,9 +154,9 @@ body.pdf-landscape {
   table td, table.official-table td,
   [id^="ojt-weekly-page-"] th, [id^="ojt-weekly-page-"] tbody td {
     border: 1px solid #000000 !important;
-    padding: 4px 5px !important;
-    font-size: 9.5pt !important;
-    line-height: 1.25 !important;
+    padding: 2.5px 4px !important;
+    font-size: 8.5pt !important;
+    line-height: 1.18 !important;
     vertical-align: top !important;
     word-break: break-word !important;
     overflow-wrap: break-word !important;
@@ -217,16 +217,31 @@ body.pdf-landscape {
     text-align: left !important;
   }
 
-  /* ใน tfoot เซลล์แรกผสาน 2 คอลัมน์ (colspan 2 = 12% + 6% = 18%) ล็อคความกว้างป้องกันบีบตัวอักษรแนวตั้ง */
+  /* ใน tfoot เซลล์แรกผสาน 2 คอลัมน์ (colspan 2 = 12% + 6% = 18%) และเซลล์ที่สองผสาน 3 คอลัมน์ (colspan 3 = 82%) */
   table.official-table tfoot > tr > td:first-child,
-  table.official-table tfoot td.footer-hours-cell,
-  [id^="ojt-weekly-page-"] table tfoot > tr > td:first-child,
-  [id^="ojt-weekly-page-"] table tfoot td.footer-hours-cell {
+  [id^="ojt-weekly-page-"] table tfoot > tr > td:first-child {
     width: 18% !important;
     max-width: 18% !important;
     min-width: 18% !important;
     box-sizing: border-box !important;
-    padding: 0 !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    font-size: 9pt !important;
+    line-height: 1.2 !important;
+    padding: 3px 2px !important;
+  }
+
+  table.official-table tfoot > tr > td:nth-child(2),
+  [id^="ojt-weekly-page-"] table tfoot > tr > td:nth-child(2) {
+    width: 82% !important;
+    max-width: 82% !important;
+    min-width: 82% !important;
+    box-sizing: border-box !important;
+    text-align: left !important;
+    vertical-align: middle !important;
+    font-size: 9pt !important;
+    line-height: 1.2 !important;
+    padding: 3px 10px !important;
   }
 
   /* ซ่อนคอลัมน์ปุ่มจัดการในโหมดพิมพ์เสมอ */
@@ -238,14 +253,26 @@ body.pdf-landscape {
     border: none !important;
   }
 
-  /* 5. กล่องลายเซ็นคู่ */
+  /* 5. กล่องลายเซ็นคู่ (Symmetric Dual Signature Grid) ตรงตามเอกสารราชการจริง */
   .signature-grid {
     display: flex !important;
+    flex-direction: row !important;
     justify-content: space-between !important;
     width: 100% !important;
-    margin-top: 14px !important;
+    margin-top: 3.5mm !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
+  }
+
+  .signature-grid > div {
+    width: 48% !important;
+    text-align: center !important;
+    font-size: 8.5pt !important;
+    line-height: 1.25 !important;
+  }
+
+  .signature-grid p {
+    margin-bottom: 1.5px !important;
   }
 
   .text-center, td.text-center, th.text-center {
