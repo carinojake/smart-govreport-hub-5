@@ -101,33 +101,39 @@
 
   /* ล็อคสัดส่วนคอลัมน์ตาราง OJT ให้แม่นยำ 100% ตามมาตรฐานราชการ (12% | 6% | 38% | 23% | 21%) */
   [id^="ojt-weekly-page-"] table th:nth-child(1),
-  [id^="ojt-weekly-page-"] table td:nth-child(1) {
+  [id^="ojt-weekly-page-"] table tbody td:nth-child(1) {
     width: 12% !important;
     max-width: 12% !important;
   }
 
   [id^="ojt-weekly-page-"] table th:nth-child(2),
-  [id^="ojt-weekly-page-"] table td:nth-child(2) {
+  [id^="ojt-weekly-page-"] table tbody td:nth-child(2) {
     width: 6% !important;
     max-width: 6% !important;
   }
 
   [id^="ojt-weekly-page-"] table th:nth-child(3),
-  [id^="ojt-weekly-page-"] table td:nth-child(3) {
+  [id^="ojt-weekly-page-"] table tbody td:nth-child(3) {
     width: 38% !important;
     max-width: 38% !important;
   }
 
   [id^="ojt-weekly-page-"] table th:nth-child(4),
-  [id^="ojt-weekly-page-"] table td:nth-child(4) {
+  [id^="ojt-weekly-page-"] table tbody td:nth-child(4) {
     width: 23% !important;
     max-width: 23% !important;
   }
 
   [id^="ojt-weekly-page-"] table th:nth-child(5),
-  [id^="ojt-weekly-page-"] table td:nth-child(5) {
+  [id^="ojt-weekly-page-"] table tbody td:nth-child(5) {
     width: 21% !important;
     max-width: 21% !important;
+  }
+
+  /* ใน tfoot เซลล์แรกผสาน 2 คอลัมน์ (colspan 2 = 12% + 6% = 18%) */
+  [id^="ojt-weekly-page-"] table tfoot > tr > td:first-child {
+    width: 18% !important;
+    max-width: 18% !important;
   }
 
   /* ซ่อนคอลัมน์ปุ่มจัดการในโหมดพิมพ์เสมอ */
@@ -144,12 +150,12 @@
     break-inside: avoid !important;
   }
 
-  /* กำหนดขนาดตัวอักษรในเซลล์ให้อ่านสบายตาและคมชัด (10pt ไม่เล็กจิ๋ว) */
+  /* กำหนดขนาดตัวอักษรในเซลล์ให้อ่านสบายตาและคมชัด (9.5pt พอดี 1 หน้า A4 เสมอ) */
   table th, table td, [id^="ojt-weekly-page-"] th, [id^="ojt-weekly-page-"] tbody td {
     border: 1px solid #000000 !important;
-    padding: 5px 6px !important;
-    font-size: 10pt !important;
-    line-height: 1.35 !important;
+    padding: 3.5px 5px !important;
+    font-size: 9.5pt !important;
+    line-height: 1.25 !important;
     vertical-align: top !important;
     word-break: break-word !important;
     overflow-wrap: break-word !important;
@@ -161,8 +167,8 @@
     background-color: #f1f5f9 !important;
     font-weight: bold !important;
     text-align: center !important;
-    padding: 6px 4px !important;
-    font-size: 10pt !important;
+    padding: 4px 4px !important;
+    font-size: 9.5pt !important;
   }
 
   .text-center, td.text-center, th.text-center {
