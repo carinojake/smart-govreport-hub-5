@@ -2,22 +2,22 @@
     // Master State for Profile & Training Metadata
     const defaultProfileData = {
       orgName: "สำนักงานปลัดกระทรวงยุติธรรม ศูนย์เทคโนโลยีสารสนเทศและการสื่อสาร",
-      orgAddr: "อาคารรัฐประศาสนภักดี ศูนย์ราชการเฉลิมพระเกียรติฯ ถ.แจ้งวัฒนะ กทม. 10210",
-      orgPhone: "0 2141 9999",
-      orgFax: "0 2143 8888",
-      supervisorName: "นางสาวสรินยา สุวรรณวณิช",
-      supervisorPos: "ผู้อำนวยการกลุ่มงานสารสนเทศและพัฒนาระบบ",
+      orgAddr: "ชั้น 4 อาคารกระทรวงยุติธรรม เลขที่ 120 ถ.แจ้งวัฒนะ แขวงทุ่งสองห้อง เขตหลักสี่ กทม. 10210",
+      orgPhone: "02 141 546",
+      orgFax: "02 141 546",
+      supervisorName: "นางสาวชนินาถ วิจิตรไพฑูรณ์",
+      supervisorPos: "นักวิชาการคอมพิวเตอร์ชำนาญการ",
       traineeName: "นายเจค (นิติพัฒน์ คุ้มวงษ์)",
       traineeNick: "เจค",
       traineeDisability: "ทางการเคลื่อนไหวหรือทางร่างกาย",
-      traineePhone: "081-234-5678",
-      traineeEmail: "carinojake@gmail.com",
+      traineePhone: "081-926-5159",
+      traineeEmail: "lusir_999@gmail.com",
       curriculum: {
-        w1: { dates: "1 - 4 ก.ย. 69", title: "งานสารบรรณ ระเบียบราชการ และระบบ e-Saraban ภาครัฐ", hours: "22.5 ชม." },
-        w2: { dates: "7 - 11 ก.ย. 69", title: "การบริหารจัดการฐานข้อมูล Data Cleaning & Excel ขั้นสูง", hours: "22.5 ชม." },
+        w1: { dates: "1 - 4 ก.ย. 69", title: "งานสารบรรณ ระเบียบราชการ และระบบ e-Saraban ภาครัฐ", hours: "32.0 ชม." },
+        w2: { dates: "7 - 11 ก.ย. 69", title: "การบริหารจัดการฐานข้อมูล Data Cleaning & Excel ขั้นสูง", hours: "40.0 ชม." },
         w3: { dates: "14 - 18 ก.ย. 69", title: "การพัฒนา Dashboard, การประเมิน WCAG 2.1 AA & PDPA", hours: "22.5 ชม." },
         w4: { dates: "21 - 25 ก.ย. 69", title: "การวิเคราะห์ข้อมูลผู้เรียน, Agile Project Canvas & Portfolio", hours: "22.5 ชม." },
-        w5: { enabled: true, dates: "28 - 30 ก.ย. 69", title: "-", hours: "13.5 ชม." }
+        w5: { enabled: true, dates: "28 - 30 ก.ย. 69", title: "สรุปผลสัมฤทธิ์ OJT ส่งมอบคู่มือระบบ และประเมินผลสมรรถนะ", hours: "13.5 ชม." }
       },
       signDateCover: "30 กันยายน 2569"
     };

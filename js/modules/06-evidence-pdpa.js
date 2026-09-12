@@ -1790,6 +1790,22 @@ ${JSON.stringify(weekTasks, null, 2)}
       const traineeEmailEl = document.getElementById('doc-trainee-email');
       if (traineeEmailEl) traineeEmailEl.innerText = profileData.traineeEmail;
 
+      // Official Paper Cover Elements Syncing
+      const offOrgName = document.getElementById('official-cover-org-name');
+      if (offOrgName) offOrgName.innerText = profileData.orgName;
+      const offSupName = document.getElementById('official-cover-supervisor-name');
+      if (offSupName) offSupName.innerText = profileData.supervisorName;
+      const offTraineeName = document.getElementById('official-cover-trainee-name');
+      if (offTraineeName) offTraineeName.innerText = profileData.traineeName;
+      const offTraineeNick = document.getElementById('official-cover-trainee-nick');
+      if (offTraineeNick) offTraineeNick.innerText = profileData.traineeNick;
+      const offTraineeDis = document.getElementById('official-cover-trainee-disability');
+      if (offTraineeDis) offTraineeDis.innerText = profileData.traineeDisability;
+      const offTraineePhone = document.getElementById('official-cover-trainee-phone');
+      if (offTraineePhone) offTraineePhone.innerText = profileData.traineePhone;
+      const offTraineeEmail = document.getElementById('official-cover-trainee-email');
+      if (offTraineeEmail) offTraineeEmail.innerText = profileData.traineeEmail;
+
       // Section 3: Curriculum Schedule & Dates on Cover Sheet
       const cur = profileData.curriculum || {
         w1: { dates: "1 - 5 ก.ย. 69", title: "งานสารบรรณ ระเบียบราชการ และระบบ e-Saraban ภาครัฐ", hours: "22.5 ชม." },

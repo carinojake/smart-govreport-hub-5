@@ -1021,3 +1021,46 @@ window.setCondensedEntryCache = setCondensedEntryCache;
       `;
     }
 
+    // =========================================================================
+    // OJT SAMPLE DATA SWITCHER: 72-HOUR PDF SAMPLE VS FULL 90-HOUR ACTUAL
+    // =========================================================================
+    function loadPdfSample72Hours() {
+      if (!window.fullOjtBackupData) {
+        window.fullOjtBackupData = JSON.parse(JSON.stringify(liveOjtData));
+      }
+      liveOjtData[3] = [];
+      liveOjtData[4] = [];
+      if (liveOjtData[5]) liveOjtData[5] = [];
+      
+      renderOjtPages();
+      if (typeof updateDashboardKPI === 'function') updateDashboardKPI();
+    }
+    window.loadPdfSample72Hours = loadPdfSample72Hours;
+
+    function loadFullOjt90Hours() {
+      if (window.fullOjtBackupData) {
+        liveOjtData = JSON.parse(JSON.stringify(window.fullOjtBackupData));
+      } else {
+        liveOjtData = JSON.parse(JSON.stringify(initialOjtWeeklyData));
+      }
+      renderOjtPages();
+      if (typeof updateDashboardKPI === 'function') updateDashboardKPI();
+    }
+    window.loadFullOjt90Hours = loadFullOjt90Hours;
+
+    let isPdfSampleMode = false;
+    function togglePdfSampleData() {
+      isPdfSampleMode = !isPdfSampleMode;
+      const label = document.getElementById('label-toggle-pdf-sample');
+      const btn = document.getElementById('btn-toggle-pdf-sample');
+      if (isPdfSampleMode) {
+        loadPdfSample72Hours();
+        if (label) label.innerText = '📊 ตัวอย่างตาม PDF (72 ชม.)';
+        if (btn) btn.className = 'px-3 py-1.5 bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-xs font-bold transition flex items-center space-x-1';
+      } else {
+        loadFullOjt90Hours();
+        if (label) label.innerText = '💎 ข้อมูลจริง 90 ชม.';
+        if (btn) btn.className = 'px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition flex items-center space-x-1';
+      }
+    }
+    window.togglePdfSampleData = togglePdfSampleData;
