@@ -1,5 +1,6 @@
-# 🏛️ Smart GovReport Hub 2.5 (PostgreSQL 5432 + Modular Architecture)
-### ระบบบริหารจัดการและรายงานผลการปฏิบัติงานอัจฉริยะ 2.5 (รุ่นที่ ๒ - OJT Report System 2.0)
+# 🏛️ Smart GovReport Hub 5 (PostgreSQL 5432 + Modular Architecture)
+### ระบบบริหารจัดการและรายงานผลการปฏิบัติงานอัจฉริยะ 5 (รุ่นที่ 1 - OJT Report System 5)
+#### โครงการส่งเสริมและเตรียมความพร้อมสำหรับการจ้างงานคนพิการในหน่วยงานภาครัฐ 90 ชั่วโมง
 
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI%20AsyncPG-009688.svg)](https://fastapi.tiangolo.com/)
 [![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL%2016-336791.svg)](https://www.postgresql.org/)
@@ -11,7 +12,7 @@
 
 ## 📖 ภาพรวมระบบ (System Overview)
 
-**Smart GovReport Hub 2.5 (Modular Standalone Edition)** คือระบบบริหารจัดการและรายงานผลการปฏิบัติงานอัจฉริยะสำหรับงานสารบรรณภาครัฐและการฝึกงาน (OJT 90 ชั่วโมง) ขับเคลื่อนด้วยสถาปัตยกรรมแบบแยกส่วน (Modular JavaScript ES6 Modules) เชื่อมต่อฐานข้อมูลหลัก **Docker PostgreSQL 16 (Port: 5432)** และรองรับ **FastAPI AsyncPG REST API (Port: 8086)** พร้อมเสิร์ฟหน้าบ้านแบบ Secure HTTP Server **(Port: 8085)**
+**Smart GovReport Hub 5 (Modular Standalone Edition)** คือระบบบริหารจัดการและรายงานผลการปฏิบัติงานอัจฉริยะสำหรับงานสารบรรณภาครัฐและการฝึกงาน (OJT 90 ชั่วโมง - โครงการส่งเสริมและเตรียมความพร้อมสำหรับการจ้างงานคนพิการในหน่วยงานภาครัฐ 90 ชั่วโมง) ขับเคลื่อนด้วยสถาปัตยกรรมแบบแยกส่วน (Modular JavaScript ES6 Modules) เชื่อมต่อฐานข้อมูลหลัก **Docker PostgreSQL 16 (Port: 5432)** และรองรับ **FastAPI AsyncPG REST API (Port: 8086)** พร้อมเสิร์ฟหน้าบ้านแบบ Secure HTTP Server **(Port: 8085)**
 
 ---
 
