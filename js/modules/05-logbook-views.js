@@ -432,27 +432,36 @@ window.setCondensedEntryCache = setCondensedEntryCache;
       const match = arabicStr.match(/(\d+)/);
       return match ? parseInt(match[1], 10) : 999;
     }
+    window.extractDayNumber = extractDayNumber;
 
-    // ฟังก์ชันจัดเรียงลำดับรายการงานตามวันที่จากน้อยไปมาก (Chronological Order)
+    // ฟังก์ชันจัดเรียงลำดับรายการงานตามวันที่จากน้อยไปมาก (Chronological Order) พร้อมขจัดรายการซ้ำซ้อน (Deduplication)
     function sortWeekEntriesByDate(weekNum) {
       if (!liveOjtData[weekNum] || !Array.isArray(liveOjtData[weekNum])) return;
+      
+      // ขจัดรายการซ้ำซ้อนของวันเดียวกัน (ป้องกันปัญหาคำนวณชั่วโมงเกินจริง เช่น 40 ชม. กลายเป็น 48 ชม.)
+      const dayMap = new Map();
+      liveOjtData[weekNum].forEach(r => {
+        const dNum = extractDayNumber(r.date);
+        const dayKey = dNum !== 999 ? `day-${dNum}` : ((r.date || '').trim().split(' ')[0].replace(/^วัน/, '') || r.id);
+        dayMap.set(dayKey, r);
+      });
+      liveOjtData[weekNum] = Array.from(dayMap.values());
       liveOjtData[weekNum].sort((a, b) => extractDayNumber(a.date) - extractDayNumber(b.date));
     }
+    window.sortWeekEntriesByDate = sortWeekEntriesByDate;
 
     function generateSingleWeekHTML(weekNum, isMultiWeek = false, totalPages = 5, pageNumOverride = null) {
       sortWeekEntriesByDate(weekNum);
       const data = liveOjtData[weekNum] || [];
-      let weekHours = 0;
-      data.forEach(r => { weekHours += (parseFloat(r.hours) || 0); });
 
+      // คำนวณชั่วโมงสะสมของสัปดาห์ก่อนหน้า โดยกรองเฉพาะรายการวันทำการที่ไม่ซ้ำ
       let prevHours = 0;
       for (let w = 1; w < weekNum; w++) {
         if (liveOjtData[w]) {
+          sortWeekEntriesByDate(w);
           liveOjtData[w].forEach(r => { prevHours += (parseFloat(r.hours) || 0); });
         }
       }
-
-      let grandTotal = prevHours + weekHours;
 
       const session = getActiveSession();
       const isTrainee = session && session.role === 'trainee';
@@ -480,19 +489,22 @@ window.setCondensedEntryCache = setCondensedEntryCache;
         }
       }
 
-      // แมปข้อมูลตามวันในสัปดาห์
+      // แมปข้อมูลตามวันในสัปดาห์ และคำนวณชั่วโมงรวมจากแถวที่แสดงผลจริง 100%
+      let weekHours = 0;
       const usedEntryIds = new Set();
       const rowsHTML = standardDays.map(std => {
         // หา entry ที่ตรงกับวันนี้
-        const entry = data.find(r => {
+        const matched = data.filter(r => {
           if (usedEntryIds.has(r.id)) return false;
           const dStr = (r.date || '').trim();
           return dStr.startsWith(std.prefix) || dStr.includes(std.prefix);
         });
+        const entry = matched.length > 0 ? matched[matched.length - 1] : null;
 
         if (entry) {
           usedEntryIds.add(entry.id);
           const h = parseFloat(entry.hours) || 0;
+          weekHours += h; // รวมชั่วโมงเฉพาะรายการที่เรนเดอร์ในตารางจริง 100%
           const isCondensed = isWeekCondensed(weekNum);
           const cond = isCondensed ? getCondensedEntry(entry.id) : null;
           const displayTask = (cond && cond.task) ? cond.task : entry.task;
@@ -563,6 +575,7 @@ window.setCondensedEntryCache = setCondensedEntryCache;
         }
       }).join('');
 
+      const grandTotal = prevHours + weekHours;
       const isCurrentWeekCondensed = isWeekCondensed(weekNum);
 
       return `
@@ -657,12 +670,10 @@ window.setCondensedEntryCache = setCondensedEntryCache;
                     <div>จำนวนชั่วโมงรวม</div>
                     <div>ในรายงานฉบับนี้</div>
                   </td>
-                  <td colspan="3" class="border border-slate-700 px-4 py-1 text-left align-middle font-normal text-black">
+                  <td colspan="3" class="border border-slate-700 px-4 py-1.5 text-left align-middle font-normal text-black">
                     <span class="inline-flex items-center text-[12px] print:text-[9.5pt]">
-                      <span class="tracking-widest text-slate-500 font-light">................</span>
-                      <span class="font-bold text-black px-2 text-[13px] print:text-[10pt]">${toThaiNum(weekHours.toFixed(1))}</span>
-                      <span class="tracking-widest text-slate-500 font-light">................</span>
-                      <span class="ml-1.5 font-medium text-black">ชั่วโมง</span>
+                      <span class="border-b border-dotted border-black min-w-[140px] text-center font-bold text-black px-2 text-[13px] print:text-[10pt] inline-block mr-2">${toThaiNum(weekHours.toFixed(1))}</span>
+                      <span class="font-normal text-black">ชั่วโมง</span>
                     </span>
                   </td>
                   <td class="border border-slate-700 p-1 no-print bg-slate-50"></td>
@@ -674,12 +685,10 @@ window.setCondensedEntryCache = setCondensedEntryCache;
                     <div>ในรายงานฉบับ</div>
                     <div>ก่อน</div>
                   </td>
-                  <td colspan="3" class="border border-slate-700 px-4 py-1 text-left align-middle font-normal text-black">
+                  <td colspan="3" class="border border-slate-700 px-4 py-1.5 text-left align-middle font-normal text-black">
                     <span class="inline-flex items-center text-[12px] print:text-[9.5pt]">
-                      <span class="tracking-widest text-slate-500 font-light">................</span>
-                      <span class="font-bold text-black px-2 text-[13px] print:text-[10pt]">${toThaiNum(prevHours.toFixed(1))}</span>
-                      <span class="tracking-widest text-slate-500 font-light">................</span>
-                      <span class="ml-1.5 font-medium text-black">ชั่วโมง</span>
+                      <span class="border-b border-dotted border-black min-w-[140px] text-center font-bold text-black px-2 text-[13px] print:text-[10pt] inline-block mr-2">${toThaiNum(prevHours.toFixed(1))}</span>
+                      <span class="font-normal text-black">ชั่วโมง</span>
                     </span>
                   </td>
                   <td class="border border-slate-700 p-1 no-print bg-slate-50"></td>
@@ -690,12 +699,10 @@ window.setCondensedEntryCache = setCondensedEntryCache;
                     <div>จำนวนชั่วโมงรวม</div>
                     <div>ทั้งหมด</div>
                   </td>
-                  <td colspan="3" class="border border-slate-700 px-4 py-1 text-left align-middle font-normal text-black">
+                  <td colspan="3" class="border border-slate-700 px-4 py-1.5 text-left align-middle font-normal text-black">
                     <span class="inline-flex items-center text-[12px] print:text-[9.5pt]">
-                      <span class="tracking-widest text-slate-500 font-light">................</span>
-                      <span class="font-bold text-black px-2 text-[13px] print:text-[10pt]">${toThaiNum(grandTotal.toFixed(1))}</span>
-                      <span class="tracking-widest text-slate-500 font-light">................</span>
-                      <span class="ml-1.5 font-bold text-black">ชั่วโมง</span>
+                      <span class="border-b border-dotted border-black min-w-[140px] text-center font-bold text-black px-2 text-[13px] print:text-[10pt] inline-block mr-2">${toThaiNum(grandTotal.toFixed(1))}</span>
+                      <span class="font-bold text-black">ชั่วโมง</span>
                     </span>
                   </td>
                   <td class="border border-slate-700 p-1 no-print bg-slate-50"></td>

@@ -1277,9 +1277,39 @@ ${isMultiCase ? 'คำสั่งสำคัญ: หากมีหลาย�
         });
         liveOjtData[targetWeek].push({ id: editId, date, hours, task, skill, blocker, steps, tools, artifacts, impact, images: existingImages });
       } else {
-        const newId = `${targetWeek}-${Date.now()}`;
+        // ตรวจสอบว่าใน targetWeek มีรายการของวันเดียวกันนี้อยู่แล้วหรือไม่ (เพื่อป้องกัน phantom duplicate entries)
+        const dNum = (typeof window.extractDayNumber === 'function') ? window.extractDayNumber(date) : ((typeof extractDayNumber === 'function') ? extractDayNumber(date) : 999);
+        const dayPrefix = (date || '').trim().split(' ')[0].replace(/^วัน/, '');
+        const existingIndex = liveOjtData[targetWeek].findIndex(x => {
+          const xDNum = (typeof window.extractDayNumber === 'function') ? window.extractDayNumber(x.date) : ((typeof extractDayNumber === 'function') ? extractDayNumber(x.date) : 999);
+          if (dNum !== 999 && xDNum !== 999) return dNum === xDNum;
+          const xPrefix = (x.date || '').trim().split(' ')[0].replace(/^วัน/, '');
+          return Boolean(dayPrefix && xPrefix && dayPrefix === xPrefix);
+        });
+
         const newImages = (currentEntryImages && currentEntryImages.length > 0) ? currentEntryImages : [];
-        liveOjtData[targetWeek].push({ id: newId, date, hours, task, skill, blocker, steps, tools, artifacts, impact, images: newImages });
+
+        if (existingIndex !== -1) {
+          // หากมีวันเดียวกันอยู่แล้ว ให้อัปเดตแทนการเพิ่มรายการซ้ำ
+          const existingItem = liveOjtData[targetWeek][existingIndex];
+          const finalImages = newImages.length > 0 ? newImages : (existingItem.images || []);
+          liveOjtData[targetWeek][existingIndex] = {
+            ...existingItem,
+            date,
+            hours,
+            task,
+            skill,
+            blocker,
+            steps,
+            tools,
+            artifacts,
+            impact,
+            images: finalImages
+          };
+        } else {
+          const newId = `${targetWeek}-${Date.now()}`;
+          liveOjtData[targetWeek].push({ id: newId, date, hours, task, skill, blocker, steps, tools, artifacts, impact, images: newImages });
+        }
       }
 
       // จัดเรียงแถวตามวันที่อัตโนมัติ (วันที่ 1 -> 2 -> 3 -> 4)

@@ -112,8 +112,14 @@
         const savedOjt = localStorage.getItem(ojtKey);
         if (savedOjt) {
           liveOjtData = JSON.parse(savedOjt);
-          // จัดเรียงตามวันที่อัตโนมัติทุกสัปดาห์
-          [1, 2, 3, 4, 5].forEach(w => sortWeekEntriesByDate(w));
+          // จัดเรียงตามวันที่อัตโนมัติและขจัดรายการซ้ำทุกสัปดาห์
+          [1, 2, 3, 4, 5].forEach(w => {
+            if (typeof window.sortWeekEntriesByDate === 'function') {
+              window.sortWeekEntriesByDate(w);
+            } else if (typeof sortWeekEntriesByDate === 'function') {
+              sortWeekEntriesByDate(w);
+            }
+          });
           // Merge curated default photos if row has none (only if trainee_jake)
           if (targetUser.toLowerCase() === 'trainee_jake') {
             for (let w in initialOjtWeeklyData) {
@@ -127,6 +133,8 @@
               }
             }
           }
+          // ทำความสะอาดและบันทึกข้อมูลที่ไร้รายการซ้ำซ้อนกลับเข้าสู่ localStorage ทันที
+          localStorage.setItem(ojtKey, JSON.stringify(liveOjtData));
         } else {
           if (targetUser.toLowerCase() === 'trainee_jake') {
             liveOjtData = JSON.parse(JSON.stringify(initialOjtWeeklyData));
