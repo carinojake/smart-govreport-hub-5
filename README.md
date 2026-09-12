@@ -117,4 +117,4 @@ ojt-smartgov-report-v2.5/
 ```
 
 ---
-© 2026 Smart GovReport Hub - สำนักงานปลัดกระทรวงยุติธรรม ศูนย์เทคโนโลยีสารสนเทศและการสื่อสาร (ศทส.)
+© 2026 Smart GovReport Hub
